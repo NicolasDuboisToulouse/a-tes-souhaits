@@ -4,3 +4,6 @@ export const currentUser : {
   name: null
 };
 
+export function setCurrentUser({userName} : { userName: string} ) {
+  currentUser.name = userName;
+}
