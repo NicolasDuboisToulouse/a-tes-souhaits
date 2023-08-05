@@ -1,3 +1,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --color-text:                   #000000;
+    --color-thin-boder:             #FFFFFF;
+    --color-main-bg:                #F7EFE2;
+    --color-main2-bg:               #FFE5BB;
+    --color-action:                 #F26D21;
+    --color-action-hl:              #B44200;
+    --color-action-bg:              #F7EFE2;
+    --color-action-focus:           #fbf7f1;
+    --color-action-focus-selected:  #FFE5BB;
+    --color-action-selected:        #DDDDDD;
+}
+
+html, body {
+    background-color: var(--color-main-bg);
+}
+
+/* Center main content and define its min/max with */
+body {
+    display: flex;
+}
+
+.main-content {
+    min-width: 60%;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+/* Forms */
+select, button, [type='submit'] {
+    border:           1px solid var(--color-thin-boder);
+    border-radius:    4px;
+    background-color: var(--color-action);
+    font-weight:      bold;
+    color:            var(--color-action-bg);
+}
+
+button {
+    padding:     0.3em;
+    /* Hack to change unicode char color in chrome */
+    color:       transparent;
+    text-shadow: 0 0 0 var(--color-action-bg);
+    transition:  border-color 0.25s;
+}
+
+button:hover {
+    border: 1px solid var(--color-action-hl);
+}
+
+textarea, input {
+    background-color: var(--color-action-bg);
+    border: 1px solid var(--color-action);
+    border-radius: 4px;
+    transition: outline-color 0.25s;
+    outline-color: transparent;
+}
+
+textarea:focus, input:focus {
+    outline: 1px solid var(--color-action);
+}
+
+input.invalid {
+    background-color: var(--color-main2-bg);
+}
+
+
+/* vertical form */
+.v-form {
+    max-width:    fit-content;
+    margin-left:  auto;
+    margin-right: auto;
+}
+
+.v-form label {
+    display:       block;
+    margin-bottom: 0.2em;
+}
+
+.v-form input {
+    display: block;
+    width:   100%;
+    padding: 0.2em;
+}
+
+.v-form .form-group {
+    margin-bottom: 0.8em;
+}
+
+.v-form button {
+    display: block;
+    margin-left:  auto;
+    margin-right: auto;
+}

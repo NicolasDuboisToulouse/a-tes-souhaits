@@ -13,7 +13,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        <div className="main-content">
+          {children}
+        </div>
+      </body>
     </html>
   )
 }
