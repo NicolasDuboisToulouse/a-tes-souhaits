@@ -1,7 +1,9 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+
 import { setCurrentUser } from 'lib/user';
+import { alertService } from 'components/Alerts';
 
 
 export default function Login() {
@@ -29,7 +31,7 @@ export default function Login() {
       setCurrentUser({userName: userName});
       router.push('/');
     } catch(err) {
-      alert("La connexion a echouée: " + err);
+      alertService.addAlert("La connexion a echouée: " + err);
     }
   }
 

@@ -96,3 +96,34 @@ input.invalid {
     margin-left:  auto;
     margin-right: auto;
 }
+
+/* Alert */
+.alert {
+    background-color: var(--color-bg-focus);
+    border: solid 1px var(--color-border);
+    border-radius: 4px;
+    padding: 0.5em;
+    padding-right: 5em;
+    margin-bottom: 1em;
+    ddfcolor: var(--color-bg);
+    position: relative;
+}
+
+.alert button {
+    position: absolute;
+    top: 0.3em;
+    right: 0.3em;
+    padding: 0;
+    background-color: var(--color-bg-focus);
+    text-shadow: 0 0 0 var(--color-border);
+    border-color: var(--color-bg-focus);
+    outline: none;
+}
+.alert button:hover {
+    text-shadow: 0 0 0 var(--color-border-focus);
+}
+
+.fadeout {
+    transition: opacity 0.25s linear;
+    opacity: 0;
+}
