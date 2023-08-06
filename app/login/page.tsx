@@ -34,7 +34,7 @@ export default function Login() {
   }
 
   return (
-    <div className="v-form mt-24">
+    <div className="v-form absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" acceptCharset='UTF-8'>
         <div className="form-group">
           <label>Nom</label>

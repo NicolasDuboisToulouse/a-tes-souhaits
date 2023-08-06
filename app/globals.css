@@ -25,6 +25,7 @@ body {
 }
 
 .main-content {
+    height: 100vh;
     min-width: 60%;
     max-width: 90%;
     margin: 0 auto;
