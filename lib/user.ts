@@ -1,9 +1,8 @@
-export const currentUser : {
-  name: string|null
-} = {
-  name: null
+export type User = {
+  userName: string|null,
+  isAdmin: boolean
 };
 
-export function setCurrentUser({userName} : { userName: string} ) {
-  currentUser.name = userName;
+export function User(userName?: string, isAdmin?: boolean) {
+  return <User>{ userName: userName, isAdmin: isAdmin ? isAdmin : false };
 }
