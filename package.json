@@ -8,7 +8,6 @@
     "disabled_prestart": "npm run updatedb",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
