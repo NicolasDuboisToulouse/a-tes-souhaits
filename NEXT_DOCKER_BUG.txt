@@ -1,0 +1,2 @@
+next js 13.4.13 has an issue: https://github.com/vercel/next.js/issues/54008
+Force next js version to 13.4.9 until it is solved.
