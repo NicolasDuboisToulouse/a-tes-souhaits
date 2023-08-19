@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "updatedb": "npx ts-node database/update_database.ts",
-    "predev": "npm run updatedb",
-    "prestart": "npm run updatedb",
+    "disabled_predev": "npm run updatedb",
+    "disabled_prestart": "npm run updatedb",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
