@@ -1,3 +1,5 @@
+import Database from 'better-sqlite3';
+import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { serialize } from 'cookie';
@@ -17,14 +19,20 @@ export default async function handler(request: NextApiRequest, response: NextApi
     response.status(500).json({ message: 'Server error: invalid API usage' });
   }
 
-  if (userName === 'admin' && password == 'admin') {
-    const token = jwt.sign({ userName: userName }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    var expires = new Date(); expires.setDate(expires.getDate() + 30);
-    response.setHeader('Set-Cookie', serialize('token', token, { path: '/', expires: expires } ));
-    response.status(200).json({ userName: userName });
-    console.log('User login: ' + userName);
-  } else {
-    console.log('Invalid user/password: ' + userName + ', ' + password);
-    response.status(401).json({ message: 'Nom ou mot de passe invalide.' });
-  }
+  const db = new Database('database/data/database.db', { readonly: false, fileMustExist: true });
+  db.pragma('journal_mode = WAL');
+
+  const user = db.prepare("SELECT userName, passwordHash FROM users WHERE userName=?").get(userName) as any;
+  if (user == null ||
+    bcrypt.compareSync(password, user.passwordHash) == false) {
+      console.log('Invalid user/password: ' + userName + ', ' + password);
+      response.status(401).json({ message: 'Nom ou mot de passe invalide.' });
+      return;
+    }
+
+  const token = jwt.sign({ userName: userName }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  var expires = new Date(); expires.setDate(expires.getDate() + 30);
+  response.setHeader('Set-Cookie', serialize('token', token, { path: '/', expires: expires } ));
+  response.status(200).json({ userName: userName });
+  console.log('User login: ' + userName);
 }

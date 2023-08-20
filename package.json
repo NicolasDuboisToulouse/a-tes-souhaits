@@ -4,19 +4,21 @@
   "private": true,
   "scripts": {
     "updatedb": "npx ts-node database/update_database.ts",
-    "disabled_predev": "npm run updatedb",
-    "disabled_prestart": "npm run updatedb",
     "dev": "next dev",
     "build": "next build",
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/better-sqlite3": "^7.6.4",
     "@types/cookie": "^0.5.1",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.5.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "autoprefixer": "^10.4.15",
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^8.5.1",
     "cookie": "^0.5.0",
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.13",
@@ -26,7 +28,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
-    "sqlite3": "^5.1.6",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6",
     "typescript-eslint-language-service": "^5.0.5"

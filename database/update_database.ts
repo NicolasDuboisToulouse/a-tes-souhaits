@@ -4,7 +4,8 @@
  *  - the first db_<version>.sql must create database <version>
  *  - next db_<version>.sql must upgrade database to <version>
  */
-import * as sqlite3 from 'sqlite3';
+import Database from 'better-sqlite3';
+import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -31,40 +32,49 @@ files.forEach((file: string) => {
 
 console.log(schemas.size + ' schemas found. Target db version: ' + db_version + '.');
 
+// Check data folder exists or create it
+// In a docker container, it shall be a volume
+const db_dir = path.join(__dirname, '/data/');
+const db_dir_stat = fs.statSync(db_dir, { throwIfNoEntry: false });
+if (db_dir_stat == null || db_dir_stat.isDirectory() == false) {
+  console.log('WARNING: crrating directory ' + db_dir + '. In a docker container, it shall be a volume.');
+  fs.mkdirSync(db_dir);
+  const db_dir_stat = fs.statSync(db_dir, { throwIfNoEntry: false });
+  if (db_dir_stat == null || db_dir_stat.isDirectory() == false) {
+    console.log("Failed to create directory " + db_dir);
+    process.exit(1);
+  }
+}
+
 // Open database
-const db_path = path.join(__dirname, 'database.db');
+const db_path = path.join(db_dir, 'database.db');
 console.log('Create or open database: ' + db_path);
-sqlite3.verbose();
-let db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE | sqlite3.OPEN_FULLMUTEX,
-  (error: Error|null) => {
-    if (error) return console.log(error);
 
-    // Get datbase version
-    db.get('PRAGMA user_version', [],
-      function(error: Error, row: any) {
-        if (error) return console.log(error);
-        if (row.user_version == null) return console.log('Error: row.user_version expected. row:' + JSON.stringify(row));
-        console.log('Current database version: ' + row.user_version + '.');
+const db = new Database(db_path, { readonly: false, fileMustExist: false });
+const user_version:number = db.pragma('user_version', { simple: true }) as number;
+console.log('Current database version: ' + user_version + '.');
+if (user_version == 0) {
+  db.prepare('PRAGMA foreign_keys=OFF').run();
+}
 
-        // Update database to last version
-        db.serialize(() => {
-          if (row.user_version == 0) {
-            db.run('PRAGMA foreign_keys=OFF');
-          }
-          for(let version = row.user_version + 1; version <= db_version; version++) {
-            if (schemas.has(version)) {
-              console.log('Update database to version ' + version + '...');
-              db.run('BEGIN TRANSACTION');
-              db.exec(schemas.get(version)!);
-              db.run('PRAGMA user_version=' + version);
-              db.run('COMMIT');
-            }
-          }
-          db.close(function(error: Error|null) {
-            if (error) return console.log(error);
-            console.log("Database up to date.");
-          });
-        });
-      });
-  });
+// Update database to last version
+for(let version = user_version + 1; version <= db_version; version++) {
+  if (schemas.has(version)) {
+    db.transaction( () => {
+      console.log('Update database to version ' + version + '...');
+      db.exec(schemas.get(version)!);
+      db.prepare('PRAGMA user_version=' + version).run();
+    }) ();
+  }
+}
 
+// Add an admin if none exists
+const admin = db.prepare("SELECT userName FROM users WHERE isAdmin=1").pluck().get();
+if (admin == null) {
+  console.log("WARNING: No administrator found. Add default administrator: admin/admin.");
+  const admin_password_hash = bcrypt.hashSync("admin", 10);
+  db.prepare("INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES('admin', 'admin', ?, 1, 1)").run(admin_password_hash);
+}
+
+db.close();
+console.log("Database is up to date.");
