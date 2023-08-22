@@ -24,15 +24,27 @@ dockerimage: .env.production
 	echo -n JWT_SECRET=                                                    >> $@
 	cat /dev/urandom | tr -dc '[:alnum:]' | fold -w $${1:-30} | head -n 1  >> $@
 
+# For debug purpose
 dockerrun: dockerclean dockerimage
 	docker run --mount type=bind,src=${docker_datbase_dir},target=//a-tes-souhaits/database/data --name ${NAME} -p ${LOCAL_PORT}:${PORT} "${NAME}:${TAG}"
 
+# For debug purpose
 dockerclean:
 	if docker container ls -a --filter "Name=${NAME}" | grep ${NAME} >/dev/null; then docker container rm --force ${NAME}; fi
 	if docker image ls -a ${NAME} | grep ${NAME} >/dev/null; then docker image rm --force $$(docker images -q ${NAME}); fi
 
+# For debug purpose
 dockercacheclean: dockerclean
 	docker builder prune
+
+# For debug purpose (before generating dockerimage)
+next:
+	npm run build
+
+# For debug purpose
+dev:
+	npm run dev
+
 
 clean: dockerclean
 	rm -f  ${NAME}.*.tar
