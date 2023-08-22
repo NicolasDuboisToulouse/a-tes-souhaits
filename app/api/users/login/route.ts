@@ -1,22 +1,19 @@
 import Database from 'better-sqlite3';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { serialize } from 'cookie';
+import { NextRequest, NextResponse } from 'next/server';
 
-
-export default async function handler(request: NextApiRequest, response: NextApiResponse) {
+export async function POST(request: NextRequest) {
   if (process.env.JWT_SECRET == null) {
     // Server is not correctly configured: define JWT_SECRET in .env.local.
     console.log('Server error: JWT_SECRET is not set.');
-    response.status(500).json({ message: 'Server error: JWT_SECRET is not set.' });
-    return;
+    return NextResponse.json({ message: 'Server error: JWT_SECRET is not set.' }, { status: 500 });
   }
 
-  const { userName, password } = request.body;
+  const { userName, password } = await request.json();
   if (userName == null || password == null) {
     console.log('Server error: invalid API usage');
-    response.status(500).json({ message: 'Server error: invalid API usage' });
+     return NextResponse.json({ message: 'Server error: invalid API usage' }, { status: 500 });
   }
 
   const db = new Database('database/data/database.db', { readonly: false, fileMustExist: true });
@@ -26,13 +23,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
   if (user == null ||
     bcrypt.compareSync(password, user.passwordHash) == false) {
       console.log('Invalid user/password: ' + userName + ', ' + password);
-      response.status(401).json({ message: 'Nom ou mot de passe invalide.' });
-      return;
+      return NextResponse.json({ message: 'Nom ou mot de passe invalide.' }, { status: 401 });
     }
 
+  console.log('User login: ' + userName);
   const token = jwt.sign({ userName: userName }, process.env.JWT_SECRET, { expiresIn: '7d' });
   var expires = new Date(); expires.setDate(expires.getDate() + 30);
-  response.setHeader('Set-Cookie', serialize('token', token, { path: '/', expires: expires } ));
-  response.status(200).json({ userName: userName });
-  console.log('User login: ' + userName);
+  var response = NextResponse.json({ userName: userName }, { status: 200 });
+  response.cookies.set('token', token, { path: '/', expires: expires, sameSite: "strict" } );
+  return response;
 }

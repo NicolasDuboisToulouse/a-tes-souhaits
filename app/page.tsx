@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-import { Login } from 'components/Login';
-import { User } from 'lib/user';
+import { Login } from '_components/Login';
+import { User } from '_lib/user';
 
 
 export default function Main() {

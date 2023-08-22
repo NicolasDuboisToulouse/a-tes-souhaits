@@ -1,7 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 
-import { Alerts } from 'components/Alerts'
+import { Alerts } from '_components/Alerts'
 
 export const metadata: Metadata = {
   title: 'A tes souhaits !',

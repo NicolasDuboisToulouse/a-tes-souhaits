@@ -11,10 +11,7 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /a-tes-souhaits
 COPY --from=dependencies /a-tes-souhaits/node_modules ./node_modules/
-COPY lib lib/
-COPY components components/
 COPY app app/
-COPY pages pages/
 COPY next.config.js postcss.config.js tailwind.config.js tsconfig.json .eslintrc.json LICENSE package*.json ./
 COPY .env.production .env.production
 ENV NEXT_TELEMETRY_DISABLED 1

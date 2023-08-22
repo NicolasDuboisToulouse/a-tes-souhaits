@@ -3,8 +3,8 @@
  */
 import { useForm } from 'react-hook-form';
 
-import { alertService } from 'components/Alerts';
-import { User } from 'lib/user';
+import { alertService } from '_components/Alerts';
+import { User } from '_lib/user';
 
 // Callback on log-on
 type LoginUserFunc = (user: User) => void;
