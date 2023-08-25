@@ -19,12 +19,10 @@ export function Login({onLoginUser } : { onLoginUser : LoginUserFunc}) {
     fetch('api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }).
       then(response => response.json().then(data => ({status: response.status, body: data}) )).
       then((answer) => {
-        const { message, userName, isAdmin } = answer.body;
-
-        if (answer.status === 200 && userName != null) {
-          onLoginUser(User(userName, isAdmin));
+        if (answer.status === 200 && answer.body.userName != null) {
+          onLoginUser(User.fromObject(answer.body));
         } else {
-          if (message) alertService.addAlert('La connexion a echouée: ' + message);
+          if (answer.body.message) alertService.addAlert('La connexion a echouée: ' + answer.body.message);
           else alertService.addAlert('La connexion a echouée.');
         }
       });

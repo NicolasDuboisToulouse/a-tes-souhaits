@@ -6,7 +6,7 @@ import { User } from '_lib/user';
 
 
 export default function Main() {
-  const [ user, setUser ] = useState<User>(User());
+  const [ user, setUser ] = useState<User>(new User());
   const [ isConnecting, setIsConnecting ] = useState<boolean>(true);
 
   // Try autologon at first load
@@ -14,11 +14,10 @@ export default function Main() {
     fetch('api/users/autologon').
       then(response => response.json().then(data => ({status: response.status, body: data}) )).
       then((answer) => {
-        const { message, userName, isAdmin } = answer.body;
         if (answer.status === 200) {
-          setUser(User(userName, isAdmin));
+          setUser(User.fromObject(answer.body));
         } else {
-          if (message) console.log(message);
+          if (answer.body.message) console.log(answer.body.message);
           else console.log('Unexpected autologon error');
         }
         setIsConnecting(false);
@@ -37,7 +36,7 @@ export default function Main() {
   if (isConnecting) {
     return <div>Connection...</div>;
   }
-  if (user.userName == null) {
+  if (user.isValid() == false) {
     return <Login onLoginUser={handleLoginUser} />
   }
   return <div>Hello {user.userName} !</div>;
