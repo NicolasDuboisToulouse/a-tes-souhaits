@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getDatabase } from '_lib/database';
+
 export async function GET(request: NextRequest) {
 
   if (process.env.JWT_SECRET == null) {
@@ -21,8 +23,10 @@ export async function GET(request: NextRequest) {
     if (data == null) throw 'Unauthorized';
     const userName = (data as { userName: string } ).userName;
     if (userName == null) throw 'Unauthorized';
-    console.log('Autologon: ' + userName);
-    return NextResponse.json({ userName: userName }, { status: 200 });
+    const user = getDatabase().selectUser(userName);
+    if (user.isValid() == false) throw 'Unauthorized';
+    console.log('Autologon: ' + user.userName);
+    return NextResponse.json(user, { status: 200 });
   } catch(err) {
     // login error
     console.log('Invalid jwt token used.');

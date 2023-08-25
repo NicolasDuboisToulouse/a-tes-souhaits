@@ -39,5 +39,11 @@ export default function Main() {
   if (user.isValid() == false) {
     return <Login onLoginUser={handleLoginUser} />
   }
-  return <div>Hello {user.userName} !</div>;
+  return (
+    <div>
+      Hello {user.displayName} !
+      {user.isAdmin? ' (administrator)' : ''}
+      {user.firstLogin? ' (first login)' : ''}
+    </div>
+  );
 }
