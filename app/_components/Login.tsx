@@ -3,29 +3,16 @@
  */
 import { useForm } from 'react-hook-form';
 
-import { alertService } from '_components/Alerts';
-import { User } from '_lib/user';
+import * as userService from '_lib/userService'
 
-// Callback on log-on
-type LoginUserFunc = (user: User) => void;
+export function Login({onUserLogin } : { onUserLogin : userService.SetUserFunc }) {
 
-export function Login({onLoginUser } : { onLoginUser : LoginUserFunc}) {
-
-  type formInput = { userName: string, password: string };
+  type formInput = userService.LoginInfo;
   const { register, handleSubmit, formState } = useForm<formInput>();
   const { errors } = formState;
 
   function onSubmit(input: formInput) {
-    fetch('api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }).
-      then(response => response.json().then(data => ({status: response.status, body: data}) )).
-      then((answer) => {
-        if (answer.status === 200 && answer.body.userName != null) {
-          onLoginUser(User.fromObject(answer.body));
-        } else {
-          if (answer.body.message) alertService.addAlert('La connexion a echouée: ' + answer.body.message);
-          else alertService.addAlert('La connexion a echouée.');
-        }
-      });
+    userService.login(input, onUserLogin);
   }
 
   return (
