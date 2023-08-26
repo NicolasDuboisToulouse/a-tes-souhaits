@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers'
 
 import { getDatabase } from '_lib/database';
 
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Server error: JWT_SECRET is not set.' }, { status: 500 });
   }
 
-  const token = request.cookies.get('token');
+  const token = cookies().get('token');
   if (token == null) {
     // User not logged in
     return NextResponse.json({ userName: null }, { status: 200 });
