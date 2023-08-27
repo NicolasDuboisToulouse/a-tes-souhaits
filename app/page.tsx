@@ -14,7 +14,7 @@ export default function Main() {
   }, []);
 
   if (user == null) {
-    return <div>Connection...</div>;
+    return null;
   }
 
   if (user.isValid() == false) {
