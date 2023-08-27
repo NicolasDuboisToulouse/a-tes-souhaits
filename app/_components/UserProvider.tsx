@@ -8,8 +8,9 @@ export type { User }
 // UserContext that can be retrived by useContext(UserContext)
 interface UserContextType {
   user: User;
+  logout: () => void;
 }
-export const UserContext = createContext<UserContextType>({ user: new User() });
+export const UserContext = createContext<UserContextType|undefined>(undefined);
 
 
 // Types for login callback
@@ -70,9 +71,15 @@ export function UserProvider({children} : {children: React.ReactNode}) {
       }));
   }
 
+  // Callback to logout current user
+  const doLogout = function() {
+    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    setUser(new User());
+  }
+
   // Display either childen or login form
   return (
-    <UserContext.Provider value={{user}}>
+    <UserContext.Provider value={{user, logout: doLogout}}>
       { (user.isValid())? children : <Login doLogin={doLogin} /> }
     </UserContext.Provider>
   )
