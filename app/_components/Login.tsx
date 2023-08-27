@@ -1,23 +1,14 @@
-/*
- * Log-in form
- */
 import { useForm } from 'react-hook-form';
+import { LoginInfo, LoginFunc } from '_components/UserProvider'
 
-import * as userService from '_lib/userService'
-
-export function Login({onUserLogin } : { onUserLogin : userService.SetUserFunc }) {
-
-  type formInput = userService.LoginInfo;
+export function Login({doLogin} : {doLogin: LoginFunc}) {
+  type formInput = LoginInfo;
   const { register, handleSubmit, formState } = useForm<formInput>();
   const { errors } = formState;
 
-  function onSubmit(input: formInput) {
-    userService.login(input, onUserLogin);
-  }
-
   return (
     <div className='v-form absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
-      <form onSubmit={handleSubmit(onSubmit)} autoComplete='off' acceptCharset='UTF-8'>
+      <form onSubmit={handleSubmit(doLogin)} autoComplete='off' acceptCharset='UTF-8'>
         <div className='form-group'>
           <label>Nom</label>
           <input type='text' {...register('userName', { required: true })} autoComplete='off' autoCapitalize='none' className={`${errors.userName ? 'invalid' : ''}`} />
