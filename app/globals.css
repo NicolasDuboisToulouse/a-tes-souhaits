@@ -20,15 +20,22 @@ html, body {
 }
 
 /* Center main content and define its min/max with */
-body {
-    display: flex;
+.main-content {
+    max-width: 90%;
+    width: fit-content;
+    margin: 0 auto;
 }
 
-.main-content {
-    height: 100vh;
-    min-width: 60%;
-    max-width: 90%;
-    margin: 0 auto;
+.main-content .main {
+    min-width: 20rem;
+}
+
+/* screen center */
+.screen-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* Forms */
@@ -49,6 +56,12 @@ button {
 }
 
 button:hover {
+    outline: none;
+    border: 1px solid var(--color-button-border-hover);
+}
+
+button:focus, button:active {
+    outline: none;
     border: 1px solid var(--color-button-border-hover);
 }
 
@@ -107,6 +120,7 @@ input.invalid {
     margin-bottom: 1em;
     ddfcolor: var(--color-bg);
     position: relative;
+    min-width: 20rem;
 }
 
 .alert button {

@@ -5,7 +5,7 @@ import { UserContext, UserProvider } from '_components/UserProvider'
 function Welcome() {
   const { user, logout } = useContext(UserContext)!;
   return (
-    <div>
+    <div className="main">
       Hello {user.displayName} !
       {user.isAdmin? ' (administrator)' : ''}
       {user.firstLogin? ' (first login)' : ''}

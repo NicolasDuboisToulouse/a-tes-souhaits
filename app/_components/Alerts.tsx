@@ -23,7 +23,6 @@ export function Alerts() {
     const fadeAlert = { ...alert, fading_out: true };
     setAlerts(alerts => alerts.map(alert => alert.id === fadeAlert.id ? fadeAlert : alert ));
     setTimeout(() => { deleteAlert(fadeAlert); }, 300);
-
   }
 
   function deleteAlert(alert: AlertInfo) {
@@ -31,19 +30,17 @@ export function Alerts() {
   }
 
   return (
-    <div className="h-screen">
-      <div className="w-fit z-[100] right-0 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        {alerts.map(
-          (alert, index) => {
-            return (
-              <div key={index} className={`alert ${alert.fading_out?'fadeout':''}`}>
-                <button autoFocus onClick={() => {closeAlert(alert)} }>{String.fromCharCode(0x2716)}</button>
-                {alert.message}
-              </div>
-            );
-          })
-        }
-      </div>
+    <div className="w-fit z-[100] screen-center">
+      {alerts.map(
+        (alert, index) => {
+          return (
+            <div key={index} className={`alert ${alert.fading_out?'fadeout':''}`}>
+              <button autoFocus onClick={() => {closeAlert(alert)} }>{String.fromCharCode(0x2716)}</button>
+              {alert.message}
+            </div>
+          );
+        })
+      }
     </div>
   );
 }
