@@ -4,12 +4,14 @@
 
 :root {
     --color-bg:                     #F7EFE2;
-    --color-bg-focus:               #FFE5BB;
+    --color-bg-focus:               #fff1db;
     --color-text:                   #000000;
     --color-border:                 #F26D21;
     --color-border-focus:           #B44200;
+    --color-menu-hover:             #ffd899;
 
     --color-button:                 var(--color-border);
+    --color-button-transparent:     #F26D2140;
     --color-button-text:            var(--color-bg);
     --color-button-border:          var(--color-bg);
     --color-button-border-hover:    var(--color-border-focus);
@@ -36,6 +38,18 @@ html, body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+/* Menu colors */
+button.menu:hover, button.menu:focus, button.menu:active {
+    background-color: var(--color-button-transparent);
+}
+ul.menu {
+    background-color: var(--color-bg-focus);
+    border: solid 1px var(--color-border);
+}
+ul.menu li:hover {
+    background-color: var(--color-menu-hover);
 }
 
 /* Forms */

@@ -1,3 +1,4 @@
+'use client'
 import { createContext, useState, useEffect } from 'react';
 import { spinnerService } from '_components/Spinner';
 import { alertService } from '_components/Alerts';

@@ -1,8 +1,8 @@
 'use client'
 import { useContext } from 'react'
-import { UserContext, UserProvider } from '_components/UserProvider'
+import { UserContext } from '_components/UserProvider'
 
-function Welcome() {
+export default function Main() {
   const { user, logout } = useContext(UserContext)!;
   return (
     <div className="main">
@@ -11,13 +11,5 @@ function Welcome() {
       {user.firstLogin? ' (first login)' : ''}
       <button onClick={logout}>Logout</button>
     </div>
-  );
-}
-
-export default function Main() {
-  return (
-    <UserProvider>
-      <Welcome/>
-    </UserProvider>
   );
 }

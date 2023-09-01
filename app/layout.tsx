@@ -3,6 +3,9 @@ import type { Metadata } from 'next'
 
 import { Alerts } from '_components/Alerts'
 import { Spinner } from '_components/Spinner'
+import { Header } from '_components/Header'
+import { UserProvider } from '_components/UserProvider'
+
 
 export const metadata: Metadata = {
   title: 'A tes souhaits !',
@@ -15,9 +18,12 @@ export default function RootLayout({ children } : { children: React.ReactNode}) 
       <body>
         <Spinner />
         <Alerts />
-        <div className="main-content">
-          {children}
-        </div>
+        <UserProvider>
+          <Header />
+          <div className="main-content">
+            {children}
+          </div>
+        </UserProvider>
       </body>
     </html>
   )
