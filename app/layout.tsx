@@ -8,7 +8,7 @@ import { UserProvider } from '_components/UserProvider'
 
 
 export const metadata: Metadata = {
-  title: 'A tes souhaits !',
+  title: 'À tes souhaits !',
   description: 'Exprimes tes souhaits et comble ceux des autres!',
 }
 

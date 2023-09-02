@@ -12,6 +12,7 @@ FROM base AS builder
 WORKDIR /a-tes-souhaits
 COPY --from=dependencies /a-tes-souhaits/node_modules ./node_modules/
 COPY app app/
+COPY public public/
 COPY next.config.js postcss.config.js tailwind.config.js tsconfig.json .eslintrc.json LICENSE package*.json ./
 COPY .env.production .env.production
 ENV NEXT_TELEMETRY_DISABLED 1
@@ -34,6 +35,7 @@ USER nodejs
 
 COPY --from=builder /a-tes-souhaits/.next/standalone ./
 COPY --from=builder /a-tes-souhaits/.next/static ./.next/static/
+COPY --from=builder /a-tes-souhaits/public public/
 
 # Note: update_database.js dependencies are already present in next, we needn't to install them
 COPY --from=builder /a-tes-souhaits/database/schemas database/schemas/

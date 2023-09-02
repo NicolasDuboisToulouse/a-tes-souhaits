@@ -21,6 +21,18 @@ html, body {
     background-color: var(--color-bg);
 }
 
+body {
+    background: url(/imgs/a-tes-souhaits.svg) top left no-repeat,
+                url(/imgs/presents.svg) top right no-repeat,
+                url(/imgs/header_middle.png) top left repeat-x;
+    min-width:  200px;
+    min-height: 150px;
+}
+
+#header {
+    min-height: 140px;
+}
+
 /* Center main content and define its min/max with */
 .main-content {
     max-width: 90%;
