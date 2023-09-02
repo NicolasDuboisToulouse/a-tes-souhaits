@@ -1,5 +1,6 @@
 'use client'
 import { createContext, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'
 import { spinnerService } from '_components/Spinner';
 import { alertService } from '_components/Alerts';
 import { Login } from '_components/Login';
@@ -29,10 +30,11 @@ export type LoginFunc = (loginInfo: LoginInfo) => void;
 //
 export function UserProvider({children} : {children: React.ReactNode}) {
   const [ user, setUser ] = useState<User|undefined>();
+  const router = useRouter();
 
   // Perform autologon at first load
   useEffect(() => {
-    spinnerService.wait(fetch('api/users/autologon').
+    spinnerService.wait(fetch('/api/users/autologon').
       then(response => response.json().then(data => ({status: response.status, body: data}) )).
       then((answer) => {
         if (answer.status === 200) {
@@ -57,7 +59,7 @@ export function UserProvider({children} : {children: React.ReactNode}) {
 
   // Callback function to perform login
   const doLogin: LoginFunc = function(loginInfo: LoginInfo) {
-    spinnerService.wait(fetch('api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(loginInfo) }).
+    spinnerService.wait(fetch('/api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(loginInfo) }).
       then(response => response.json().then(data => ({status: response.status, body: data}) )).
       then((answer) => {
         if (answer.status === 200 && answer.body.userName != null) {
@@ -76,6 +78,7 @@ export function UserProvider({children} : {children: React.ReactNode}) {
   const doLogout = function() {
     document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     setUser(new User());
+    router.push('/');
   }
 
   // Display either childen or login form
