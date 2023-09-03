@@ -1,37 +1,12 @@
-import jwt from 'jsonwebtoken';
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server';
+import * as loginService from '_lib/loginService';
 
-import { getDatabase } from '_lib/database';
-
-export async function GET(request: NextRequest) {
-
-  if (process.env.JWT_SECRET == null) {
-    // Server is not correctly configured: define JWT_SECRET in .env.local.
-    console.log('Server error: JWT_SECRET is not set.');
-    return NextResponse.json({ message: 'Server error: JWT_SECRET is not set.' }, { status: 500 });
-  }
-
-  const token = cookies().get('token');
-  if (token == null) {
-    // User not logged in
-    return NextResponse.json({ userName: null }, { status: 200 });
-  }
-
+export async function GET() {
   try {
-    // Validate token and return userName
-    const data = jwt.verify(token.value, process.env.JWT_SECRET);
-    if (data == null) throw 'Unauthorized';
-    const userName = (data as { userName: string } ).userName;
-    if (userName == null) throw 'Unauthorized';
-    const user = getDatabase().selectUser(userName);
-    if (user.isValid() == false) throw 'Unauthorized';
-    console.log('Autologon: ' + user.userName);
+    const user = loginService.tokenLogOn({allowsNotConnected: true})
+    if (user.isValid()) console.log('Autologon: ' + user.userName);
     return NextResponse.json(user, { status: 200 });
-  } catch(err) {
-    // login error
-    console.log('Invalid jwt token used.');
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  } catch(error) {
+    return loginService.errorResponse(error);
   }
 }
-
