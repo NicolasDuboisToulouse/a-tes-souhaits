@@ -48,7 +48,7 @@ export function Header() {
 
   return (
 	<div id='header' className="text-end">
-      <button ref={button} className="menu rounded-full border-0 m-1 p-1 hover:border-0 focus:border-0 active:border-0 bg-transparent transition-colors">
+      <button ref={button} tabIndex={-1} className="menu rounded-full border-0 m-1 p-1 hover:border-0 focus:border-0 active:border-0 bg-transparent transition-colors">
         {/* https://mui.com/ */}
         <svg className="w-6" viewBox="0 0 24 24" fill="#B44200">
           <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2

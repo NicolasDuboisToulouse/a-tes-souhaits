@@ -13,10 +13,12 @@ export function Alerts() {
   alertService.addAlert = addAlert;
 
   function addAlert(message: string) {
-    const newAlert = { id: nextId, message, fading_out: false };
-    setNextId(nextId => nextId + 1);
-    setAlerts(alerts => [...alerts, newAlert ]);
-    setTimeout(() => { closeAlert(newAlert); }, 5000);
+    setTimeout(() => {
+      const newAlert = { id: nextId, message, fading_out: false };
+      setNextId(nextId => nextId + 1);
+      setAlerts(alerts => [...alerts, newAlert ]);
+      setTimeout(() => { closeAlert(newAlert); }, 5000);
+    }, 0);
   }
 
   function closeAlert(alert: AlertInfo) {
