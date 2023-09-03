@@ -18,7 +18,7 @@ class Database {
     return User.fromObject(this.stmtSelectUser.get(userName));
   }
   private stmtSelectUser: Sqlite.Statement|null = null;
-  
+
 
   public selectUserPasswordHash(userName: string): string|undefined {
     if (this.stmtSelectUserPasswordHash == null) {
@@ -27,6 +27,17 @@ class Database {
     return this.stmtSelectUserPasswordHash.get(userName) as string|undefined;
   }
   private stmtSelectUserPasswordHash: Sqlite.Statement|null = null;
+
+
+  public updateUserPasswordHash(user: User, passwordHash: string) : boolean {
+    if (this.stmtUpdateUserPasswordHash == null) {
+      this.stmtUpdateUserPasswordHash = this.db.prepare("UPDATE users SET passwordHash=? WHERE userName=?");
+    }
+    const info = this.stmtUpdateUserPasswordHash.run(passwordHash, user.userName);
+    return (info.changes != 0);
+  }
+  private stmtUpdateUserPasswordHash: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

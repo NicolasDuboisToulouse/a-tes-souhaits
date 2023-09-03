@@ -86,3 +86,17 @@ export function login({userName, password}: {userName: string, password: string}
   response.cookies.set('token', token, { path: '/', expires: expires, sameSite: "strict" } );
   return response;
 }
+
+//
+// Set user password
+// throw an object { message, status } on error
+//
+export function setPassword(user: User, password: string) {
+  if (user == null || password == null) {
+    throw { message: 'Server error: invalid API usage', status: 500 };
+  }
+  const passwordHash = bcrypt.hashSync(password, 10);
+  if (getDatabase().updateUserPasswordHash(user, passwordHash) == false) {
+    throw { message: 'Internal server error', status: 500 };
+  }
+}
