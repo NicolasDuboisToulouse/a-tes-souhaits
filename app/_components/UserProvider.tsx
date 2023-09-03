@@ -5,6 +5,7 @@ import { spinnerService } from '_components/Spinner';
 import { alertService } from '_components/Alerts';
 import { Login } from '_components/Login';
 import { User } from '_lib/user';
+import { Password } from './Password';
 export type { User }
 
 // UserContext that can be retrived by useContext(UserContext)
@@ -81,10 +82,36 @@ export function UserProvider({children} : {children: React.ReactNode}) {
     router.push('/');
   }
 
-  // Display either childen or login form
+  // Callback on password change (first login)
+  const onPasswordUpdated = function() {
+    const newUser = new User(user);
+    newUser.firstLogin = false;
+    setUser(newUser);
+  }
+
+  // Display children only if logged in and password changed
+  let content = null;
+  if (user.isValid() == false) {
+    content = (
+      <>
+        <div id="header" />
+        <Login doLogin={doLogin} />
+      </>
+    )
+  } else if (user.firstLogin) {
+    content = (
+      <>
+        <div id="header" />
+        <Password onPasswordUpdated={onPasswordUpdated}/>
+      </>
+    );
+  } else {
+    content = children;
+  }
+
   return (
     <UserContext.Provider value={{user, logout: doLogout}}>
-      { (user.isValid())? children : <Login doLogin={doLogin} /> }
+      {content}
     </UserContext.Provider>
   )
 }

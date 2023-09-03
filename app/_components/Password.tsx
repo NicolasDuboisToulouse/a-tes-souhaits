@@ -5,7 +5,8 @@ import { UserContext } from '_components/UserProvider'
 import { alertService } from '_components/Alerts';
 import { spinnerService } from '_components/Spinner';
 
-export function Password() {
+// if onPasswordUpdated is not provided, will call router.push('/')
+export function Password({onPasswordUpdated = undefined} : {onPasswordUpdated?: (() => void) | undefined}) {
   const router = useRouter();
 
   const { user } = useContext(UserContext)!;
@@ -19,8 +20,12 @@ export function Password() {
       then(response => response.json().then(data => ({status: response.status, body: data}) )).
       then((answer) => {
         if (answer.status === 200) {
-          router.push('/');
           alertService.addAlert('Mot de passe changé.');
+          if (onPasswordUpdated) {
+            onPasswordUpdated();
+          } else {
+            router.push('/');
+          }
         } else {
           console.log('Server error');
           throw Error('Internal error');
@@ -45,7 +50,9 @@ export function Password() {
     <div className='v-form'>
       <div className="pb-10">
         <div>Bienvenue {user.displayName}.</div>
-        <div>Vous pouvez changer de mot de passe.</div>
+        { (user.firstLogin)?
+          <div>S&apos;il vous plait, changez de mot de passe.</div> :
+          <div>Vous pouvez changer de mot de passe.</div> }
       </div>
       <form onSubmit={handleSubmit(doChangePassword)} autoComplete='off' acceptCharset='UTF-8'>
         <div className='form-group'>
@@ -58,7 +65,7 @@ export function Password() {
         </div>
         <div className="button-group">
           <button type='submit'>Modifier</button>
-          <button type='button' onClick={() => {router.push('/')}}>Annuler</button>
+          { (user.firstLogin)? '' : <button type='button' onClick={() => {router.push('/')}}>Annuler</button> }
         </div>
       </form>
     </div>

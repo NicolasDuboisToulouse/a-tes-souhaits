@@ -4,8 +4,11 @@ export class User {
   firstLogin:  boolean          = true;
   isAdmin:     boolean          = false;
 
-  // Not logged-in user
-  constructor() { }
+  // without clone: Not logged-in user
+  // with clone: copy constructor
+  constructor(clone?: User) {
+    if (clone) Object.assign(this, clone);
+  }
 
   // Build from object
   public static fromObject(object: any): User {
@@ -13,7 +16,7 @@ export class User {
     let user = new User();
     user.userName    = object.userName;
     user.displayName = object.displayName || object.userName;
-    user.firstLogin  = object.firstLogin || true;
+    user.firstLogin  = (object.firstLogin == null || object.firstLogin)? true : false;
     user.isAdmin     = object.isAdmin || false;
     return user;
   }

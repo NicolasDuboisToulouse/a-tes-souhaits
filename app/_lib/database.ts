@@ -31,7 +31,7 @@ class Database {
 
   public updateUserPasswordHash(user: User, passwordHash: string) : boolean {
     if (this.stmtUpdateUserPasswordHash == null) {
-      this.stmtUpdateUserPasswordHash = this.db.prepare("UPDATE users SET passwordHash=? WHERE userName=?");
+      this.stmtUpdateUserPasswordHash = this.db.prepare("UPDATE users SET passwordHash=?, firstLogin=0 WHERE userName=?");
     }
     const info = this.stmtUpdateUserPasswordHash.run(passwordHash, user.userName);
     return (info.changes != 0);
