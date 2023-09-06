@@ -6,12 +6,6 @@ import { useState } from 'react';
 export const spinnerService = {
   addWaiter : () => { },              // Add a waiter. Start annimation for the first one.
   removeWaiter : () => { },           // Remove a waiter. Stop annimation for the last one.
-  wait,                               // Wrap any promise with addWaiter/removeWaiter.
-}
-
-async function wait<T>(promise: Promise<T>): Promise<T> {
-  spinnerService.addWaiter();
-  return promise.finally(spinnerService.removeWaiter);
 }
 
 // The Spinner itself

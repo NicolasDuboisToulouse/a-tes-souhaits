@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import { spinnerService } from '_components/Spinner';
+import * as fetchService from '_lib/fetchService';
 import { alertService } from '_components/Alerts';
 import { Login } from '_components/Login';
 import { User } from '_lib/user';
@@ -35,22 +35,14 @@ export function UserProvider({children} : {children: React.ReactNode}) {
 
   // Perform autologon at first load
   useEffect(() => {
-    spinnerService.wait(fetch('/api/users/autologon').
-      then(response => response.json().then(data => ({status: response.status, body: data}) )).
-      then((answer) => {
-        if (answer.status === 200) {
-          const user = User.fromObject(answer.body);
-          setUser(user);
-        } else {
-          if (answer.body.message) console.log(answer.body.message);
-        else console.log('Unexpected autologon error');
-          setUser(new User());
-        }
-      }).
-      catch(() => {
-        console.log('Unexpected autologon error');
+    fetchService.post('/api/users/autologon')
+      .then((data) => {
+        setUser(User.fromObject(data));
+      })
+      .catch((error) => {
         setUser(new User());
-      }));
+        alertService.handleError(error, {displayAlert:false});
+      });
   }, []);
 
   // autologon will display a spinner. Do not display anything else.
@@ -60,19 +52,12 @@ export function UserProvider({children} : {children: React.ReactNode}) {
 
   // Callback function to perform login
   const doLogin: LoginFunc = function(loginInfo: LoginInfo) {
-    spinnerService.wait(fetch('/api/users/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(loginInfo) }).
-      then(response => response.json().then(data => ({status: response.status, body: data}) )).
-      then((answer) => {
-        if (answer.status === 200 && answer.body.userName != null) {
-          setUser(User.fromObject(answer.body));
-        } else {
-          if (answer.body.message) {
-            alertService.addAlert('La connexion a echouée: ' + answer.body.message);
-          } else {
-            alertService.addAlert('La connexion a echouée.');
-          }
-        }
-      }));
+    fetchService.post('/api/users/login', loginInfo)
+      .then((data) => {
+        if (data.userName == null) throw 'Unexpected error (invalid answer body).';
+        setUser(User.fromObject(data));
+      })
+      .catch(alertService.handleError);
   }
 
   // Callback to logout current user

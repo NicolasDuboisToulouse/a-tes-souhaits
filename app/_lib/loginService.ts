@@ -35,7 +35,7 @@ export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
     if (options && options.allowsNotConnected) {
       return new User();
     } else {
-      throw { message: 'Unauthorized', status: 401 };
+      throw { message: 'Unauthorized.', status: 401 };
     }
   }
 
@@ -51,7 +51,7 @@ export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
   } catch(err) {
     // login error
     console.log('Invalid jwt token used.');
-    throw { message: 'Unauthorized', status: 401 };
+    throw { message: 'Unauthorized.', status: 401 };
   }
 }
 
@@ -67,8 +67,8 @@ export function login({userName, password}: {userName: string, password: string}
   }
 
   if (userName == null || password == null) {
-    console.log('Server error: invalid API usage');
-    throw { message: 'Server error: invalid API usage', status: 500 };
+    console.log('Server error: invalid API usage.');
+    throw { message: 'Server error: invalid API usage.', status: 500 };
   }
 
   const passwordHash = getDatabase().selectUserPasswordHash(userName);

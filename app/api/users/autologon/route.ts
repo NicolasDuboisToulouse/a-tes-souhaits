@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as loginService from '_lib/loginService';
 
-export async function GET() {
+export async function POST() {
   try {
     const user = loginService.tokenLogOn({allowsNotConnected: true})
     if (user.isValid()) console.log('Autologon: ' + user.userName);

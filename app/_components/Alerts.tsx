@@ -2,7 +2,16 @@
 import { useState } from 'react';
 
 export const alertService = {
-  addAlert : (message: string) => { alert(message) }
+  addAlert : (message: string) => { alert(message) },
+  handleError,
+}
+
+function handleError(error: any, options : { displayAlert?: boolean } = { displayAlert: true } ) {
+  const message = (typeof error === 'string')? error : (error && error.message) || 'Unexpected error.';
+  console.log(message);
+  if ((options.displayAlert === false) == false) {
+    alertService.addAlert(message);
+  }
 }
 
 export function Alerts() {

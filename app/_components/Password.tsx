@@ -2,8 +2,8 @@ import { useContext } from 'react'
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation'
 import { UserContext } from '_components/UserProvider'
+import * as fetchService from '_lib/fetchService';
 import { alertService } from '_components/Alerts';
-import { spinnerService } from '_components/Spinner';
 
 // if onPasswordUpdated is not provided, will call router.push('/')
 export function Password({onPasswordUpdated = undefined} : {onPasswordUpdated?: (() => void) | undefined}) {
@@ -16,23 +16,16 @@ export function Password({onPasswordUpdated = undefined} : {onPasswordUpdated?: 
   const { errors } = formState;
 
   function doChangePassword(input: formInput) {
-    spinnerService.wait(fetch('/api/users/password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }).
-      then(response => response.json().then(data => ({status: response.status, body: data}) )).
-      then((answer) => {
-        if (answer.status === 200) {
-          alertService.addAlert('Mot de passe changé.');
-          if (onPasswordUpdated) {
-            onPasswordUpdated();
-          } else {
-            router.push('/');
-          }
+    fetchService.post('/api/users/password', input)
+      .then(() => {
+        alertService.addAlert('Mot de passe changé.');
+        if (onPasswordUpdated) {
+          onPasswordUpdated();
         } else {
-          console.log('Server error');
-          throw Error('Internal error');
+          router.push('/');
         }
-      }).catch(() => {
-        alertService.addAlert('Internal error.');
-      }));
+      })
+      .catch(alertService.handleError);
   }
 
   function comparePasswords(value: string) {
