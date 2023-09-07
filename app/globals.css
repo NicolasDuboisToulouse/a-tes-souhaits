@@ -64,6 +64,19 @@ ul.menu li:hover {
     background-color: var(--color-menu-hover);
 }
 
+/* modal */
+dialog.modal {
+    background-color: var(--color-bg-focus);
+    border: solid 1px var(--color-border);
+    border-radius:5%;
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+dialog.modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+
 /* Forms */
 select, button, [type='submit'], [type='button']  {
     border:           1px solid var(--color-button-border);

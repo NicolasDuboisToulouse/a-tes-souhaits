@@ -90,8 +90,15 @@ export function setPassword(user: User, password: string) {
   if (user == null || password == null) {
     throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
-  const passwordHash = bcrypt.hashSync(password, 10);
+  const passwordHash = getPasswordHash(password);
   if (getDatabase().updateUserPasswordHash(user, passwordHash) == false) {
     throw new ApplicationError('Server error: Password update failed.', ApplicationError.SERVER_ERROR);
   }
+}
+
+//
+// Generate a password hash
+//
+export function getPasswordHash(password: string) : string {
+  return bcrypt.hashSync(password, 10);
 }

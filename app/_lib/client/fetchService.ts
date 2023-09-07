@@ -1,5 +1,13 @@
 import { spinnerService } from '_components/Spinner';
 
+export class FetchError extends Error {
+  status: number;
+  constructor(msg: string, status: number) {
+    super(msg);
+    this.status = status;
+  }
+};
+
 export async function post(url: string, content?: Object) : Promise<any> {
   spinnerService.addWaiter();
 
@@ -11,7 +19,7 @@ export async function post(url: string, content?: Object) : Promise<any> {
     )
     .then((answer) => {
       if (answer.status != 200) {
-        throw new Error(answer.data.message || `Unexpected error [HTTP ${answer.status}].`);
+        throw new FetchError(answer.data.message || `Unexpected error [HTTP ${answer.status}].`, answer.status);
       }
       return Promise.resolve(answer.data);
     })

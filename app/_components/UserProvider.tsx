@@ -6,7 +6,7 @@ import { alertService } from '_components/Alerts';
 import { Login } from '_components/Login';
 import { User } from '_lib/user';
 import { Password } from './Password';
-export type { User }
+export { User }
 
 // UserContext that can be retrived by useContext(UserContext)
 interface UserContextType {

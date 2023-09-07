@@ -1,6 +1,6 @@
 import Sqlite from 'better-sqlite3';
-
 import { User } from '_lib/user';
+export const SqliteError = Sqlite.SqliteError;
 
 class Database {
   private db : Sqlite.Database;
@@ -19,6 +19,14 @@ class Database {
   }
   private stmtSelectUser: Sqlite.Statement|null = null;
 
+  public insertUser(userName: string, displayName: string, passwordHash: string) : boolean {
+    if (this.stmtInsertUser == null) {
+      this.stmtInsertUser = this.db.prepare("INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES(?, ?, ?, 1, 0)");
+    }
+    const info = this.stmtInsertUser.run(userName, displayName, passwordHash);
+    return (info.changes != 0);
+  }
+  private stmtInsertUser: Sqlite.Statement|null = null;
 
   public selectUserPasswordHash(userName: string): string|undefined {
     if (this.stmtSelectUserPasswordHash == null) {
@@ -37,6 +45,14 @@ class Database {
     return (info.changes != 0);
   }
   private stmtUpdateUserPasswordHash: Sqlite.Statement|null = null;
+
+  public listUsers(): Array<User> {
+    if (this.stmtListUsers == null) {
+      this.stmtListUsers = this.db.prepare("SELECT userName, displayName, firstLogin, isAdmin FROM users");
+    }
+    return this.stmtListUsers.all().map((row) => User.fromObject(row));
+  }
+  private stmtListUsers: Sqlite.Statement|null = null;
 
 }
 
