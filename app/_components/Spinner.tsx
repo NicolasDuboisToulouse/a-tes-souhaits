@@ -30,7 +30,7 @@ export function Spinner() {
   return (
     <div className='w-fit z-[100] screen-center'>
       {/* Many thanks to https://github.com/SamHerbert/SVG-Loaders */}
-      <svg width="4em" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="#F26D21">
+      <svg width="4em" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="#F26D21" stroke="#F7EFE2">
         <circle cx="15" cy="15" r="15">
           <animate attributeName="r" from="15" to="15"
             begin="0s" dur="0.8s"
