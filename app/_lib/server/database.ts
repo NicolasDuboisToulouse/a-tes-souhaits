@@ -89,6 +89,15 @@ class Database {
   }
   private stmtInsertList: Sqlite.Statement|null = null;
 
+  public deleteList(id: number) : boolean {
+    if (this.stmtDeleteList == null) {
+      this.stmtDeleteList = this.db.prepare("DELETE FROM lists WHERE id=?");
+    }
+    const info = this.stmtDeleteList.run(id);
+    return (info.changes != 0);
+  }
+  private stmtDeleteList: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

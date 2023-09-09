@@ -88,14 +88,21 @@ export default function ManageLists() {
     updateLists();
   }, [updateLists]);
 
-  if (lists.length === 0) return null;
+  // Delete list
+  function deleteList(id: number) {
+    fetchService.post('/api/lists/del', { id })
+      .then(() => {
+        updateLists();
+      })
+      .catch(alertService.handleError);
+  }
 
   return (
     <div className='pb-2'>
       <div className='text-2xl pb-2'>Lists</div>
-      <table className='border-2 border-white mb-2'>
+      <table className='border-2 border-white mb-2 w-full'>
         <thead>
-          <tr className="border-b-2 border-black bg-orange-300 [&>th]:px-2"><th>Id</th><th>Titles</th><th>Owners</th></tr>
+          <tr className="border-b-2 border-black bg-orange-300 [&>th]:px-2"><th>Id</th><th>Titles</th><th>Owners</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {lists.map((list) => {
@@ -104,6 +111,11 @@ export default function ManageLists() {
                 <td>{list.id}</td>
                 <td>{list.title}</td>
                 <td> </td>
+                <td>
+                  <div className='flex flex-wrap gap-1'>
+                    <button className='flex-1 whitespace-nowrap' title='Supprimer'  onClick={() => deleteList(list.id)}>Supprimer</button>
+                  </div>
+                </td>
               </tr>
             );
           })}

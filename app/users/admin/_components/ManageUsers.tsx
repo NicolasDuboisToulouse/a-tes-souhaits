@@ -121,7 +121,7 @@ export default function ManageUsers() {
   return (
     <div className='pb-2'>
       <div className='text-2xl pb-2'>Users</div>
-      <table className='border-2 border-white mb-2'>
+      <table className='border-2 border-white mb-2 w-full'>
         <thead>
           <tr className="border-b-2 border-black bg-orange-300 [&>th]:px-2"><th>Login</th><th>Display</th><th>New</th><th>Admin</th><th>Actions</th></tr>
         </thead>
