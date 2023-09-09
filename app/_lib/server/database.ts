@@ -63,6 +63,15 @@ class Database {
   }
   private stmtUpdateUserIsAdmin: Sqlite.Statement|null = null;
 
+  public deleteUser(userName: string) : boolean {
+    if (this.stmtDeleteUser == null) {
+      this.stmtDeleteUser = this.db.prepare("DELETE FROM users WHERE userName=?");
+    }
+    const info = this.stmtDeleteUser.run(userName);
+    return (info.changes != 0);
+  }
+  private stmtDeleteUser: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

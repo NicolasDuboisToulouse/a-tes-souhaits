@@ -106,6 +106,16 @@ export default function ManageUsers() {
       .catch(alertService.handleError);
   }
 
+  // Delete user
+  function deleteUser(user: User) {
+    fetchService.post('/api/users/del', { userName: user.userName })
+      .then(() => {
+        updateUsers();
+      })
+      .catch(alertService.handleError);
+  }
+
+
   if (users.length === 0) return null;
 
   return (
@@ -125,7 +135,7 @@ export default function ManageUsers() {
                 <td className='text-center'>{user.isAdmin ? 'Yes' : 'No'}</td>
                 <td>
                   <div className='flex flex-wrap gap-1'>
-                    <button className='flex-1 whitespace-nowrap' title='Supprimer'>Supprimer</button>
+                    <button className='flex-1 whitespace-nowrap' title='Supprimer'  onClick={() => deleteUser(user)}>Supprimer</button>
                     <button className='flex-1 whitespace-nowrap' title='Reset password' onClick={() => resetPassword(user)}>Reset password</button>
                     <button className='flex-1 whitespace-nowrap' title='Toggle Admin' onClick={() => toggleAdmin(user)}>{user.isAdmin ? 'Ungrant' : 'Grant'}</button>
                   </div>
