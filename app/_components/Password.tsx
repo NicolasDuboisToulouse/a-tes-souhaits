@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation'
 import { UserContext } from '_components/UserProvider'
-import * as fetchService from '_lib/fetchService';
+import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 
 // if onPasswordUpdated is not provided, will call router.push('/')

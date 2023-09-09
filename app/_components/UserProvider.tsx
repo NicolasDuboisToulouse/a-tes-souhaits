@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import * as fetchService from '_lib/fetchService';
+import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 import { Login } from '_components/Login';
 import { User } from '_lib/user';

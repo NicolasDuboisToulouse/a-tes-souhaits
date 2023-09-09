@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 import { User } from '_lib/user';
-import { getDatabase } from '_lib/database';
+import { getDatabase } from '_lib/server/database';
 
 //
 // Create a NextResponse from an error object throwed by other functions
