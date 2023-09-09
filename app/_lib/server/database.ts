@@ -80,6 +80,15 @@ class Database {
   }
   private stmtListLists: Sqlite.Statement|null = null;
 
+  public insertList(title: string) : boolean {
+    if (this.stmtInsertList == null) {
+      this.stmtInsertList = this.db.prepare("INSERT INTO lists (title) VALUES(?)");
+    }
+    const info = this.stmtInsertList.run(title);
+    return (info.changes != 0);
+  }
+  private stmtInsertList: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

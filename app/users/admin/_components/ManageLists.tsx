@@ -1,4 +1,5 @@
-import { useContext, useState, useCallback, useEffect } from 'react'
+import { useRef, useContext, useState, useCallback, useEffect } from 'react'
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation'
 import { UserContext } from '_components/UserProvider'
 import * as fetchService from '_lib/client/fetchService';
@@ -10,9 +11,59 @@ type List = {
   userNames: Array<string>,
 };
 
+//
+// Dialog to add a list
+//
+function AddList({isOpened, setOpened, onListAdded} : {isOpened: boolean, setOpened: (opened: boolean) => void, onListAdded: () => void} ) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const form = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (isOpened) {
+      form.current?.reset();
+      dialog.current?.showModal();
+    } else {
+      dialog.current?.close();
+    }
+  }, [dialog, form, isOpened]);
+
+
+  type formInput = { title: string };
+  const { register, handleSubmit, formState } = useForm<formInput>({mode: 'onSubmit', reValidateMode: 'onSubmit'});
+  const { errors } = formState;
+
+  function doAddList(input: formInput) {
+    setOpened(false);
+    fetchService.post('/api/lists/add', input)
+      .then(() => {
+        onListAdded();
+      })
+      .catch(alertService.handleError);
+  }
+
+  return (
+    <dialog ref={dialog} className="modal" onCancel={() => setOpened(false)}>
+      <div className='v-form'>
+      <form ref={form} onSubmit={handleSubmit(doAddList)} >
+        <div className='form-group'>
+          <label>Title</label>
+          <input type='text' {...register('title', { required: true })} className={`${errors.title ? 'invalid' : ''}`} />
+        </div>
+        <div className="button-group">
+          <button type='submit'>Ajouter</button>
+          <button type='button' onClick={() => setOpened(false)}>Annuler</button>
+        </div>
+      </form>
+      </div>
+    </dialog>
+  );
+}
+
+// ManageLists pannel
 export default function ManageLists() {
   const { user } = useContext(UserContext)!;
   const [ lists, setLists ] = useState<Array<List>>([]);
+  const [addListVisible, setAddListVisible] = useState<boolean>(false);
   const router = useRouter();
 
   // Refresh page on list list change
@@ -22,7 +73,6 @@ export default function ManageLists() {
     }
     fetchService.post('/api/lists/list')
       .then((data) => {
-        console.log(data);
         setLists(data);
       })
       .catch((error) => {
@@ -59,8 +109,10 @@ export default function ManageLists() {
           })}
         </tbody>
       </table>
+
+      <AddList isOpened={addListVisible} setOpened={setAddListVisible} onListAdded={updateLists}/>
       <div className='text-center'>
-        <button>Ajouter</button>
+        <button onClick={() => setAddListVisible(true)}>Ajouter</button>
       </div>
     </div>
   );
