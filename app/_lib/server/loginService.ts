@@ -86,12 +86,12 @@ export function login({userName, password}: {userName: string, password: string}
 // Set user password
 // on failure, throw a Error
 //
-export function setPassword(user: User, password: string) {
-  if (user == null || password == null) {
+export function setPassword(userName: string, password: string) {
+  if (userName == null || password == null) {
     throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
   const passwordHash = getPasswordHash(password);
-  if (getDatabase().updateUserPasswordHash(user, passwordHash) == false) {
+  if (getDatabase().updateUserPasswordHash(userName, passwordHash) == false) {
     throw new ApplicationError('Server error: Password update failed.', ApplicationError.SERVER_ERROR);
   }
 }

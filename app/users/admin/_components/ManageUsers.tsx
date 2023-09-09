@@ -66,6 +66,7 @@ export default function ManageUsers() {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
   const router = useRouter();
 
+  // Refresh page on user list change
   const updateUsers = useCallback(() => {
     if (user.isAdmin == false) {
       router.push('/401');
@@ -87,6 +88,15 @@ export default function ManageUsers() {
     updateUsers();
   }, [updateUsers]);
 
+  // reset user password
+  function resetPassword(user: User) {
+    fetchService.post('/api/users/password', { userName: user.userName, password: user.userName })
+      .then(() => {
+        alertService.addAlert('Mot de passe réinitialisé.');
+      })
+      .catch(alertService.handleError);
+  }
+
 
   if (users.length === 0) return null;
 
@@ -106,9 +116,11 @@ export default function ManageUsers() {
                 <td className='text-center'>{user.firstLogin ? 'Yes' : 'No'}</td>
                 <td className='text-center'>{user.isAdmin ? 'Yes' : 'No'}</td>
                 <td>
-                  <button title='Toggle Admin' className='mr-2'>Admin</button>
-                  <button title='Reset password' className='mr-2'>{String.fromCharCode(0x2605)+String.fromCharCode(0x2605)+String.fromCharCode(0x2605)}</button>
-                  <button title='Supprimer' className='mr-2'>{String.fromCharCode(0x2716)}</button>
+                  <div className='flex flex-wrap gap-1'>
+                    <button className='flex-1 whitespace-nowrap' title='Supprimer'>Supprimer</button>
+                    <button className='flex-1 whitespace-nowrap' title='Reset password' onClick={() => resetPassword(user)}>Reset password</button>
+                    <button className='flex-1 whitespace-nowrap' title='Toggle Admin'>{user.isAdmin ? 'Ungrant' : 'Grant'}</button>
+                  </div>
                 </td>
               </tr>
             );

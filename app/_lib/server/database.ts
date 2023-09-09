@@ -37,11 +37,11 @@ class Database {
   private stmtSelectUserPasswordHash: Sqlite.Statement|null = null;
 
 
-  public updateUserPasswordHash(user: User, passwordHash: string) : boolean {
+  public updateUserPasswordHash(userName: string, passwordHash: string) : boolean {
     if (this.stmtUpdateUserPasswordHash == null) {
       this.stmtUpdateUserPasswordHash = this.db.prepare("UPDATE users SET passwordHash=?, firstLogin=0 WHERE userName=?");
     }
-    const info = this.stmtUpdateUserPasswordHash.run(passwordHash, user.userName);
+    const info = this.stmtUpdateUserPasswordHash.run(passwordHash, userName);
     return (info.changes != 0);
   }
   private stmtUpdateUserPasswordHash: Sqlite.Statement|null = null;
