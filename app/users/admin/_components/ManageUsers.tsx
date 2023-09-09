@@ -1,8 +1,6 @@
-'use client'
-import { useContext, useRef, useEffect, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { User, UserContext } from '_components/UserProvider'
+import { User } from '_components/UserProvider'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 
@@ -60,33 +58,8 @@ function AddUser({isOpened, setOpened, onUserAdded} : {isOpened: boolean, setOpe
 }
 
 // ManageUsers pannel
-export default function ManageUsers() {
-  const { user } = useContext(UserContext)!;
-  const [ users, setUsers ] = useState<Array<User>>([]);
+export default function ManageUsers({users, updateUsers} : {users: Array<User>, updateUsers: () => void}) {
   const [addUserVisible, setAddUserVisible] = useState<boolean>(false);
-  const router = useRouter();
-
-  // Refresh page on user list change
-  const updateUsers = useCallback(() => {
-    if (user.isAdmin == false) {
-      router.push('/401');
-    }
-    fetchService.post('/api/users/list')
-      .then((data) => {
-        setUsers(data);
-      })
-      .catch((error) => {
-        if (error instanceof fetchService.FetchError && error.status == 401) {
-          router.push('/401');
-        } else {
-          alertService.handleError(error);
-        }
-      });
-  }, [router, user]);
-
-  useEffect(() => {
-    updateUsers();
-  }, [updateUsers]);
 
   // reset user password
   function resetPassword(user: User) {
