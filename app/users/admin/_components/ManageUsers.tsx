@@ -119,7 +119,7 @@ export default function ManageUsers() {
   if (users.length === 0) return null;
 
   return (
-    <div>
+    <div className='pb-2'>
       <div className='text-2xl pb-2'>Users</div>
       <table className='border-2 border-white mb-2'>
         <thead>

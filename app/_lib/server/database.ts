@@ -72,6 +72,14 @@ class Database {
   }
   private stmtDeleteUser: Sqlite.Statement|null = null;
 
+  public listLists(): Array<{id: number, title: string}> {
+    if (this.stmtListLists == null) {
+      this.stmtListLists = this.db.prepare("SELECT id, title FROM lists");
+    }
+    return this.stmtListLists.all() as Array<{id: number, title: string}>;
+  }
+  private stmtListLists: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;
