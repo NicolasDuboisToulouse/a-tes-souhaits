@@ -4,29 +4,26 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 import { User } from '_lib/user';
 import { getDatabase } from '_lib/server/database';
+import { ApplicationError } from '_lib/server/applicationError';
 
-//
-// Create a NextResponse from an error object throwed by other functions
-//
-export function errorResponse(error: any): NextResponse {
-  if (error && error.message && error.status) {
-    return NextResponse.json({ message: error.message }, { status: error.status });
-  } else {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+export class LoginError extends ApplicationError {
+  static readonly UNAUTHORIZED = 401;
+
+  constructor(message: string = 'Unauthorized', status:number = LoginError.UNAUTHORIZED) {
+    super(message, status);
   }
 }
 
 //
 // Perform login by the cookie 'token'
-// Return a User or throw an object { message, status }
-// if 'token' not set and allowsNotConnected is set to true,
-// the promise will be accepted with an invalid user.
+// Return a User or throw an Error.
+// if 'token' not set and allowsNotConnected is set to true, will return an invalid user.
 //
 export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
   if (process.env.JWT_SECRET == null) {
     // Server is not correctly configured: define JWT_SECRET in .env.local.
-    console.log('Server error: JWT_SECRET is not set.');
-    throw { message: 'Server error: JWT_SECRET is not set.', status: 500 };
+    throw new ApplicationError('Server error: JWT_SECRET is not set.', ApplicationError.SERVER_ERROR);
   }
 
   const token = cookies().get('token');
@@ -35,46 +32,44 @@ export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
     if (options && options.allowsNotConnected) {
       return new User();
     } else {
-      throw { message: 'Unauthorized.', status: 401 };
+      throw new LoginError('Unauthorized: Not logged in.');
     }
   }
 
   try {
     // Validate token and return userName
     const data = jwt.verify(token.value, process.env.JWT_SECRET);
-    if (data == null) throw 'Unauthorized';
+    if (data == null) throw new LoginError();
     const userName = (data as { userName: string } ).userName;
-    if (userName == null) throw 'Unauthorized';
+    if (userName == null) throw new LoginError();
     const user = getDatabase().selectUser(userName);
-    if (user.isValid() == false) throw 'Unauthorized';
+    if (user.isValid() == false) throw new LoginError();
     return user;
   } catch(err) {
     // login error
     console.log('Invalid jwt token used.');
-    throw { message: 'Unauthorized.', status: 401 };
+    throw new LoginError();
   }
 }
 
 //
 // Perform login by user/password
-// Return the NextResponse to provide to client or throw an object { message, status }
+// Return the NextResponse to provide to client or throw an Error.
 //
 export function login({userName, password}: {userName: string, password: string}) : NextResponse {
   if (process.env.JWT_SECRET == null) {
     // Server is not correctly configured: define JWT_SECRET in .env.local.
-    console.log('Server error: JWT_SECRET is not set.');
-    throw { message: 'Server error: JWT_SECRET is not set.', status: 500 };
+    throw new ApplicationError('Server error: JWT_SECRET is not set.', ApplicationError.SERVER_ERROR);
   }
 
   if (userName == null || password == null) {
-    console.log('Server error: invalid API usage.');
-    throw { message: 'Server error: invalid API usage.', status: 500 };
+    throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
 
   const passwordHash = getDatabase().selectUserPasswordHash(userName);
   if (passwordHash == null || bcrypt.compareSync(password, passwordHash) == false) {
     console.log('Invalid user/password: ' + userName + ', ' + password);
-    throw { message: 'Nom ou mot de passe invalide.', status: 401 };
+    throw new LoginError('Nom ou mot de passe invalide.');
   }
 
   const user = getDatabase().selectUser(userName);
@@ -89,14 +84,14 @@ export function login({userName, password}: {userName: string, password: string}
 
 //
 // Set user password
-// throw an object { message, status } on error
+// on failure, throw a Error
 //
 export function setPassword(user: User, password: string) {
   if (user == null || password == null) {
-    throw { message: 'Server error: invalid API usage', status: 500 };
+    throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
   const passwordHash = bcrypt.hashSync(password, 10);
   if (getDatabase().updateUserPasswordHash(user, passwordHash) == false) {
-    throw { message: 'Internal server error', status: 500 };
+    throw new ApplicationError('Server error: Password update failed.', ApplicationError.SERVER_ERROR);
   }
 }

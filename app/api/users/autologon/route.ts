@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
+import { errorResponse } from '_lib/server/applicationError';
 
 export async function POST() {
   try {
@@ -7,6 +8,6 @@ export async function POST() {
     if (user.isValid()) console.log('Autologon: ' + user.userName);
     return NextResponse.json(user, { status: 200 });
   } catch(error) {
-    return loginService.errorResponse(error);
+    return errorResponse(error);
   }
 }
