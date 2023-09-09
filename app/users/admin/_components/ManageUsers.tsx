@@ -97,6 +97,14 @@ export default function ManageUsers() {
       .catch(alertService.handleError);
   }
 
+  // Change administration right
+  function toggleAdmin(user: User) {
+    fetchService.post('/api/users/grant', { userName: user.userName, isAdmin: user.isAdmin == false })
+      .then(() => {
+        updateUsers();
+      })
+      .catch(alertService.handleError);
+  }
 
   if (users.length === 0) return null;
 
@@ -119,7 +127,7 @@ export default function ManageUsers() {
                   <div className='flex flex-wrap gap-1'>
                     <button className='flex-1 whitespace-nowrap' title='Supprimer'>Supprimer</button>
                     <button className='flex-1 whitespace-nowrap' title='Reset password' onClick={() => resetPassword(user)}>Reset password</button>
-                    <button className='flex-1 whitespace-nowrap' title='Toggle Admin'>{user.isAdmin ? 'Ungrant' : 'Grant'}</button>
+                    <button className='flex-1 whitespace-nowrap' title='Toggle Admin' onClick={() => toggleAdmin(user)}>{user.isAdmin ? 'Ungrant' : 'Grant'}</button>
                   </div>
                 </td>
               </tr>

@@ -54,6 +54,15 @@ class Database {
   }
   private stmtListUsers: Sqlite.Statement|null = null;
 
+  public updateUserIsAdmin(userName: string, isAdmin: boolean) : boolean {
+    if (this.stmtUpdateUserIsAdmin == null) {
+      this.stmtUpdateUserIsAdmin = this.db.prepare("UPDATE users SET isAdmin=? WHERE userName=?");
+    }
+    const info = this.stmtUpdateUserIsAdmin.run(isAdmin? 1 : 0, userName);
+    return (info.changes != 0);
+  }
+  private stmtUpdateUserIsAdmin: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

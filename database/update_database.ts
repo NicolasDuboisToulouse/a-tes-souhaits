@@ -71,9 +71,15 @@ for(let version = user_version + 1; version <= db_version; version++) {
 // Add an admin if none exists
 const admin = db.prepare("SELECT userName FROM users WHERE isAdmin=1").pluck().get();
 if (admin == null) {
-  console.log("WARNING: No administrator found. Add default administrator: admin/admin.");
-  const admin_password_hash = bcrypt.hashSync("admin", 10);
-  db.prepare("INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES('admin', 'admin', ?, 1, 1)").run(admin_password_hash);
+  const admin = db.prepare("SELECT userName FROM users WHERE userName='admin'").pluck().get();
+  if (admin == null) {
+    console.log("WARNING: No administrator found. Add default administrator: admin/admin.");
+    const admin_password_hash = bcrypt.hashSync("admin", 10);
+    db.prepare("INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES('admin', 'admin', ?, 1, 1)").run(admin_password_hash);
+  } else {
+    console.log("WARNING: No administrator found. Grant administrator rights to user admin.");
+    db.prepare("UPDATE users SET isAdmin=1 WHERE userName='admin'").run();
+  }
 }
 
 db.close();
