@@ -53,22 +53,6 @@ class Database {
     return this.stmts.get(name)!;
   }
 
-  public selectUser(userName: string) : User {
-    if (this.stmtSelectUser == null) {
-      this.stmtSelectUser = this.db.prepare("SELECT userName, displayName, firstLogin, isAdmin FROM users WHERE userName=?");
-    }
-    return User.fromObject(this.stmtSelectUser.get(userName));
-  }
-  private stmtSelectUser: Sqlite.Statement|null = null;
-
-  public selectUserPasswordHash(userName: string): string|undefined {
-    if (this.stmtSelectUserPasswordHash == null) {
-      this.stmtSelectUserPasswordHash = this.db.prepare("SELECT passwordHash FROM users WHERE userName=?").pluck(true);
-    }
-    return this.stmtSelectUserPasswordHash.get(userName) as string|undefined;
-  }
-  private stmtSelectUserPasswordHash: Sqlite.Statement|null = null;
-
   public listUsers(): Array<User> {
     if (this.stmtListUsers == null) {
       this.stmtListUsers = this.db.prepare("SELECT userName, displayName, firstLogin, isAdmin FROM users");
@@ -92,19 +76,6 @@ class Database {
     return this.stmtListListOwner.all(listId) as Array<string>;
   }
   private stmtListListOwner: Sqlite.Statement|null = null;
-
-  public selectUserList(userName: string): number {
-    if (this.stmtSelectUserList == null) {
-      // Select the list owned by userName with the lesser number of other owners
-      this.stmtSelectUserList = this.db.prepare('\
-        SELECT lstCount.listId, COUNT(lstCount.listId) AS count FROM listsOwners AS lstCount \
-        INNER JOIN listsOwners AS lstOwner ON lstCount.listId == lstOwner.listId AND lstOwner.userName=? \
-        GROUP BY lstCount.listId ORDER BY count');
-    }
-    const result = this.stmtSelectUserList.get(userName) as { listId: number, count: number } | undefined;
-    return (result === undefined)? -1 : result.listId;
-  }
-  private stmtSelectUserList: Sqlite.Statement|null = null;
 
 }
 

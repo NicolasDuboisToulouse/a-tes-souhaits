@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase, getDbStatement, SqliteError } from '_lib/server/database';
+import { getDbStatement, SqliteError } from '_lib/server/database';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
     }
 
-    const owner = getDatabase().selectUser(userName);
+    const owner = loginService.getUser(userName);
     if (owner.isValid() == false) {
       throw new ApplicationError('User to add to list owners does not exists!', ApplicationError.SERVER_ERROR);
     }

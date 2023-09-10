@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 import { User } from '_lib/user';
-import { getDatabase, getDbStatement } from '_lib/server/database';
+import { getDbStatement } from '_lib/server/database';
 import { ApplicationError } from '_lib/server/applicationError';
 
 
@@ -42,7 +42,7 @@ export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
     if (data == null) throw new LoginError();
     const userName = (data as { userName: string } ).userName;
     if (userName == null) throw new LoginError();
-    const user = getDatabase().selectUser(userName);
+    const user = getUser(userName);
     if (user.isValid() == false) throw new LoginError();
     return user;
   } catch(err) {
@@ -66,13 +66,13 @@ export function login({userName, password}: {userName: string, password: string}
     throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
 
-  const passwordHash = getDatabase().selectUserPasswordHash(userName);
+  const passwordHash = getDbStatement('selectUserPasswordHash', 'SELECT passwordHash FROM users WHERE userName=?', {pluck:true}).get<string>(userName);
   if (passwordHash == null || bcrypt.compareSync(password, passwordHash) == false) {
     console.log('Invalid user/password: ' + userName + ', ' + password);
     throw new LoginError('Nom ou mot de passe invalide.');
   }
 
-  const user = getDatabase().selectUser(userName);
+  const user = getUser(userName);
 
   console.log('User login: ' + user.userName);
   const token = jwt.sign({ userName: user.userName }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -103,4 +103,14 @@ export function setPassword(userName: string, password: string, firstLogin: bool
 //
 export function getPasswordHash(password: string) : string {
   return bcrypt.hashSync(password, 10);
+}
+
+//
+// Select a user from database
+// Return an invalid user on failure
+//
+export function getUser(userName: string) : User {
+  const userData = getDbStatement('selectUser', 'SELECT userName, displayName, firstLogin, isAdmin FROM users WHERE userName=?')
+    .get<{userName: string, displayName: string, firstLogin: number, isAdmin: number}>(userName);
+  return User.fromObject(userData);
 }
