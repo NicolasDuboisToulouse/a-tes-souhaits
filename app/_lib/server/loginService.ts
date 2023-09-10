@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 import { User } from '_lib/user';
-import { getDatabase } from '_lib/server/database';
+import { getDatabase, getDbStatement } from '_lib/server/database';
 import { ApplicationError } from '_lib/server/applicationError';
 
 
@@ -86,12 +86,14 @@ export function login({userName, password}: {userName: string, password: string}
 // Set user password
 // on failure, throw a Error
 //
-export function setPassword(userName: string, password: string) {
+export function setPassword(userName: string, password: string, firstLogin: boolean = false) {
   if (userName == null || password == null) {
     throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
   }
   const passwordHash = getPasswordHash(password);
-  if (getDatabase().updateUserPasswordHash(userName, passwordHash) == false) {
+  if (getDbStatement('updateUserPasswordHash', 'UPDATE users SET passwordHash=?, firstLogin=? WHERE userName=?')
+    .run(passwordHash, firstLogin? 1 : 0, userName) == false
+  ) {
     throw new ApplicationError('Server error: Password update failed.', ApplicationError.SERVER_ERROR);
   }
 }

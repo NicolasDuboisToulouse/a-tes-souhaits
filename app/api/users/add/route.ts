@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase, SqliteError } from '_lib/server/database';
+import { getDbStatement, SqliteError } from '_lib/server/database';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
@@ -17,7 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = loginService.getPasswordHash(userName);
-    if (getDatabase().insertUser(userName, displayName, passwordHash) == false) {
+    if (getDbStatement('insertUser', 'INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES(?, ?, ?, 1, 0)')
+      .run(userName, displayName, passwordHash) == false
+    ) {
       throw new ApplicationError('Unexpected error while adding user', ApplicationError.SERVER_ERROR);
     }
 

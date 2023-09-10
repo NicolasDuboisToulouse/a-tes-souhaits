@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase, SqliteError } from '_lib/server/database';
+import { getDatabase, getDbStatement, SqliteError } from '_lib/server/database';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
@@ -21,7 +21,9 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('User to add to list owners does not exists!', ApplicationError.SERVER_ERROR);
     }
 
-    if (getDatabase().insertListOwner(listId, userName) == false) {
+    if (getDbStatement('insertListOwner', 'INSERT INTO listsOwners (listId, userName) VALUES(?, ?)')
+      .run(listId, userName) == false
+    ) {
       throw new ApplicationError('Unexpected error while adding user to list owners.', ApplicationError.SERVER_ERROR);
     }
 

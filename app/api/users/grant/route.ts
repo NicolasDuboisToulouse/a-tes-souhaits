@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
-import { getDatabase } from '_lib/server/database';
+import { getDbStatement } from '_lib/server/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('You cannot un-grant yourself!', ApplicationError.CLIENT_ERROR);
     }
 
-    if (getDatabase().updateUserIsAdmin(userName, isAdmin) == false) {
+    if (getDbStatement('updateUserIsAdmin', 'UPDATE users SET isAdmin=? WHERE userName=?')
+      .run(isAdmin? 1 : 0, userName) == false
+    ) {
       throw new ApplicationError('Unexpected error while updating admin rights.', ApplicationError.SERVER_ERROR);
     }
 

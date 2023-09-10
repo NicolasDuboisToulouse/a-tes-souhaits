@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase, SqliteError } from '_lib/server/database';
+import { getDbStatement, SqliteError } from '_lib/server/database';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
     }
 
-    if (getDatabase().deleteListOwner(listId, userName) == false) {
+    if (getDbStatement('deleteListOwner', 'DELETE FROM listsOwners WHERE listId=? AND userName=?')
+      .run(listId, userName) == false
+    ) {
       throw new ApplicationError('Unexpected error while deleting user to list owners.', ApplicationError.SERVER_ERROR);
     }
 

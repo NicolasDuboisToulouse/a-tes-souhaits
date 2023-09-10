@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
 import { ApplicationError, errorResponse } from '_lib/server/applicationError';
-import { getDatabase } from '_lib/server/database';
+import { getDbStatement } from '_lib/server/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,8 +20,15 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('You cannot delete yourself!', ApplicationError.CLIENT_ERROR);
     }
 
-    if (getDatabase().deleteUser(userName) == false) {
+    if (getDbStatement('deleteUser', 'DELETE FROM users WHERE userName=?')
+      .run(userName) == false
+    ) {
       throw new ApplicationError('Unexpected error while deleting user.', ApplicationError.SERVER_ERROR);
+    }
+    if (getDbStatement('deleteListOwnerByOwner', 'DELETE FROM listsOwners WHERE userName=?')
+      .run(userName) == false
+    ) {
+      throw new ApplicationError('Unexpected error while deleting user from listsOwners.', ApplicationError.SERVER_ERROR);
     }
 
     return NextResponse.json({}, { status: 200 });
