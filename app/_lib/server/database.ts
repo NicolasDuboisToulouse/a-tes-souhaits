@@ -129,6 +129,14 @@ class Database {
   }
   private stmtListListOwner: Sqlite.Statement|null = null;
 
+  public deleteListOwner(listId: number, userName: string) : boolean {
+    if (this.stmtDeleteListOwner == null) {
+      this.stmtDeleteListOwner = this.db.prepare("DELETE FROM listsOwners WHERE listId=? AND userName=?");
+    }
+    return this.stmtDeleteListOwner.run(listId, userName).changes != 0;
+  }
+  private stmtDeleteListOwner: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

@@ -109,6 +109,18 @@ export default function ManageLists({users} : {users: Array<User>}) {
       .catch(alertService.handleError);
   }
 
+  // Delete owner
+  function delOwner(event: ChangeEvent<HTMLSelectElement>, id: number) {
+    fetchService.post('/api/lists/owner/del', { listId: id, userName: event.target.value})
+      .finally(() => {
+        event.target.value = '-1';
+      })
+      .then(() => {
+        updateLists();
+      })
+      .catch(alertService.handleError);
+  }
+
   // userDisplayNames : userName -> displayName
   const userDisplayNames: any = {};
   for (const anyUser of users) {
@@ -135,6 +147,12 @@ export default function ManageLists({users} : {users: Array<User>}) {
                       <option hidden value='-1'>Add owner</option>
                       {users.filter(user => list.userNames.includes(user.userName!) == false).map((user) => {
                         return <option key={user.userName} value={user.userName}>{user.displayName}</option>
+                      })}
+                    </select>
+                    <select onChange={(event) => delOwner(event, list.id)}>
+                      <option hidden value='-1'>Del owner</option>
+                      {list.userNames.map((userName) => {
+                        return <option key={userName} value={userName}>{userDisplayNames[userName]}</option>
                       })}
                     </select>
                     <button className='flex-1 whitespace-nowrap' title='Supprimer'  onClick={() => deleteList(list.id)}>Supprimer</button>
