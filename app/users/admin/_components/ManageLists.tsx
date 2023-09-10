@@ -72,8 +72,8 @@ export default function ManageLists({users} : {users: Array<User>}) {
       router.push('/401');
     }
     fetchService.post('/api/lists/list', {withOwners:true})
-      .then((data) => {
-        setLists(data);
+      .then((listInfos) => {
+        setLists(listInfos.lists);
       })
       .catch((error) => {
         if (error instanceof fetchService.FetchError && error.status == 401) {

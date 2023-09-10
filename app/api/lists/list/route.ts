@@ -6,7 +6,10 @@ import { errorResponse } from '_lib/server/applicationError';
 export async function POST(request: NextRequest) {
   try {
     const user = loginService.tokenLogOn();
-    const lists = getDatabase().listLists();
+    const listInfos = {
+      lists:    getDatabase().listLists(),
+      myListId: getDatabase().selectUserList(user.userName!)
+    };
 
     const { withOwners } = await request.json();
     if (withOwners) {
@@ -14,16 +17,15 @@ export async function POST(request: NextRequest) {
         console.log('Warn: non-admin user try to access lists/list');
         throw new loginService.LoginError();
       }
-      const listsWithOwners = lists.map((list) =>
+      listInfos.lists = listInfos.lists.map((list) =>
         ({
           ...list,
           userNames: getDatabase().listListOwners(list.id)
         })
       );
-      return NextResponse.json(listsWithOwners, { status: 200 });
     }
 
-    return NextResponse.json(lists, { status: 200 });
+    return NextResponse.json(listInfos, { status: 200 });
 
   } catch(error) {
     return errorResponse(error);

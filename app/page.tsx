@@ -1,15 +1,17 @@
 'use client'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { UserContext } from '_components/UserProvider'
+import { Lists } from '_components/Lists'
 
 export default function Main() {
-  const { user, logout } = useContext(UserContext)!;
+  const { user } = useContext(UserContext)!;
+  const [ listId, setListId ] = useState<number>(-1);
+
   return (
     <div className="main">
-      Hello {user.displayName} !
-      {user.isAdmin? ' (administrator)' : ''}
-      {user.firstLogin? ' (first login)' : ''}
-      <button onClick={logout}>Logout</button>
+      <Lists onListChange={setListId} />
+      <div>Hello {user.displayName} !</div>
+      <div>Liste selectionnée: {listId}</div>
     </div>
   );
 }

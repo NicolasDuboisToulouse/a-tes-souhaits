@@ -137,6 +137,19 @@ class Database {
   }
   private stmtDeleteListOwner: Sqlite.Statement|null = null;
 
+  public selectUserList(userName: string): number {
+    if (this.stmtSelectUserList == null) {
+      // Select the list owned by userName with the lesser number of other owners
+      this.stmtSelectUserList = this.db.prepare('\
+        SELECT lstCount.listId, COUNT(lstCount.listId) AS count FROM listsOwners AS lstCount \
+        INNER JOIN listsOwners AS lstOwner ON lstCount.listId == lstOwner.listId AND lstOwner.userName=? \
+        GROUP BY lstCount.listId ORDER BY count');
+    }
+    const result = this.stmtSelectUserList.get(userName) as { listId: number, count: number } | undefined;
+    return (result === undefined)? -1 : result.listId;
+  }
+  private stmtSelectUserList: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;
