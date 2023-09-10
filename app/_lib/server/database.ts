@@ -67,10 +67,17 @@ class Database {
     if (this.stmtDeleteUser == null) {
       this.stmtDeleteUser = this.db.prepare("DELETE FROM users WHERE userName=?");
     }
-    const info = this.stmtDeleteUser.run(userName);
-    return (info.changes != 0);
+    if (this.stmtDeleteListOwnerByOwner == null) {
+      this.stmtDeleteListOwnerByOwner = this.db.prepare("DELETE FROM listsOwners WHERE userName=?");
+    }
+    if (this.stmtDeleteUser.run(userName).changes != 0) {
+      this.stmtDeleteListOwnerByOwner.run(userName);
+      return true;
+    }
+    return false;
   }
   private stmtDeleteUser: Sqlite.Statement|null = null;
+  private stmtDeleteListOwnerByOwner: Sqlite.Statement|null = null;
 
   public listLists(): Array<{id: number, title: string}> {
     if (this.stmtListLists == null) {
@@ -93,10 +100,17 @@ class Database {
     if (this.stmtDeleteList == null) {
       this.stmtDeleteList = this.db.prepare("DELETE FROM lists WHERE id=?");
     }
-    const info = this.stmtDeleteList.run(id);
-    return (info.changes != 0);
+    if (this.stmtDeleteListOwnerByListId == null) {
+      this.stmtDeleteListOwnerByListId = this.db.prepare("DELETE FROM listsOwners WHERE listId=?");
+    }
+    if (this.stmtDeleteList.run(id).changes != 0) {
+      this.stmtDeleteListOwnerByListId.run(id);
+      return true;
+    }
+    return false;
   }
   private stmtDeleteList: Sqlite.Statement|null = null;
+  private stmtDeleteListOwnerByListId: Sqlite.Statement|null = null;
 
   public insertListOwner(listId: number, userName: string) : boolean {
     if (this.stmtInsertListOwner == null) {

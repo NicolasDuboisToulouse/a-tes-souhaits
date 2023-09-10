@@ -86,7 +86,7 @@ export default function ManageLists({users} : {users: Array<User>}) {
 
   useEffect(() => {
     updateLists();
-  }, [updateLists]);
+  }, [updateLists, users]);
 
   // Delete list
   function deleteList(id: number) {
