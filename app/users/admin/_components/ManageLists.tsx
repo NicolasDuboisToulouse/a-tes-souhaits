@@ -71,7 +71,7 @@ export default function ManageLists({users} : {users: Array<User>}) {
     if (user.isAdmin == false) {
       router.push('/401');
     }
-    fetchService.post('/api/lists/list')
+    fetchService.post('/api/lists/list', {withOwners:true})
       .then((data) => {
         setLists(data);
       })

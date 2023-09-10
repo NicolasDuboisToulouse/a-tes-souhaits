@@ -11,7 +11,9 @@ export class FetchError extends Error {
 export async function post(url: string, content?: Object) : Promise<any> {
   spinnerService.addWaiter();
 
-  return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(content) })
+  const body = (content)? JSON.stringify(content) : '{}';
+
+  return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
     .then(response =>
       response.json()
         .then(data => ({status: response.status, data: data}))
