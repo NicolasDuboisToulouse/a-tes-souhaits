@@ -143,13 +143,13 @@ export default function ManageLists({users} : {users: Array<User>}) {
                 <td>{list.userNames.map(userName => userDisplayNames[userName]).join(', ')}</td>
                 <td>
                   <div className='flex flex-wrap gap-1'>
-                    <select onChange={(event) => addOwner(event, list.id)}>
+                    <select className='flex-1 whitespace-nowrap' onChange={(event) => addOwner(event, list.id)}>
                       <option hidden value='-1'>Add owner</option>
                       {users.filter(user => list.userNames.includes(user.userName!) == false).map((user) => {
                         return <option key={user.userName} value={user.userName}>{user.displayName}</option>
                       })}
                     </select>
-                    <select onChange={(event) => delOwner(event, list.id)}>
+                    <select className='flex-1 whitespace-nowrap' onChange={(event) => delOwner(event, list.id)}>
                       <option hidden value='-1'>Del owner</option>
                       {list.userNames.map((userName) => {
                         return <option key={userName} value={userName}>{userDisplayNames[userName]}</option>
