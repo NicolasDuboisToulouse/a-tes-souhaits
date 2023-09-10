@@ -66,6 +66,7 @@ export default function ManageUsers({users, updateUsers} : {users: Array<User>, 
     fetchService.post('/api/users/password', { userName: user.userName, password: user.userName })
       .then(() => {
         alertService.addAlert('Mot de passe réinitialisé.');
+        updateUsers();
       })
       .catch(alertService.handleError);
   }

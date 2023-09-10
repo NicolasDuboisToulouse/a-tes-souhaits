@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         console.log("Warn: non-admin user try to change other's password");
         throw new loginService.LoginError();
       }
-       loginService.setPassword(userName, password);
+       loginService.setPassword(userName, password, true);
     }
 
     return NextResponse.json({}, { status: 200 });
