@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase } from '_lib/server/database';
+import { getDbStatement } from '_lib/server/database';
+import { User } from '_lib/user';
 import { errorResponse } from '_lib/server/applicationError';
 
 export async function POST() {
@@ -11,7 +12,10 @@ export async function POST() {
       throw new loginService.LoginError();
     }
 
-    const users = getDatabase().listUsers();
+    const users = getDbStatement('listUsers', 'SELECT userName, displayName, firstLogin, isAdmin FROM users')
+      .all<{userName: string, displayName: string, firstLogin: number, isAdmin: number}>()
+      .map(row => User.fromObject(row));
+
     return NextResponse.json(users, { status: 200 });
 
   } catch(error) {

@@ -1,5 +1,4 @@
 import Sqlite from 'better-sqlite3';
-import { User } from '_lib/user';
 export const SqliteError = Sqlite.SqliteError;
 
 export function getDatabase():Database  {
@@ -52,31 +51,6 @@ class Database {
     }
     return this.stmts.get(name)!;
   }
-
-  public listUsers(): Array<User> {
-    if (this.stmtListUsers == null) {
-      this.stmtListUsers = this.db.prepare("SELECT userName, displayName, firstLogin, isAdmin FROM users");
-    }
-    return this.stmtListUsers.all().map((row) => User.fromObject(row));
-  }
-  private stmtListUsers: Sqlite.Statement|null = null;
-
-  public listLists(): Array<{id: number, title: string}> {
-    if (this.stmtListLists == null) {
-      this.stmtListLists = this.db.prepare("SELECT id, title FROM lists");
-    }
-    return this.stmtListLists.all() as Array<{id: number, title: string}>;
-  }
-  private stmtListLists: Sqlite.Statement|null = null;
-
-  public listListOwners(listId: number): Array<string> {
-    if (this.stmtListListOwner == null) {
-      this.stmtListListOwner = this.db.prepare("SELECT userName FROM listsOwners WHERE listId=?").pluck();
-    }
-    return this.stmtListListOwner.all(listId) as Array<string>;
-  }
-  private stmtListListOwner: Sqlite.Statement|null = null;
-
 }
 
 let database:Database|undefined = undefined;

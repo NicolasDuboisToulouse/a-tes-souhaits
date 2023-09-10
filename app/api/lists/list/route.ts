@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { getDatabase, getDbStatement } from '_lib/server/database';
+import { getDbStatement } from '_lib/server/database';
 import { errorResponse } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
   try {
     const user = loginService.tokenLogOn();
-    const listInfos = {
-      lists:    getDatabase().listLists(),
-      myListId: -1,
-    };
+
+    // Select all lists
+    const lists = getDbStatement('listLists', 'SELECT id, title FROM lists')
+      .all<{id: number, title: string}>();
 
     // Select the list owned by userName with the lesser number of other owners
     const userList = getDbStatement('selectUserList', '\
@@ -17,7 +17,11 @@ export async function POST(request: NextRequest) {
         INNER JOIN listsOwners AS lstOwner ON lstCount.listId == lstOwner.listId AND lstOwner.userName=? \
         GROUP BY lstCount.listId ORDER BY count').
       get<{ listId: number, count: number }>(user.userName);
-    listInfos.myListId = (userList === undefined)? -1 : userList.listId;
+
+    const listInfos = {
+      lists,
+      myListId: (userList === undefined)? -1 : userList.listId,
+    };
 
     const { withOwners } = await request.json();
     if (withOwners) {
@@ -25,10 +29,11 @@ export async function POST(request: NextRequest) {
         console.log('Warn: non-admin user try to access lists/list');
         throw new loginService.LoginError();
       }
+      const listListOwners = getDbStatement('listListOwners', 'SELECT userName FROM listsOwners WHERE listId=?', {pluck:true});
       listInfos.lists = listInfos.lists.map((list) =>
         ({
           ...list,
-          userNames: getDatabase().listListOwners(list.id)
+          userNames: listListOwners.all<string>(list.id)
         })
       );
     }
