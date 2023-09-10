@@ -2,6 +2,7 @@
 import { useEffect, useRef, useContext } from 'react';
 import { UserContext } from '_components/UserProvider'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 export function Header() {
 
@@ -41,8 +42,13 @@ export function Header() {
     { text: "Déconnetion", target: logout },
     { text: "Changer de mot de passe", target: '/users/password' },
   ];
+  const pathname = usePathname();
   if (user.isAdmin) {
-    items.push({ text: "Administration", target: '/users/admin' });
+    if (pathname == '/users/admin') {
+      items.push({ text: "Acceuil", target: '/' });
+    } else {
+      items.push({ text: "Administration", target: '/users/admin' });
+    }
   }
 
 
