@@ -1,7 +1,7 @@
-import { useRef, useContext, useState, useCallback, useEffect } from 'react'
+import { useRef, useContext, useState, useCallback, useEffect, ChangeEvent } from 'react'
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation'
-import { UserContext } from '_components/UserProvider'
+import { User, UserContext } from '_components/UserProvider'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 
@@ -60,7 +60,7 @@ function AddList({isOpened, setOpened, onListAdded} : {isOpened: boolean, setOpe
 }
 
 // ManageLists pannel
-export default function ManageLists() {
+export default function ManageLists({users} : {users: Array<User>}) {
   const { user } = useContext(UserContext)!;
   const [ lists, setLists ] = useState<Array<List>>([]);
   const [addListVisible, setAddListVisible] = useState<boolean>(false);
@@ -97,6 +97,24 @@ export default function ManageLists() {
       .catch(alertService.handleError);
   }
 
+  // Add owner
+  function addOwner(event: ChangeEvent<HTMLSelectElement>, id: number) {
+    fetchService.post('/api/lists/owner/add', { listId: id, userName: event.target.value})
+      .finally(() => {
+        event.target.value = '-1';
+      })
+      .then(() => {
+        updateLists();
+      })
+      .catch(alertService.handleError);
+  }
+
+  // userDisplayNames : userName -> displayName
+  const userDisplayNames: any = {};
+  for (const anyUser of users) {
+    userDisplayNames[anyUser.userName as any] = anyUser.displayName;
+  }
+
   return (
     <div className='pb-2'>
       <div className='text-2xl pb-2'>Lists</div>
@@ -110,9 +128,15 @@ export default function ManageLists() {
               <tr className='even:bg-orange-300 [&>td]:p-2' key={list.id}>
                 <td>{list.id}</td>
                 <td>{list.title}</td>
-                <td> </td>
+                <td>{list.userNames.map(userName => userDisplayNames[userName]).join(', ')}</td>
                 <td>
                   <div className='flex flex-wrap gap-1'>
+                    <select onChange={(event) => addOwner(event, list.id)}>
+                      <option hidden value='-1'>Add owner</option>
+                      {users.filter(user => list.userNames.includes(user.userName!) == false).map((user) => {
+                        return <option key={user.userName} value={user.userName}>{user.displayName}</option>
+                      })}
+                    </select>
                     <button className='flex-1 whitespace-nowrap' title='Supprimer'  onClick={() => deleteList(list.id)}>Supprimer</button>
                   </div>
                 </td>

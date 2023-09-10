@@ -98,6 +98,23 @@ class Database {
   }
   private stmtDeleteList: Sqlite.Statement|null = null;
 
+  public insertListOwner(listId: number, userName: string) : boolean {
+    if (this.stmtInsertListOwner == null) {
+      this.stmtInsertListOwner = this.db.prepare("INSERT INTO listsOwners (listId, userName) VALUES(?, ?)");
+    }
+    const info = this.stmtInsertListOwner.run(listId, userName);
+    return (info.changes != 0);
+  }
+  private stmtInsertListOwner: Sqlite.Statement|null = null;
+
+  public listListOwners(listId: number): Array<string> {
+    if (this.stmtListListOwner == null) {
+      this.stmtListListOwner = this.db.prepare("SELECT userName FROM listsOwners WHERE listId=?").pluck();
+    }
+    return this.stmtListListOwner.all(listId) as Array<string>;
+  }
+  private stmtListListOwner: Sqlite.Statement|null = null;
+
 }
 
 let database:Database|undefined = undefined;

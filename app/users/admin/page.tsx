@@ -39,7 +39,7 @@ export default function Admin() {
   return (
     <>
       <ManageUsers users={users} updateUsers={updateUsers} />
-      <ManageList />
+      <ManageList users={users} />
     </>
   );
 }

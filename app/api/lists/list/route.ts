@@ -12,7 +12,14 @@ export async function POST() {
     }
 
     const lists = getDatabase().listLists();
-    return NextResponse.json(lists, { status: 200 });
+    const listsWithOwners = lists.map((list) =>
+      ({
+        ...list,
+        userNames: getDatabase().listListOwners(list.id)
+      })
+    );
+
+    return NextResponse.json(listsWithOwners, { status: 200 });
 
   } catch(error) {
     return errorResponse(error);
