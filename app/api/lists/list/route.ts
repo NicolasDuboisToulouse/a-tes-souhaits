@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
 import { getDbStatement } from '_lib/server/database';
-import { errorResponse } from '_lib/server/applicationError';
+import { errorResponse, logger } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const { withOwners } = await request.json();
     if (withOwners) {
       if (user.isAdmin == false) {
-        console.log('Warn: non-admin user try to access lists/list');
+        logger.warn('Non-admin user try to access lists/list');
         throw new loginService.LoginError();
       }
       const listListOwners = getDbStatement('listListOwners', 'SELECT userName FROM listsOwners WHERE listId=?', {pluck:true});

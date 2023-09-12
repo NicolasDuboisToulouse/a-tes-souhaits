@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'
 import { User } from '_lib/user';
 import { getDbStatement } from '_lib/server/database';
-import { ApplicationError } from '_lib/server/applicationError';
+import { ApplicationError, logger } from '_lib/server/applicationError';
 
 
 export class LoginError extends ApplicationError {
@@ -47,7 +47,7 @@ export function tokenLogOn(options?: { allowsNotConnected: boolean }) : User {
     return user;
   } catch(err) {
     // login error
-    console.log('Invalid jwt token used.');
+    logger.warn('Invalid jwt token used.');
     throw new LoginError();
   }
 }
@@ -68,13 +68,13 @@ export function login({userName, password}: {userName: string, password: string}
 
   const passwordHash = getDbStatement('selectUserPasswordHash', 'SELECT passwordHash FROM users WHERE userName=?', {pluck:true}).get<string>(userName);
   if (passwordHash == null || bcrypt.compareSync(password, passwordHash) == false) {
-    console.log('Invalid user/password: ' + userName + ', ' + password);
+    logger.warn('Invalid user/password: ' + userName + ', ' + password);
     throw new LoginError('Nom ou mot de passe invalide.');
   }
 
   const user = getUser(userName);
 
-  console.log('User login: ' + user.userName);
+  logger.info('User login: ' + user.userName);
   const token = jwt.sign({ userName: user.userName }, process.env.JWT_SECRET, { expiresIn: '7d' });
   var expires = new Date(); expires.setDate(expires.getDate() + 30);
   var response = NextResponse.json(user, { status: 200 });

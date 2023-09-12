@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
 import { getDbStatement } from '_lib/server/database';
 import { User } from '_lib/user';
-import { errorResponse } from '_lib/server/applicationError';
+import { errorResponse, logger } from '_lib/server/applicationError';
 
 export async function POST() {
   try {
     const user = loginService.tokenLogOn();
     if (user.isAdmin == false) {
-      console.log('Warn: non-admin user try to access users/list');
+      logger.warn('Non-admin user try to access users/list');
       throw new loginService.LoginError();
     }
 

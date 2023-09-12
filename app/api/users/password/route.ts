@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { errorResponse } from '_lib/server/applicationError';
+import { errorResponse, logger } from '_lib/server/applicationError';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     } else {
       // User change password of someone else
       if (user.isAdmin == false) {
-        console.log("Warn: non-admin user try to change other's password");
+        logger.warn("Non-admin user try to change other's password");
         throw new loginService.LoginError();
       }
        loginService.setPassword(userName, password, true);

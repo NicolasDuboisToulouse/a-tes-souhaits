@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as loginService from '_lib/server/loginService';
-import { ApplicationError, errorResponse } from '_lib/server/applicationError';
+import { ApplicationError, errorResponse, logger } from '_lib/server/applicationError';
 import { getDbStatement } from '_lib/server/database';
 
 export async function POST(request: NextRequest) {
   try {
     const user = loginService.tokenLogOn();
     if (user.isAdmin == false) {
-      console.log("Warn: non-admin user try to delete an other user");
+      logger.warn("Non-admin user try to delete an other user");
       throw new loginService.LoginError();
     }
 

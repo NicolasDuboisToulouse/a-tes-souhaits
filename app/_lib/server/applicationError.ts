@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+export const logger = require('pino')()
+
+if (process.env.LOG_LEVEL) {
+  logger.level = process.env.LOG_LEVEL;
+}
 
 //
 // Generic error
@@ -20,11 +25,10 @@ export class ApplicationError extends Error {
 //
 export function errorResponse(error: any): NextResponse {
   if (error && error instanceof ApplicationError) {
-    console.log(error.message);
+    logger.error(error.message);
     return NextResponse.json({ message: error.message }, { status: error.status });
   } else {
-    console.log('Unhandled error.');
-    console.log(error);
+    logger.error(error, 'Unhandled error.');
     return NextResponse.json({ message: 'Unhandled error.' }, { status: ApplicationError.SERVER_ERROR });
   }
 }
