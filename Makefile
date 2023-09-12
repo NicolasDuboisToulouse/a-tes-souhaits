@@ -6,7 +6,7 @@ VERSION := $(shell git describe --tags --always --dirty)
 ARCH := $(shell docker info --format '{{.Architecture}}' 2>/dev/null)
 TAG := ${ARCH}.${VERSION}
 NAME=a-tes-souhaits
-docker_datbase_dir=${PWD}/database/data_docker
+docker_database_dir=${PWD}/database
 APP_GID=1001
 APP_UID=1001
 PORT=3000
@@ -26,7 +26,7 @@ dockerimage: .env.production
 
 # Docker targets (for debug purpose)
 dockerrun: dockerclean dockerimage
-	docker run --mount type=bind,src=${docker_datbase_dir},target=//a-tes-souhaits/database/data --name ${NAME} -p ${LOCAL_PORT}:${PORT} "${NAME}:${TAG}"
+	docker run --mount type=bind,src=${docker_database_dir},target=//a-tes-souhaits/database --name ${NAME} -p ${LOCAL_PORT}:${PORT} "${NAME}:${TAG}"
 
 dockerclean:
 	if docker container ls -a --filter "Name=${NAME}" | grep ${NAME} >/dev/null; then docker container rm --force ${NAME}; fi
@@ -36,23 +36,19 @@ dockercacheclean: dockerclean
 	docker builder prune
 
 # Generation/run target (for debug purpose)
-updatedb:
-	npx ts-node database/update_database.ts
-
-dev: updatedb
+dev:
+	mkdir -p database
 	npm run dev | npx pino-pretty
 
-next: updatedb
+next:
 	npm run build
 	rm -rf .next/standalone/.next/static
 	cp -r .next/static .next/standalone/.next
 	rm -rf .next/standalone/public
 	cp -r public .next/standalone/public
-	rm -rf .next/standalone/database/data
-	mkdir -p .next/standalone/database
-	cp -r database/data .next/standalone/database/data
+	if [ -d database ]; then cp -r database .next/standalone; else mkdir .next/standalone/database; fi
 
-run: next
+prod: next
 	HOSTNAME=localhost node .next/standalone/server.js | npx pino-pretty
 
 
@@ -60,5 +56,5 @@ clean: dockerclean
 	rm -f  ${NAME}.*.tar
 	rm -fr .next
 	rm -f  .env.production
-	rm -rf database/data
-	rm -rf ${docker_datbase_dir}
+	rm -rf database
+	rm -rf ${docker_database_dir}

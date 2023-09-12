@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "updatedb": "npx ts-node database/update_database.ts",
     "dev": "next dev",
     "build": "next build",
     "lint": "next lint"
