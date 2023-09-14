@@ -4,9 +4,11 @@
 
 :root {
     --color-bg:                     #F7EFE2;
+    --color-bg-alt:                 #FFE5BB;
     --color-bg-focus:               #fff1db;
     --color-text:                   #000000;
     --color-border:                 #F26D21;
+    --color-border-light:           #FFFFFF;
     --color-border-focus:           #B44200;
     --color-menu-hover:             #ffd899;
 
@@ -36,12 +38,9 @@ body {
 /* Center main content and define its min/max with */
 .main-content {
     max-width: 90%;
+    min-width: 20rem;
     width: fit-content;
     margin: 0 auto;
-}
-
-.main-content .main {
-    min-width: 20rem;
 }
 
 /* screen center */
@@ -68,7 +67,7 @@ ul.menu li:hover {
 dialog.modal {
     background-color: var(--color-bg-focus);
     border: solid 1px var(--color-border);
-    border-radius:5%;
+    border-radius: 1rem;
     padding: 1rem;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
@@ -120,7 +119,6 @@ input.invalid {
 
 /* vertical form */
 .v-form {
-    max-width:    fit-content;
     margin-left:  auto;
     margin-right: auto;
 }
@@ -130,7 +128,7 @@ input.invalid {
     margin-bottom: 0.2em;
 }
 
-.v-form input {
+.v-form input,.v-form textarea {
     display: block;
     width:   100%;
     padding: 0.2em;
@@ -220,4 +218,13 @@ input.invalid {
     -webkit-mask: var(--icon);
     mask: var(--icon);
     mask-position: center;
+}
+
+/* wishList */
+.wishList {
+    border: solid 1px var(--color-border-light);
+}
+
+.wishList > :nth-child(2n+1) {
+    background-color: var(--color-bg-alt);
 }
