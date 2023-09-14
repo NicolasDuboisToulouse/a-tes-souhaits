@@ -25,11 +25,8 @@ export async function POST(request: NextRequest) {
     ) {
       throw new ApplicationError('Unexpected error while deleting user.', ApplicationError.SERVER_ERROR);
     }
-    if (getDbStatement('deleteListOwnerByOwner', 'DELETE FROM listsOwners WHERE userName=?')
-      .run(userName) == false
-    ) {
-      throw new ApplicationError('Unexpected error while deleting user from listsOwners.', ApplicationError.SERVER_ERROR);
-    }
+
+    getDbStatement('deleteListOwnerByOwner', 'DELETE FROM listsOwners WHERE userName=?').run(userName);
 
     return NextResponse.json({}, { status: 200 });
 
