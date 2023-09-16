@@ -46,7 +46,7 @@ export function Alerts() {
         (alert, index) => {
           return (
             <div key={index} className={`alert ${alert.fading_out?'fadeout':''}`}>
-              <button autoFocus onClick={() => {closeAlert(alert)} }>{String.fromCharCode(0x2716)}</button>
+              <button autoFocus onClick={() => {closeAlert(alert)} } title='Fermer'><span className='icon icon-close'><span>Fermer</span></span></button>
               {alert.message}
             </div>
           );

@@ -88,10 +88,7 @@ select, button, [type='submit'], [type='button']  {
 }
 
 button {
-    transition:  border-color 0.25s;
-    /* Hack to change unicode char color in chrome */
-    color:       transparent;
-    text-shadow: 0 0 0 var(--color-button-text);
+    transition: border-color 0.25s;
 }
 
 button:hover {
@@ -191,4 +188,36 @@ input.invalid {
 .fadeout {
     transition: opacity 0.25s linear;
     opacity: 0;
+}
+
+/* icons */
+.icon:before {
+    background-color: var(--color-button-text);
+    mask-size: 1rem;
+    content: '\2003';
+}
+.icon span {
+    display:none;
+}
+
+.icon-close:before {
+    background-color: var(--color-button);
+    --icon: url('/imgs/xmark-solid.svg') no-repeat;
+    -webkit-mask: var(--icon);
+    mask: var(--icon);
+    mask-position: center;
+}
+
+.icon-modify:before {
+    --icon: url('/imgs/pen-to-square-regular.svg') no-repeat;
+    -webkit-mask: var(--icon);
+    mask: var(--icon);
+    mask-position: center;
+}
+
+.icon-delete:before {
+    --icon: url('/imgs/xmark-solid.svg') no-repeat;
+    -webkit-mask: var(--icon);
+    mask: var(--icon);
+    mask-position: center;
 }
