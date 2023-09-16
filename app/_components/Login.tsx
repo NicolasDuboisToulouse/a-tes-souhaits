@@ -7,7 +7,7 @@ export function Login({doLogin} : {doLogin: LoginFunc}) {
   const { errors } = formState;
 
   return (
-    <div className='v-form screen-center'>
+    <div className='v-form'>
       <form onSubmit={handleSubmit(doLogin)} autoComplete='off' acceptCharset='UTF-8'>
         <div className='form-group'>
           <label>Nom</label>

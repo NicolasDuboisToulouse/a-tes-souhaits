@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 
 import { Alerts } from '_components/Alerts'
 import { Spinner } from '_components/Spinner'
-import { Header } from '_components/Header'
 import { UserProvider } from '_components/UserProvider'
 
 
@@ -19,10 +18,7 @@ export default function RootLayout({ children } : { children: React.ReactNode}) 
         <Spinner />
         <Alerts />
         <UserProvider>
-          <Header />
-          <div className="main-content">
-            {children}
-          </div>
+          {children}
         </UserProvider>
       </body>
     </html>

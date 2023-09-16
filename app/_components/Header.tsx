@@ -1,14 +1,14 @@
-'use client'
-import { useEffect, useRef, useContext } from 'react';
-import { UserContext } from '_components/UserProvider'
+import { useEffect, useRef } from 'react';
+import { User } from '_lib/user'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 
-export function Header() {
+export function Header({user, onLogout}: {user:User, onLogout: ()=>void} ) {
 
   const button = useRef<HTMLButtonElement>(null);
   const popup = useRef<HTMLUListElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Handle popup - popout
   useEffect( () => {
@@ -34,15 +34,17 @@ export function Header() {
     };
   }, [button]);
 
+  // No user, no menu
+  if (user.isValid() == false) {
+    return <div id='header' />
+  }
 
   // Menu content
-  const { user, logout } = useContext(UserContext)!;
   type Item = { text: string, target: (() => void)|string};
   const items : Array<Item> = [
-    { text: "Déconnetion", target: logout },
+    { text: "Déconnetion", target: onLogout },
     { text: "Changer de mot de passe", target: '/users/password' },
   ];
-  const pathname = usePathname();
   if (user.isAdmin) {
     if (pathname == '/users/admin') {
       items.push({ text: "Acceuil", target: '/' });
@@ -50,7 +52,6 @@ export function Header() {
       items.push({ text: "Administration", target: '/users/admin' });
     }
   }
-
 
   return (
 	<div id='header' className="text-end">

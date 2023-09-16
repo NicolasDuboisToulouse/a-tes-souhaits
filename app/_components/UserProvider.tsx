@@ -3,6 +3,7 @@ import { createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
+import { Header } from '_components/Header'
 import { Login } from '_components/Login';
 import { User } from '_lib/user';
 import { Password } from './Password';
@@ -77,26 +78,19 @@ export function UserProvider({children} : {children: React.ReactNode}) {
   // Display children only if logged in and password changed
   let content = null;
   if (user.isValid() == false) {
-    content = (
-      <>
-        <div id="header" />
-        <Login doLogin={doLogin} />
-      </>
-    )
+    content = <Login doLogin={doLogin} />;
   } else if (user.firstLogin) {
-    content = (
-      <>
-        <div id="header" />
-        <Password onPasswordUpdated={onPasswordUpdated}/>
-      </>
-    );
+    content = <Password onPasswordUpdated={onPasswordUpdated}/>;
   } else {
     content = children;
   }
 
   return (
     <UserContext.Provider value={{user, logout: doLogout}}>
-      {content}
+      <Header user={user} onLogout={doLogout} />
+      <div className='main-content'>
+        {content}
+      </div>
     </UserContext.Provider>
   )
 }
