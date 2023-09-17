@@ -6,21 +6,26 @@ import { WishEditor } from './WishEditor';
 import { Wishes, WishList } from '_components/WishList';
 
 
-export function Wishes({listId} : {listId: number}) {
+export function Wishes({listId} : {listId: number|undefined}) {
   const { user } = useContext(UserContext)!;
-  const [ wishes, setWishes ] = useState<Wishes>([]);
-  const [ owned, setOwned ] = useState<boolean|undefined>(undefined);
+  const [ wishes, setWishes ] = useState<Wishes|undefined>(undefined);
+  const [ owned, setOwned ] = useState<boolean>(false);
   const [addWishVisible, setAddWishVisible] = useState<boolean>(false);
 
   // Refresh page on wish list change
   const updateWishes = useCallback(() => {
-    if (listId >= 0) {
-      fetchService.post('/api/wishes/list', {listId})
-        .then((data) => {
-          setOwned(data.isOwner);
-          setWishes(data.wishes);
-        })
-        .catch(alertService.handleError);
+    if (listId !== undefined) {
+      if (listId >= 0) {
+        fetchService.post('/api/wishes/list', {listId})
+          .then((data) => {
+            setOwned(data.isOwner);
+            setWishes(data.wishes);
+          })
+          .catch(alertService.handleError);
+      } else {
+        setOwned(false);
+        setWishes([]);
+      }
     }
   }, [ listId ]);
 
@@ -32,7 +37,7 @@ export function Wishes({listId} : {listId: number}) {
   if (user.isValid() == false) return null;
 
   // Lading...
-  if (listId >= 0 && owned === undefined) {
+  if (listId == undefined || wishes === undefined) {
     return <div>Hello {user.displayName} !</div>;
   }
 

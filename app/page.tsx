@@ -4,7 +4,7 @@ import { Lists } from '_components/Lists'
 import { Wishes } from '_components/Wishes'
 
 export default function Main() {
-  const [ listId, setListId ] = useState<number>(-1);
+  const [ listId, setListId ] = useState<number|undefined>(undefined);
 
   return (
     <div className="main">
