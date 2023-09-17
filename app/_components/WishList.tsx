@@ -1,9 +1,44 @@
 import { Wish } from '_components/WishEditor';
+import * as fetchService from '_lib/client/fetchService';
+import { alertService } from '_components/Alerts';
 import { User } from '_lib/user'
 
 export type Wishes = Array<Wish>;
 
-export function WishList({user, owned, wishes, draftMode} : {user: User, owned: boolean, wishes: Wishes, draftMode: boolean}) {
+// Actions for a single wish
+function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boolean, onWhishesChanged: () => void}) {
+
+  function deleteWish(id: number) {
+    fetchService.post('/api/wishes/del', {wishId: id})
+      .then(() => {
+        onWhishesChanged();
+      })
+      .catch(alertService.handleError);
+  }
+
+  if (owned) {
+    return (
+      <>
+        <button className='self-start flex-none p-1' title='Modifier'>
+          <span className='icon icon-modify'><span>Modifier</span></span>
+        </button>
+        <button className='self-start flex-none p-1' title='Supprimer' onClick={()=>deleteWish(wish.id)}>
+          <span className='icon icon-delete'><span>Supprimer</span></span>
+        </button>
+      </>
+    );
+  } else {
+    return <button className='self-start flex-none p-1' title='Réserver'>Réserver</button>;
+  }
+}
+
+
+// Main
+export function WishList({
+  user, owned, wishes, draftMode, onWhishesChanged
+} : {
+  user: User, owned: boolean, wishes: Wishes, draftMode: boolean, onWhishesChanged: () => void
+}) {
 
   // Only owner may have drafts
   if (owned == false && draftMode == true) return null;
@@ -33,19 +68,6 @@ export function WishList({user, owned, wishes, draftMode} : {user: User, owned: 
     return null;
   }
 
-  // Buttons associated with a wish depend on owned status
-  let wishButtons: JSX.Element|null = null;
-  if (owned) {
-    wishButtons = (
-      <>
-        <button className='self-start flex-none p-1' title='Modifier'><span className='icon icon-modify'><span>Modifier</span></span></button>
-        <button className='self-start flex-none p-1' title='Supprimer'><span className='icon icon-delete'><span>Supprimer</span></span></button>
-      </>
-    );
-  } else {
-    wishButtons = <button className='self-start flex-none p-1' title='Réserver'>Réserver</button>;
-  }
-
   // Display list
   return (
       <div className='wishList min-w-[60vw]'>
@@ -56,7 +78,7 @@ export function WishList({user, owned, wishes, draftMode} : {user: User, owned: 
                 <div className='text-lg leading-4'>{wish.label}</div>
                 <div className='text-base ml-1'>{wish.description}</div>
               </div>
-              {wishButtons}
+              <WishActions wish={wish} owned={owned} onWhishesChanged={onWhishesChanged} />
             </div>
           )
         })}

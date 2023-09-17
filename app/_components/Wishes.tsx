@@ -13,7 +13,7 @@ export function Wishes({listId} : {listId: number}) {
   const [addWishVisible, setAddWishVisible] = useState<boolean>(false);
 
   // Refresh page on wish list change
-  const updateWishs = useCallback(() => {
+  const updateWishes = useCallback(() => {
     if (listId >= 0) {
       fetchService.post('/api/wishes/list', {listId})
         .then((data) => {
@@ -25,9 +25,8 @@ export function Wishes({listId} : {listId: number}) {
   }, [ listId ]);
 
   useEffect(() => {
-    updateWishs();
-  }, [updateWishs]);
-
+    updateWishes();
+  }, [updateWishes]);
 
   // We shall not be there
   if (user.isValid() == false) return null;
@@ -51,7 +50,7 @@ export function Wishes({listId} : {listId: number}) {
   // addWishButton: display an add button if we own the list
   const addWishButton = (owned == false)? null : (
     <>
-      <WishEditor listId={listId} isOpened={addWishVisible} setOpened={setAddWishVisible} onWishAdded={updateWishs} />
+      <WishEditor listId={listId} isOpened={addWishVisible} setOpened={setAddWishVisible} onWishAdded={updateWishes} />
       <div className='text-center pt-4'><button  onClick={() => setAddWishVisible(true)}>Ajouter</button></div>
     </>
   );
@@ -65,14 +64,14 @@ export function Wishes({listId} : {listId: number}) {
           <div className='text-2xl'>Brouillons</div>
           <div>Les souhaits ci-dessous ne sont pas visible par les autres utilisateurs.</div>
         </div>
-        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} />
+        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} onWhishesChanged={updateWishes} />
       </>
     );
   }
 
   return (
     <>
-      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} />
+      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} onWhishesChanged={updateWishes} />
       {addWishButton}
       {draftList}
     </>
