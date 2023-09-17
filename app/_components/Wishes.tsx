@@ -33,12 +33,12 @@ export function Wishes({listId} : {listId: number}) {
   if (user.isValid() == false) return null;
 
   // Lading...
-  if (owned === undefined) {
+  if (listId >= 0 && owned === undefined) {
     return <div>Hello {user.displayName} !</div>;
   }
 
   // We always shall have a selected list unless user has no owned list
-  if (listId == -1) {
+  if (listId < 0) {
     return (
       <div>
         <div>Hello {user.displayName} !</div>
@@ -56,34 +56,25 @@ export function Wishes({listId} : {listId: number}) {
     </>
   );
 
-
-  // Empty list
-  if (wishes.length == 0) {
-    let message;
-    if (owned) {
-      message = (
-        <>
-          <div>Qu&apos;est-ce qui vous ferais plaisir ?</div>
-          <div>Cliquez sur [Ajouter] pour ajouter un souhait !</div>
-          {addWishButton}
-        </>
-      );
-    } else {
-      message = <div>Cette liste de souhaits est actuellement vide.</div>;
-    }
-    return (
-      <div>
-        <div>Hello {user.displayName} !</div>
-        {message}
-      </div>
-    )
+  // The draftList is only displayed for the owner
+  let draftList: JSX.Element|null = null;
+  if (owned && wishes.some((wish) => wish.draft == true)) {
+    draftList = (
+      <>
+        <div className='pt-4 pb-2'>
+          <div className='text-2xl'>Brouillons</div>
+          <div>Les souhaits ci-dessous ne sont pas visible par les autres utilisateurs.</div>
+        </div>
+        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} />
+      </>
+    );
   }
 
-  // Filed list
   return (
     <>
-      <WishList owned={owned} wishes={wishes} />
+      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} />
       {addWishButton}
+      {draftList}
     </>
   );
 }
