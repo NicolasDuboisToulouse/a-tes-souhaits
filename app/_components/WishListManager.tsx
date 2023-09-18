@@ -8,37 +8,37 @@ import { WishArray, WishList } from '_components/WishList';
 
 export function WishListManager({listId} : {listId: number|undefined}) {
   const { user } = useContext(UserContext)!;
-  const [ wishes, setWishes ] = useState<WishArray|undefined>(undefined);
+  const [ wishArray, setWishArray ] = useState<WishArray|undefined>(undefined);
   const [ owned, setOwned ] = useState<boolean>(false);
   const [ wishEditorVisible, setWishEditorVisible ] = useState<boolean>(false);
   const [ editedWish, setEditedWish ] = useState<Wish|undefined>(undefined);
 
   // Refresh page on wish list change
-  const updateWishes = useCallback(() => {
+  const update = useCallback(() => {
     if (listId !== undefined) {
       if (listId >= 0) {
         fetchService.post('/api/wishes/list', {listId})
           .then((data) => {
             setOwned(data.isOwner);
-            setWishes(data.wishes);
+            setWishArray(data.wishArray);
           })
           .catch(alertService.handleError);
       } else {
         setOwned(false);
-        setWishes([]);
+        setWishArray([]);
       }
     }
   }, [ listId ]);
 
   useEffect(() => {
-    updateWishes();
-  }, [updateWishes]);
+    update();
+  }, [update]);
 
   // We shall not be there
   if (user.isValid() == false) return null;
 
   // Lading...
-  if (listId == undefined || wishes === undefined) {
+  if (listId == undefined || wishArray === undefined) {
     return <div>Hello {user.displayName} !</div>;
   }
 
@@ -71,22 +71,22 @@ export function WishListManager({listId} : {listId: number|undefined}) {
 
   // The draftList is only displayed for the owner
   let draftList: JSX.Element|null = null;
-  if (owned && wishes.some((wish) => wish.draft == true)) {
+  if (owned && wishArray.some((wish) => wish.draft == true)) {
     draftList = (
       <>
         <div className='pt-4 pb-2'>
           <div className='text-2xl'>Brouillons</div>
           <div>Les souhaits ci-dessous ne sont pas visible par les autres utilisateurs.</div>
         </div>
-        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} onChange={updateWishes} onEditWish={editWish} />
+        <WishList user={user} owned={owned} wishArray={wishArray} draftMode={true} onChange={update} onEditWish={editWish} />
       </>
     );
   }
 
   return (
     <>
-      <WishEditor listId={listId} isOpened={wishEditorVisible} setOpened={setWishEditorVisible} onChange={updateWishes} wish={editedWish} />
-      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} onChange={updateWishes} onEditWish={editWish} />
+      <WishEditor listId={listId} isOpened={wishEditorVisible} setOpened={setWishEditorVisible} onChange={update} wish={editedWish} />
+      <WishList user={user} owned={owned!} wishArray={wishArray} draftMode={false} onChange={update} onEditWish={editWish} />
       {addWishButton}
       {draftList}
     </>

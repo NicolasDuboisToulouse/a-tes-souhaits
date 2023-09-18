@@ -70,19 +70,19 @@ function WishActions({
 
 // Main
 export function WishList({
-  user, owned, wishes, draftMode, onChange, onEditWish
+  user, owned, wishArray, draftMode, onChange, onEditWish
 } : {
-  user: User, owned: boolean, wishes: WishArray, draftMode: boolean, onChange: () => void, onEditWish: (wish: Wish) => void
+  user: User, owned: boolean, wishArray: WishArray, draftMode: boolean, onChange: () => void, onEditWish: (wish: Wish) => void
 }) {
 
   // Only owner may have drafts
   if (owned == false && draftMode == true) return null;
 
   // Filter list according to draft status
-  let displayWishes = (owned == false)? wishes : wishes.filter((wish) => wish.draft == draftMode);
+  let displayedWishArray = (owned == false)? wishArray : wishArray.filter((wish) => wish.draft == draftMode);
 
   // Handle empty list
-  if (displayWishes.length == 0) {
+  if (displayedWishArray.length == 0) {
     if (owned == false) {
       return (
         <>
@@ -91,7 +91,7 @@ export function WishList({
         </>
       );
     }
-    else if (wishes.length == 0) { // Only if completly empty
+    else if (wishArray.length == 0) { // Only if completly empty
       return (
         <>
           <div>Hello {user.displayName} !</div>
@@ -106,7 +106,7 @@ export function WishList({
   // Display list
   return (
     <div className='wishList min-w-[60vw]'>
-      {displayWishes.map((wish) => {
+      {displayedWishArray.map((wish) => {
         return (
           <div className='p-2 flex flex-wrap gap-1' key={wish.id}>
             <div className='flex-1 pr-4'>

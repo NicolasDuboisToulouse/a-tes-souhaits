@@ -14,17 +14,17 @@ export async function POST(request: NextRequest) {
       throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
     }
 
-    const infos: {isOwner: boolean, wishes: WishArray } = {
+    const infos: {isOwner: boolean, wishArray: WishArray } = {
       isOwner: isListOwner(listId, user.userName!),
-      wishes: [],
+      wishArray: [],
     };
 
     if(infos.isOwner == false) {
       // Select wishes of another user (exclude draft wished)
-      const wishes = getDbStatement('listOthersWishes', 'SELECT id, label, description, bookedBy FROM wishes WHERE draft=0 AND listId=?').
+      const wishArray = getDbStatement('listOthersWishes', 'SELECT id, label, description, bookedBy FROM wishes WHERE draft=0 AND listId=?').
         all<{id: number, label: string, description: string, bookedBy: string}>(listId);
 
-      infos.wishes = wishes.map(wish => {
+      infos.wishArray = wishArray.map(wish => {
         const targetWish = {id: wish.id, label: wish.label, description: wish.description, bookedBy: BookedBy.Nobody, draft: false}
         if (wish.bookedBy.length != 0) {
           if (wish.bookedBy == user.userName) {
@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
 
     } else {
       // Select my wishes (exclude bookedBy)
-      const wishes = getDbStatement('listMyWishes', 'SELECT id, label, description, draft FROM wishes WHERE listId=?').
+      const wishArray = getDbStatement('listMyWishes', 'SELECT id, label, description, draft FROM wishes WHERE listId=?').
         all<{id: number, label: string, description: string, draft: number}>(listId);
-      infos.wishes = wishes.map(wish => {
+      infos.wishArray = wishArray.map(wish => {
         return {id: wish.id, label: wish.label, description: wish.description, bookedBy: BookedBy.Nobody, draft: wish.draft != 0}
       });
     }
