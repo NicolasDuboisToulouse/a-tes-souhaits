@@ -14,12 +14,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (isWishOwner(wishId, user.userName!) == false) {
-      logger.warn(user.userName + " try to delete a non-owned wish!");
+      logger.warn(user.userName + " try to move to draft a non-owned wish!");
       throw new ApplicationError('Client Error: invalid API usage.', ApplicationError.CLIENT_ERROR);
     }
 
-    if (getDbStatement('deleteWish', 'DELETE FROM wishes WHERE id=?').run(wishId) == false) {
-      throw new ApplicationError('Unexpected error while deleting a wish', ApplicationError.SERVER_ERROR);
+    if (getDbStatement('toDraftWish', 'UPDATE wishes set draft=1 WHERE id=?').run(wishId) == false) {
+      throw new ApplicationError('Unexpected error while moving to draft a wish', ApplicationError.SERVER_ERROR);
     }
 
     return NextResponse.json({}, { status: 200 });
