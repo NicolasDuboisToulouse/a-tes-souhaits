@@ -7,7 +7,11 @@ import { User } from '_lib/user'
 export type Wishes = Array<Wish>;
 
 // Actions for a single wish
-function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boolean, onWhishesChanged: () => void}) {
+function WishActions({
+  wish, owned, onChange, onEdit
+} : {
+  wish: Wish, owned: boolean, onChange: () => void, onEdit: (wish: Wish) => void
+}) {
 
   function askDeleteWish() {
     if (wish.draft == false) {
@@ -33,7 +37,7 @@ function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boole
   function wishToDraft() {
     fetchService.post('/api/wishes/toDraft', {wishId: wish.id})
       .then(() => {
-        onWhishesChanged();
+        onChange();
       })
       .catch(alertService.handleError);
   }
@@ -41,7 +45,7 @@ function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boole
   function deleteWish() {
     fetchService.post('/api/wishes/del', {wishId: wish.id})
       .then(() => {
-        onWhishesChanged();
+        onChange();
       })
       .catch(alertService.handleError);
   }
@@ -49,7 +53,7 @@ function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boole
   if (owned) {
     return (
       <>
-        <button className='self-start flex-none p-1' title='Modifier'>
+        <button className='self-start flex-none p-1' title='Modifier' onClick={() => onEdit(wish)}>
           <span className='icon icon-modify'><span>Modifier</span></span>
         </button>
         <button className='self-start flex-none p-1' title='Supprimer' onClick={askDeleteWish}>
@@ -65,9 +69,9 @@ function WishActions({wish, owned, onWhishesChanged} : {wish: Wish, owned: boole
 
 // Main
 export function WishList({
-  user, owned, wishes, draftMode, onWhishesChanged
+  user, owned, wishes, draftMode, onChange, onEditWish
 } : {
-  user: User, owned: boolean, wishes: Wishes, draftMode: boolean, onWhishesChanged: () => void
+  user: User, owned: boolean, wishes: Wishes, draftMode: boolean, onChange: () => void, onEditWish: (wish: Wish) => void
 }) {
 
   // Only owner may have drafts
@@ -108,7 +112,7 @@ export function WishList({
               <div className='text-lg leading-4'>{wish.label}</div>
               <div className='text-base ml-1'>{wish.description}</div>
             </div>
-            <WishActions wish={wish} owned={owned} onWhishesChanged={onWhishesChanged} />
+            <WishActions wish={wish} owned={owned} onChange={onChange} onEdit={onEditWish} />
           </div>
         )
       })}

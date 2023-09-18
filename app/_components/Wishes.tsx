@@ -2,7 +2,7 @@ import { useContext, useState, useCallback, useEffect } from 'react'
 import { UserContext } from '_components/UserProvider'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
-import { WishEditor } from './WishEditor';
+import { Wish, WishEditor } from './WishEditor';
 import { Wishes, WishList } from '_components/WishList';
 
 
@@ -10,7 +10,8 @@ export function Wishes({listId} : {listId: number|undefined}) {
   const { user } = useContext(UserContext)!;
   const [ wishes, setWishes ] = useState<Wishes|undefined>(undefined);
   const [ owned, setOwned ] = useState<boolean>(false);
-  const [addWishVisible, setAddWishVisible] = useState<boolean>(false);
+  const [ wishEditorVisible, setWishEditorVisible ] = useState<boolean>(false);
+  const [ editedWish, setEditedWish ] = useState<Wish|undefined>(undefined);
 
   // Refresh page on wish list change
   const updateWishes = useCallback(() => {
@@ -52,12 +53,20 @@ export function Wishes({listId} : {listId: number|undefined}) {
     );
   }
 
+  // Callbacks to show wishEditor
+  function addWish() {
+    setEditedWish(undefined);
+    setWishEditorVisible(true);
+  }
+
+  function editWish(wish: Wish) {
+    setEditedWish(wish);
+    setWishEditorVisible(true);
+  }
+
   // addWishButton: display an add button if we own the list
   const addWishButton = (owned == false)? null : (
-    <>
-      <WishEditor listId={listId} isOpened={addWishVisible} setOpened={setAddWishVisible} onWishAdded={updateWishes} />
-      <div className='text-center pt-4'><button  onClick={() => setAddWishVisible(true)}>Ajouter</button></div>
-    </>
+    <div className='text-center pt-4'><button  onClick={addWish}>Ajouter</button></div>
   );
 
   // The draftList is only displayed for the owner
@@ -69,14 +78,15 @@ export function Wishes({listId} : {listId: number|undefined}) {
           <div className='text-2xl'>Brouillons</div>
           <div>Les souhaits ci-dessous ne sont pas visible par les autres utilisateurs.</div>
         </div>
-        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} onWhishesChanged={updateWishes} />
+        <WishList user={user} owned={owned} wishes={wishes} draftMode={true} onChange={updateWishes} onEditWish={editWish} />
       </>
     );
   }
 
   return (
     <>
-      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} onWhishesChanged={updateWishes} />
+      <WishEditor listId={listId} isOpened={wishEditorVisible} setOpened={setWishEditorVisible} onChange={updateWishes} wish={editedWish} />
+      <WishList user={user} owned={owned!} wishes={wishes} draftMode={false} onChange={updateWishes} onEditWish={editWish} />
       {addWishButton}
       {draftList}
     </>
