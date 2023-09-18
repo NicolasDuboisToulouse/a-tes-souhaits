@@ -2,14 +2,8 @@ import { useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
-
-export type Wish = {
-  id:          number,
-  label:       string,
-  description: string,
-  draft:       boolean,
-  bookedBy:    string,
-};
+import { Wish } from '_lib/wish';
+export type { Wish }
 
 export function WishEditor({
   listId,

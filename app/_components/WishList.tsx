@@ -1,10 +1,11 @@
 import { Wish } from '_components/WishEditor';
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
-import { simpleDialog, SimpleDialogContainer } from '_components/SimpleDialog'
+import { simpleDialog } from '_components/SimpleDialog'
 import { User } from '_lib/user'
+import { WishArray } from '_lib/wish'
+export type { WishArray }
 
-export type Wishes = Array<Wish>;
 
 // Actions for a single wish
 function WishActions({
@@ -71,7 +72,7 @@ function WishActions({
 export function WishList({
   user, owned, wishes, draftMode, onChange, onEditWish
 } : {
-  user: User, owned: boolean, wishes: Wishes, draftMode: boolean, onChange: () => void, onEditWish: (wish: Wish) => void
+  user: User, owned: boolean, wishes: WishArray, draftMode: boolean, onChange: () => void, onEditWish: (wish: Wish) => void
 }) {
 
   // Only owner may have drafts
