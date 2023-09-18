@@ -6,7 +6,7 @@ import { Wish, WishEditor } from './WishEditor';
 import { WishArray, WishList } from '_components/WishList';
 
 
-export function Wishes({listId} : {listId: number|undefined}) {
+export function WishListManager({listId} : {listId: number|undefined}) {
   const { user } = useContext(UserContext)!;
   const [ wishes, setWishes ] = useState<WishArray|undefined>(undefined);
   const [ owned, setOwned ] = useState<boolean>(false);

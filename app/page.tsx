@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Lists } from '_components/Lists'
-import { Wishes } from '_components/Wishes'
+import { WishListManager } from '_components/WishListManager'
 
 export default function Main() {
   const [ listId, setListId ] = useState<number|undefined>(undefined);
@@ -9,7 +9,7 @@ export default function Main() {
   return (
     <div className="main">
       <Lists onListChange={setListId} />
-      <Wishes listId={listId} />
+      <WishListManager listId={listId} />
     </div>
   );
 }
