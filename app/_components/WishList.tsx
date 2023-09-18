@@ -3,7 +3,7 @@ import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 import { simpleDialog } from '_components/SimpleDialog'
 import { User } from '_lib/user'
-import { WishArray } from '_lib/wish'
+import { BookedBy, WishArray } from '_lib/wish'
 export type { WishArray }
 
 
@@ -51,6 +51,14 @@ function WishActions({
       .catch(alertService.handleError);
   }
 
+  function setBooked(booked: boolean) {
+    fetchService.post('/api/wishes/setBooked', {wishId: wish.id, booked})
+      .then(() => {
+        onChange();
+      })
+      .catch(alertService.handleError);
+  }
+
   if (owned) {
     return (
       <>
@@ -63,7 +71,13 @@ function WishActions({
       </>
     );
   } else {
-    return <button className='self-start flex-none p-1' title='Réserver'>Réserver</button>;
+    if (wish.bookedBy == BookedBy.Nobody) {
+      return <button className='self-start flex-none p-1' title='Réserver' onClick={() => setBooked(true)}>Réserver</button>;
+    } else if (wish.bookedBy == BookedBy.Me) {
+      return <button className='self-start flex-none p-1' title='Libérer' onClick={() => setBooked(false)}>Libérer</button>;
+    } else {
+      return <span>Réservé.</span>
+    }
   }
 }
 
