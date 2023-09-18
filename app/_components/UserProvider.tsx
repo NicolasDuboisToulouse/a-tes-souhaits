@@ -91,6 +91,7 @@ export function UserProvider({children} : {children: React.ReactNode}) {
       <div className='main-content'>
         {content}
       </div>
+      <div id='footer' className='h-10' />
     </UserContext.Provider>
   )
 }
