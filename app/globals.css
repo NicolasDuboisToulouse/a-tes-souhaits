@@ -144,13 +144,13 @@ input.invalid {
     margin-right: auto;
 }
 
-.v-form .button-group {
+.button-group {
     width: fit-content;
     margin-left:  auto;
     margin-right: auto;
 }
 
-.v-form .button-group button {
+.button-group button {
     display: inline;
     margin: 0 0.2rem;
 }

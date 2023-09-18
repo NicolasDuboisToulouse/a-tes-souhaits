@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 
 import { Alerts } from '_components/Alerts'
 import { Spinner } from '_components/Spinner'
+import { SimpleDialogContainer } from '_components/SimpleDialog'
 import { UserProvider } from '_components/UserProvider'
 
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children } : { children: React.ReactNode}) 
       <body>
         <Spinner />
         <Alerts />
+        <SimpleDialogContainer />
         <UserProvider>
           {children}
         </UserProvider>
