@@ -7,11 +7,18 @@ import { WishArray, WishList } from '_components/WishList';
 
 
 export function WishListManager({listId} : {listId: number|undefined}) {
+  // Logged-in user
   const { user } = useContext(UserContext)!;
+  // List of wishes to display
   const [ wishArray, setWishArray ] = useState<WishArray|undefined>(undefined);
+  // Does logged-in user own these wishes
   const [ owned, setOwned ] = useState<boolean>(false);
+  // Control the visiblity of the wish editor
   const [ wishEditorVisible, setWishEditorVisible ] = useState<boolean>(false);
+  // Control the content of the wish editor
   const [ editedWish, setEditedWish ] = useState<Wish|undefined>(undefined);
+  // Store the last render date
+  let lastRenderDate = Date.now();
 
   // Refresh page on wish list change
   const update = useCallback(() => {
@@ -33,6 +40,23 @@ export function WishListManager({listId} : {listId: number|undefined}) {
   useEffect(() => {
     update();
   }, [update]);
+
+
+  // Call update() if document become visible (user navigate back to this tab)
+  // and the component has not been render for a while
+  const mayUpdate = useCallback(() => {
+    if (listId && listId > 0 &&
+      document.visibilityState === "visible" &&
+      (Date.now() - lastRenderDate) > 10 * 60 * 1000) {
+        update();
+    }
+  }, [listId, lastRenderDate, update]);
+
+  useEffect(() => {
+    addEventListener("visibilitychange", mayUpdate);
+    return () => { removeEventListener("visibilitychange", mayUpdate); }
+  }, [mayUpdate]);
+
 
   // We shall not be there
   if (user.isValid() == false) return null;
