@@ -19,10 +19,17 @@ dockerimage: .env.production
 	docker build --platform linux/${ARCH} -t "${NAME}:${TAG}" --build-arg APP_GID=${APP_GID} --build-arg APP_UID=${APP_UID} --build-arg PORT=${PORT} .
 
 # Note: re-generating this file will invalidate all sessions
-.env.production:
+.jwt.production.secret:
 	rm -f $@
 	echo -n JWT_SECRET=                                                    >> $@
 	cat /dev/urandom | tr -dc '[:alnum:]' | fold -w $${1:-30} | head -n 1  >> $@
+
+.env.production: .jwt.production.secret
+	rm -f $@
+	cp -f $< $@
+	echo NEXT_TELEMETRY_DISABLED=1      >> $@
+	echo NEXT_PUBLIC_VERSION=${VERSION} >> $@
+.PHONY: .env.production
 
 # Docker targets (for debug purpose)
 dockerrun: dockerclean dockerimage
@@ -36,12 +43,20 @@ dockercacheclean: dockerclean
 	docker builder prune
 
 # Generation/run target (for debug purpose)
-dev:
-	mkdir -p database
-	npm run dev | npx pino-pretty
+.env.development:
+	rm -f $@
+	echo NEXT_TELEMETRY_DISABLED=1       >> $@
+	echo JWT_SECRET=This is not a secret >> $@
+	echo LOG_LEVEL=trace                 >> $@
+	echo NEXT_PUBLIC_VERSION=${VERSION}  >> $@
+.PHONY: .env.development
 
-next:
-	npm run build
+dev: .env.development
+	mkdir -p database
+	npx next dev | npx pino-pretty
+
+next: .env.production
+	npx next build
 	rm -rf .next/standalone/.next/static
 	cp -r .next/static .next/standalone/.next
 	rm -rf .next/standalone/public

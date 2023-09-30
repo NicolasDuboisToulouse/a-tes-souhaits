@@ -7,5 +7,9 @@ node_modules
 // Typescript
 next-env.d.ts
 
-// Store secret
-.env.production
+// Environment
+.jwt.production.secret
+.env.*
+
+// data
+database

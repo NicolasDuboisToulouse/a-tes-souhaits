@@ -45,12 +45,14 @@ export function Header({user, onLogout}: {user:User, onLogout: ()=>void} ) {
     { text: "Déconnetion", target: onLogout },
     { text: "Changer de mot de passe", target: '/users/password' },
   ];
-  if (user.isAdmin) {
-    if (pathname == '/users/admin') {
-      items.push({ text: "Acceuil", target: '/' });
-    } else {
+  if (user.isAdmin && pathname != '/users/admin') {
       items.push({ text: "Administration", target: '/users/admin' });
-    }
+  }
+  if (pathname != '/') {
+      items.push({ text: "Acceuil", target: '/' });
+  }
+  if (pathname != '/about') {
+    items.push({ text: "À propos", target: '/about' });
   }
 
   return (
