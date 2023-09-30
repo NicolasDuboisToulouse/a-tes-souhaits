@@ -17,28 +17,27 @@ export function WishEditor({
   wish: Wish|undefined,
 })
 {
+  // Form declaration. Set values for an edit dialog
+  type formInput = { label: string, description: string };
+  const { register, handleSubmit, reset, formState } =
+    useForm<formInput>({mode: 'onSubmit', reValidateMode: 'onSubmit', defaultValues: { label: '', description: '' }});
+  const { errors } = formState;
+
   // Handle open dialog
   const dialog = useRef<HTMLDialogElement>(null);
-  const form = useRef<HTMLFormElement>(null);
-
   useEffect(() => {
     if (isOpened) {
-      if (! wish) form.current?.reset();
+      const values = (wish)?
+        { label: wish.label, description: wish.description } :
+        { label: '', description: '' };
+      reset(values);
       dialog.current?.showModal();
     } else {
       dialog.current?.close();
     }
-  }, [dialog, form, isOpened, wish]);
+  }, [dialog, isOpened, reset, wish]);
 
 
-  // Form declaration. Set values for an edit dialog
-  const values = (wish)?
-    { label: wish.label, description: wish.description } :
-    { label: '', description: '' };
-
-  type formInput = { label: string, description: string };
-  const { register, handleSubmit, formState } = useForm<formInput>({mode: 'onSubmit', reValidateMode: 'onSubmit', values});
-  const { errors } = formState;
 
   // Handle saving wish
   function doSaveWish(input: formInput, {draft}: {draft: boolean} ) {
@@ -61,7 +60,7 @@ export function WishEditor({
   return (
     <dialog ref={dialog} className="modal w-[80vw]" onCancel={() => setOpened(false)}>
       <div className='v-form'>
-      <form ref={form}>
+      <form>
         <div className='form-group'>
           <label>Souhait</label>
           <input type='text' {...register('label', { required: true })} className={`${errors.label ? 'invalid' : ''}`} />
