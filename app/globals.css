@@ -99,7 +99,7 @@ button:focus, button:active {
     border: 1px solid var(--color-button-border-hover);
 }
 
-textarea, input {
+textarea, input, .preview {
     background-color: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: 4px;
@@ -127,7 +127,7 @@ input.invalid {
     margin-bottom: 0.2em;
 }
 
-.v-form input,.v-form textarea {
+.v-form input, .v-form textarea, .v-form .preview  {
     display: block;
     width:   100%;
     padding: 0.2em;
@@ -219,6 +219,22 @@ input.invalid {
     mask-position: center;
 }
 
+.icon-preview:before {
+    background-color: var(--color-button);
+    --icon: url('/imgs/magnifying-glass-solid.svg') no-repeat;
+    -webkit-mask: var(--icon);
+    mask: var(--icon);
+    mask-position: center;
+}
+
+.icon-question:before {
+    background-color: var(--color-button);
+    --icon: url('/imgs/question-solid.svg') no-repeat;
+    -webkit-mask: var(--icon);
+    mask: var(--icon);
+    mask-position: center;
+}
+
 /* wishList */
 .wishList {
     border: solid 1px var(--color-border-light);
@@ -226,4 +242,20 @@ input.invalid {
 
 .wishList > :nth-child(2n+1) {
     background-color: var(--color-bg-alt);
+}
+
+/* description preview */
+.preview {
+    background-color: inherit;
+}
+
+.markdown-menu button {
+    display: inline;
+    background-color: inherit;
+    border: none;
+    padding: 0.1rem;
+}
+
+.markdown-menu button:not(:last-child) {
+    margin-right: 0.2rem;
 }

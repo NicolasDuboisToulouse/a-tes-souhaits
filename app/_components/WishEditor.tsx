@@ -1,5 +1,7 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
+import { micromark } from 'micromark'
+import {gfm, gfmHtml} from 'micromark-extension-gfm'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 import { Wish } from '_lib/wish';
@@ -17,9 +19,12 @@ export function WishEditor({
   wish: Wish|undefined,
 })
 {
+  // Description preview/edit mode
+  const [ previewMode, setPreviewMode ] = useState<boolean>(false);
+
   // Form declaration. Set values for an edit dialog
   type formInput = { label: string, description: string };
-  const { register, handleSubmit, reset, formState } =
+  const { register, handleSubmit, reset, formState, getValues } =
     useForm<formInput>({mode: 'onSubmit', reValidateMode: 'onSubmit', defaultValues: { label: '', description: '' }});
   const { errors } = formState;
 
@@ -31,13 +36,15 @@ export function WishEditor({
         { label: wish.label, description: wish.description } :
         { label: '', description: '' };
       reset(values);
+      setPreviewMode(false);
       dialog.current?.showModal();
     } else {
       dialog.current?.close();
     }
   }, [dialog, isOpened, reset, wish]);
 
-
+  // Prevent dialog render if not needed
+  if (! isOpened) return null;
 
   // Handle saving wish
   function doSaveWish(input: formInput, {draft}: {draft: boolean} ) {
@@ -49,6 +56,22 @@ export function WishEditor({
         onChange();
       })
       .catch(alertService.handleError);
+  }
+
+  // toggle preview
+  function togglePreview() {
+    setPreviewMode(!previewMode);
+  }
+
+  // Handle description/preview
+  let inputDescription = null;
+  if (previewMode == false) {
+    inputDescription = <textarea className='min-h-[8rem]' {...register('description')} />;
+  } else {
+    inputDescription = <div className='preview min-h-[8rem]'
+                         dangerouslySetInnerHTML={ {
+                           __html: micromark(getValues('description'), { extensions: [gfm()], htmlExtensions: [gfmHtml()] })
+                         } } />;
   }
 
   // First button label depend on dialog kind
@@ -66,8 +89,18 @@ export function WishEditor({
           <input type='text' {...register('label', { required: true })} className={`${errors.label ? 'invalid' : ''}`} />
         </div>
         <div className='form-group'>
-          <label>Description (optionelle)</label>
-          <textarea className='min-h-[8rem]' {...register('description')} />
+          <div className='flex gap-1'>
+            <label className='flex-auto'>Description (optionelle)</label>
+            <div className='markdown-menu flex-initial'>
+              <button type='button' title='Aperçu' onClick={togglePreview}>
+                <span className='icon icon-preview'><span>Aperçu</span></span>
+              </button>
+              <button type='button' title='Aide' onClick={() => window.open('https://commonmark.org/help','_blank')}>
+                <span className='icon icon-question'><span>Aide</span></span>
+              </button>
+            </div>
+          </div>
+          {inputDescription}
         </div>
         <div className="button-group">
           <button

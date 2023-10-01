@@ -17,6 +17,8 @@
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.13",
     "jsonwebtoken": "^9.0.1",
+    "micromark": "^4.0.0",
+    "micromark-extension-gfm": "^3.0.0",
     "next": "13.4.9",
     "pino": "^8.15.1",
     "pino-pretty": "^10.2.0",
