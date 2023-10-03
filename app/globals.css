@@ -245,6 +245,13 @@ input.invalid {
 }
 
 /* description preview */
+.description-example {
+    background-color: var(--color-bg);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+
 .preview {
     background-color: inherit;
 }

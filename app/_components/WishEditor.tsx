@@ -4,6 +4,7 @@ import { micromark } from 'micromark'
 import {gfm, gfmHtml} from 'micromark-extension-gfm'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
+import { simpleDialog } from '_components/SimpleDialog'
 import { Wish } from '_lib/wish';
 export type { Wish }
 
@@ -13,10 +14,10 @@ export function WishEditor({
   onChange,               // Called on wish added or modified
   wish,                   // Wish to modify. Set to undefined for an add-wish dialog
 } : {
-  listId:number,
+  listId:   number,
   isOpened: boolean, setOpened: (opened: boolean) => void,
   onChange: () => void,
-  wish: Wish|undefined,
+  wish:     Wish|undefined,
 })
 {
   // Description preview/edit mode
@@ -58,12 +59,11 @@ export function WishEditor({
       .catch(alertService.handleError);
   }
 
-  // toggle preview
+  // Toggle description/preview
   function togglePreview() {
     setPreviewMode(!previewMode);
   }
 
-  // Handle description/preview
   let inputDescription = null;
   if (previewMode == false) {
     inputDescription = <textarea className='min-h-[8rem]' {...register('description')} />;
@@ -72,6 +72,25 @@ export function WishEditor({
                          dangerouslySetInnerHTML={ {
                            __html: micromark(getValues('description'), { extensions: [gfm()], htmlExtensions: [gfmHtml()] })
                          } } />;
+  }
+
+  // Help
+  function help() {
+    simpleDialog({
+      content: <>
+                 <div>La description peut contenir des liens <i>cliquables</i> (copiez/coller simplement l&apos;adresse) et même des caractères de formattage.</div>
+                 <div>Par exemple:&nbsp;
+                   <span className="description-example">Un **super** cadeau</span>&nbsp;
+                   affichera&nbsp;
+                   <span className="description-example">Un <b>super</b> cadeau</span>.
+                 </div>
+                 <div>Le bouton <span className='icon icon-preview'><span>Aperçu</span></span> vous permet d&apos;avoir un aperçu.</div>
+               </>,
+      buttons: [
+        { label: "Ok" },
+        { label: "Syntaxe", onClick: () => { window.open('https://commonmark.org/help','_blank') } }
+      ]
+    });
   }
 
   // First button label depend on dialog kind
@@ -95,7 +114,7 @@ export function WishEditor({
               <button type='button' title='Aperçu' onClick={togglePreview}>
                 <span className='icon icon-preview'><span>Aperçu</span></span>
               </button>
-              <button type='button' title='Aide' onClick={() => window.open('https://commonmark.org/help','_blank')}>
+              <button type='button' title='Aide' onClick={help}>
                 <span className='icon icon-question'><span>Aide</span></span>
               </button>
             </div>
