@@ -100,7 +100,7 @@ export function WishListManager({listId} : {listId: number|undefined}) {
       <>
         <div className='pt-4 pb-2'>
           <div className='text-2xl'>Brouillons</div>
-          <div>Les souhaits ci-dessous ne sont pas visible par les autres utilisateurs.</div>
+          <div>Les souhaits ci-dessous ne sont pas visibles par les autres utilisateurs.</div>
         </div>
         <WishList user={user} owned={owned} wishArray={wishArray} draftMode={true} onChange={update} onEditWish={editWish} />
       </>
