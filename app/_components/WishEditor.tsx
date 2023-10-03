@@ -1,11 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { micromark } from 'micromark'
-import {gfm, gfmHtml} from 'micromark-extension-gfm'
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 import { simpleDialog } from '_components/SimpleDialog'
 import { Wish } from '_lib/wish';
+import { markdownToHtml } from '_lib/client/markdown';
 export type { Wish }
 
 export function WishEditor({
@@ -69,9 +68,7 @@ export function WishEditor({
     inputDescription = <textarea className='min-h-[8rem]' {...register('description')} />;
   } else {
     inputDescription = <div className='preview markdown min-h-[8rem]'
-                         dangerouslySetInnerHTML={ {
-                           __html: micromark(getValues('description'), { extensions: [gfm()], htmlExtensions: [gfmHtml()] })
-                         } } />;
+                         dangerouslySetInnerHTML={markdownToHtml(getValues('description'))} />;
   }
 
   // Help

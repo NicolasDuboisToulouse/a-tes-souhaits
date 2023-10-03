@@ -1,11 +1,10 @@
-import { micromark } from 'micromark'
-import {gfm, gfmHtml} from 'micromark-extension-gfm'
 import { Wish } from '_components/WishEditor';
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
 import { simpleDialog } from '_components/SimpleDialog'
 import { User } from '_lib/user'
 import { BookedBy, WishArray } from '_lib/wish'
+import { markdownToHtml } from '_lib/client/markdown';
 export type { WishArray }
 
 
@@ -85,8 +84,7 @@ function WishActions({
 
 // Display a wish description
 function WishDescription({ description } : { description: string } ) {
-  const descHtml = { __html: micromark(description, { extensions: [gfm()], htmlExtensions: [gfmHtml()] }) };
-  return <div className='markdown ml-1' dangerouslySetInnerHTML={descHtml} />
+  return <div className='markdown ml-1' dangerouslySetInnerHTML={markdownToHtml(description)} />
 }
 
 // Main
