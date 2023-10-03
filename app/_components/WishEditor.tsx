@@ -68,7 +68,7 @@ export function WishEditor({
   if (previewMode == false) {
     inputDescription = <textarea className='min-h-[8rem]' {...register('description')} />;
   } else {
-    inputDescription = <div className='preview min-h-[8rem]'
+    inputDescription = <div className='preview markdown min-h-[8rem]'
                          dangerouslySetInnerHTML={ {
                            __html: micromark(getValues('description'), { extensions: [gfm()], htmlExtensions: [gfmHtml()] })
                          } } />;

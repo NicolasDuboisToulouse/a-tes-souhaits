@@ -86,7 +86,7 @@ function WishActions({
 // Display a wish description
 function WishDescription({ description } : { description: string } ) {
   const descHtml = { __html: micromark(description, { extensions: [gfm()], htmlExtensions: [gfmHtml()] }) };
-  return <div className='ml-1' dangerouslySetInnerHTML={descHtml} />
+  return <div className='markdown ml-1' dangerouslySetInnerHTML={descHtml} />
 }
 
 // Main
