@@ -1,3 +1,5 @@
+import { micromark } from 'micromark'
+import {gfm, gfmHtml} from 'micromark-extension-gfm'
 import { Wish } from '_components/WishEditor';
 import * as fetchService from '_lib/client/fetchService';
 import { alertService } from '_components/Alerts';
@@ -81,6 +83,11 @@ function WishActions({
   }
 }
 
+// Display a wish description
+function WishDescription({ description } : { description: string } ) {
+  const descHtml = { __html: micromark(description, { extensions: [gfm()], htmlExtensions: [gfmHtml()] }) };
+  return <div className='ml-1' dangerouslySetInnerHTML={descHtml} />
+}
 
 // Main
 export function WishList({
@@ -125,7 +132,7 @@ export function WishList({
           <div className='p-2 flex flex-wrap gap-1' key={wish.id}>
             <div className='flex-1 pr-4'>
               <div className='text-lg leading-4'>{wish.label}</div>
-              <div className='text-base ml-1'>{wish.description}</div>
+              <WishDescription description={wish.description} />
             </div>
             <WishActions wish={wish} owned={owned} onChange={onChange} onEdit={onEditWish} />
           </div>
