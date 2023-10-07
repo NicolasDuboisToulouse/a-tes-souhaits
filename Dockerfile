@@ -17,7 +17,7 @@ COPY schemas schemas/
 COPY next.config.js postcss.config.js tailwind.config.js tsconfig.json .eslintrc.json LICENSE package*.json ./
 COPY .env.production .env.production
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN npm run build
+RUN npx next build
 
 FROM base AS runner
 WORKDIR /a-tes-souhaits
