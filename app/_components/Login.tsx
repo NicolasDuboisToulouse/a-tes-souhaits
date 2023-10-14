@@ -17,7 +17,7 @@ export function Login({doLogin} : {doLogin: LoginFunc}) {
           <label>Mot de passe</label>
           <input type='password' {...register('password', { required: true })} className={`${errors.password ? 'invalid' : ''}`} />
         </div>
-        <button type='submit'>Connection</button>
+        <button type='submit'>Connexion</button>
       </form>
     </div>
   );

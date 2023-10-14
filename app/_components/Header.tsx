@@ -42,7 +42,7 @@ export function Header({user, onLogout}: {user:User, onLogout: ()=>void} ) {
   // Menu content
   type Item = { text: string, target: (() => void)|string};
   const items : Array<Item> = [
-    { text: "Déconnetion", target: onLogout },
+    { text: "Déconnexion", target: onLogout },
     { text: "Changer de mot de passe", target: '/users/password' },
   ];
   if (user.isAdmin && pathname != '/users/admin') {
