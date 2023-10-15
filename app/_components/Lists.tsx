@@ -35,7 +35,7 @@ export function Lists({onListChange} : {onListChange: (listId:number) => void}) 
     <div className='text-center text-xl mb-6'>
       <select defaultValue={listInfos.myListId} onChange={handleListChange}>
         <option hidden value='-1'>Choisir une liste</option>
-        {listInfos.lists.map((list) => {
+        {listInfos.lists.sort((l1, l2) => l1.title.localeCompare(l2.title)).map((list) => {
           return <option key={list.id} value={list.id}>{list.title}</option>;
         })}
       </select>
