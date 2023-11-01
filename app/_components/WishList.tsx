@@ -114,7 +114,7 @@ export function WishList({
       return (
         <>
           <div>Hello {user.displayName} !</div>
-          <div>Qu&apos;est-ce qui vous ferais plaisir ?</div>
+          <div>Qu&apos;est-ce qui vous ferez plaisir ?</div>
           <div>Cliquez sur [Ajouter] pour ajouter un souhait !</div>
         </>
       );
