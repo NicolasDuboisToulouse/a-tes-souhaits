@@ -10,6 +10,7 @@
     "check": "tsc && eslint"
   },
   "dependencies": {
+    "cors": "^2.8.6",
     "cross-env": "^7.0.3",
     "express": "^5.1.0",
     "react": "^19.1.0",
@@ -23,6 +24,7 @@
     "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.39.2",
     "@stylistic/eslint-plugin": "^5.7.1",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.2",
     "@types/react": "^19.1.2",
