@@ -1,8 +1,7 @@
 import express from "express";
 import ViteExpress from "vite-express";
 import cors from "cors";
-
-// import { HTTPErrorCodes, sendError } from "./error.js";
+import * as error from "./api/error/error";
 
 const app = express();
 app.set("env", "development");
@@ -35,75 +34,56 @@ app.use(express.json());
 // );
 // app.use(cookieParser(config.session_secret));
 
-app.all("/hello", (req: express.Request, res: express.Response) => {
+//
+// Some tests
+//
+app.all("/hello", (
+  req: express.Request,
+  res: express.Response
+) => {
   console.log("req", req.body);
   res.json({ hello: "world" });
 });
 
-app.all("/error", (_req: express.Request, _res: express.Response) => {
-  throw new Error("An Error");
+app.all("/error", (
+  _req: express.Request,
+  _res: express.Response
+) => {
+  error.send(error.HTTPCodes.BadRequest, "An Error");
 });
 
-app.all("/timeout", async(_req: express.Request, _res: express.Response, next: express.NextFunction) => {
+app.all("/timeout", async(
+  _req: express.Request,
+  _res: express.Response,
+  next: express.NextFunction
+) => {
   setTimeout(() => {
     try {
-      throw new Error("mlk");
+      error.send(error.HTTPCodes.InternalServerError);
     } catch(err) {
       next(err);
     }
   }, 1000);
-  //  res.send("bar");
 });
 
-
-// ???
-// import bodyParser from 'body-parser';
-// import methodOverride from 'method-override';
-// app.use(bodyParser.urlencoded({
-//  extended: true
-// }))
-// app.use(bodyParser.json())
-// app.use(methodOverride())
-
 // Hanlde functional error
-// TODO: Create a generic function that return either HTML or JSON
 app.use((
   err: Error,
   _req: express.Request,
-  res: express.Response,
-  _next: express.NextFunction,
+  _res: express.Response,
+  next: express.NextFunction,
 ) => {
-  console.log("APP Error CB");
-  console.log("err", err);
-  console.log("res", res);
-  res.json({ foo: res.statusCode });
+  // just call the main error handler
+  next(err);
 });
-
-// Handle invalid URI
-// TODO: Create a generic function that return either HTML or JSON
-function installInvalidURIMiddleWare() {
-  app.use((req: express.Request, res: express.Response) => {
-    console.log("Undefined URI CB");
-    console.log(req.get("Content-Type"));
-    console.log(req.is("html"));
-    console.log(req.is("json"));
-    console.log(req.url);
-    console.log("All times");
-    res.send("Fail");
-  });
-}
-
 
 // Only the root is serve by vite
 ViteExpress.config({ ignorePaths: /^\/.+$/ });
-
-
-// TODO ???
 app.use(ViteExpress.static());
 
 // Launch ViteExpress
 function viteExpressStarted() {
   console.log("Server is listening on port 3000...");
-  installInvalidURIMiddleWare();
+  error.installMiddleware(app);
 }
 ViteExpress.listen(app, 3000, viteExpressStarted);

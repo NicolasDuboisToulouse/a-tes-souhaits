@@ -83,7 +83,7 @@ export default defineConfig([
         prop: "parens-new-line",
         propertyValue: "parens-new-line"
       } ],
-      "@stylistic/key-spacing": "warn",
+      "@stylistic/key-spacing": [ "warn", { mode: "minimum" } ],
       "@stylistic/keyword-spacing": "warn",
       "@stylistic/line-comment-position": "off",
       "@stylistic/linebreak-style": [ "warn", "unix" ],

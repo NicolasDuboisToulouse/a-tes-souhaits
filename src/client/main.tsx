@@ -21,11 +21,22 @@ async function dont_exist() {
   console.log("resp", data);
 }
 
+async function error() {
+  const response = await fetch("error", {
+    method: "POST",
+    body: JSON.stringify({ username: "example" }),
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await response.text();
+  console.log("resp", data);
+}
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <div>
       <div>A tes souhaits !</div>
       <div><button onClick = {hello}>hello</button></div>
+      <div><button onClick = {error}>error</button></div>
       <div><button onClick = {dont_exist}>dont_exist</button></div>
     </div>
   </React.StrictMode>,

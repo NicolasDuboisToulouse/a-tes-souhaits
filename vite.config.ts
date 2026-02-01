@@ -23,7 +23,7 @@ export default defineConfig(() => {
       host: true,
     },
     root: "src/client",
-    publicDir: "../../static",
+    publicDir: "static",
     build: {
       outDir: "../../dist",
     },
