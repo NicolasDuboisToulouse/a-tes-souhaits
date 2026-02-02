@@ -6,14 +6,27 @@ import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 import reactPlugin from "eslint-plugin-react";
 import { globalIgnores } from "@eslint/config-helpers";
-import css from "@eslint/css";
+// import css from "@eslint/css";
 
 export default defineConfig([
+  // css disabled: issue with no-irregular-whitespace
+  // {
+  //   files: ["**/*.css"],
+  //   language: "css/css",
+  //   plugins: { css },
+  //   extends: ["css/recommended"],
+  //   rules: { 'no-irregular-whitespace': 'off' },
+  // },
+
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...ts.configs.stylistic,
   stylistic.configs.customize({}),
-  { files: [ "**/*.css" ], plugins: { css }, language: "css/css", extends: [ "css/recommended" ] },
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: "off"
+    }
+  },
   {
     files: [ "**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}" ],
     settings: {
@@ -37,6 +50,7 @@ export default defineConfig([
       "no-var": [ "warn" ],
       "object-shorthand": [ "warn", "always", { avoidExplicitReturnArrows: true } ],
       "@typescript-eslint/one-var": [ "off" ],
+      "@typescript-eslint/no-namespace": [ "off" ],
       "prefer-arrow-callback": [ "warn" ],
       "@typescript-eslint/no-unused-vars": [ "warn", { argsIgnorePattern: "^_" } ],
 

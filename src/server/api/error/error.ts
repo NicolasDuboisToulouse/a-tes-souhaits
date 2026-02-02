@@ -1,6 +1,7 @@
 import express from "express";
 import ejs from "ejs";
 import * as fs from "fs";
+import logger from "../../logger";
 
 //
 // Supported error code with their value and description
@@ -45,8 +46,21 @@ class ApplicationError extends Error {
 //
 // Send an error that handle HTTPCodes
 //
-export function send(code: HTTPCodesType, extra_message?: string) {
+export function send(code: HTTPCodesType, extra_message?: string): never {
   throw new ApplicationError(code, extra_message);
+}
+
+//
+// Stash an error that will be displayed at next client request
+// Typically you shash error when server is not yet started
+//
+type stashedErrorType = Error | ApplicationError | unknown | undefined;
+let stashed: stashedErrorType = undefined;
+export function stash(error: stashedErrorType) {
+  stashed = error;
+}
+export function getStashed(): stashedErrorType {
+  return stashed;
 }
 
 //
@@ -75,7 +89,7 @@ export function installMiddleware(app: express.Express) {
     res: express.Response,
     _next: express.NextFunction, // Must be define to make express call this Middleware
   ) => {
-    console.log("----");
+    logger.error("----");
     let result: { status: HTTPCodesType, msg: string } = {
       status: HTTPCodes.Ok,
       msg: HTTPMessages[HTTPCodes.Ok]
@@ -84,17 +98,20 @@ export function installMiddleware(app: express.Express) {
     if (err instanceof ApplicationError) {
       // Hanlded application error
       result = { status: err.code, msg: err.message };
-      console.error("Application error:", result);
+      logger.error("Application error: %o", result);
     } else if (err instanceof Error) {
       // unhanlded server error
-      result = { status: HTTPCodes.InternalServerError, msg: err.message ? err.message : "No error message" };
-      console.error("Internal error:", result);
+      result = {
+        status: HTTPCodes.InternalServerError,
+        msg: err.message ? err.message : "No error message"
+      };
+      logger.error("Internal error: %o", result);
     } else {
       // Not an error ? We shall not be here
       result = { status: HTTPCodes.InternalServerError, msg: "Unexpected Error" };
-      console.error("Not an error ??:", result);
+      logger.error("Not an error ??: %o", result);
     }
-    console.log("Error: ", err);
+    logger.error("Error: %s", err.stack);
 
     if (req.get("Content-Type") === "application/json") {
       // We receive json, we return json
@@ -106,6 +123,6 @@ export function installMiddleware(app: express.Express) {
       res.set("Content-Type", "text/html");
       res.send(html);
     }
-    console.log("----");
+    logger.error("----");
   });
 }

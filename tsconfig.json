@@ -21,6 +21,7 @@
     /* Linting */
     "strict": true,
     "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": false, // Handled by eslint
 
     "plugins": [
 	  {
@@ -30,5 +31,5 @@
 	  },
     ],
   },
-  "include": ["src", "./*.ts"]
+  "include": ["scripts", "src", "<root>/*.ts"]
 }
