@@ -1,0 +1,17 @@
+:root {
+    --color-bg:                     #F7EFE2;
+    --color-bg-alt:                 #FFE5BB;
+    --color-bg-focus:               #fff1db;
+    --color-text:                   #000000;
+    --color-border:                 #F26D21;
+    --color-border-light:           #FFFFFF;
+    --color-border-focus:           #B44200;
+    --color-menu-hover:             #ffd899;
+    --color-link:                   #1d4ed8;
+
+    --color-button:                 var(--color-border);
+    --color-button-transparent:     #F26D2140;
+    --color-button-text:            var(--color-bg);
+    --color-button-border:          var(--color-bg);
+    --color-button-border-hover:    var(--color-border-focus);
+}

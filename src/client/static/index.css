@@ -1,0 +1,33 @@
+html, body {
+    background-color: var(--color-bg);
+}
+
+/* header look */
+body {
+    background: url(a-tes-souhaits.svg) top left no-repeat,
+                url(presents.svg) top right no-repeat,
+                url(header_middle.png) top left repeat-x;
+    min-width:  200px;
+    min-height: 150px;
+}
+
+/* reserve space for header */
+#header {
+    min-height: 140px;
+}
+
+/* container to center it chld */
+.screen-center {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: fit-content;
+}
+
+/* Application div, centered */
+#root {
+    max-width: 90%;
+    width: fit-content;
+    margin: 0 auto;
+}
