@@ -1,6 +1,6 @@
-import { startServer } from "./api/init";
-import database from "./database/database";
-import * as error from "./api/error/error";
+import * as webServer from "./web";
+import * as database from "./database";
+import * as error from "./error";
 
 try {
   database.init();
@@ -9,4 +9,4 @@ try {
   error.stash(e);
 }
 
-startServer();
+webServer.start();

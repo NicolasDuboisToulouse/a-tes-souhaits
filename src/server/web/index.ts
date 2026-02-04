@@ -1,10 +1,10 @@
 import express from "express";
 import ViteExpress from "vite-express";
 import cors from "cors";
-import * as error from "./error/error";
+import * as error from "../error";
 import logger from "../logger";
 
-export function startServer() {
+export function start() {
 
   const app = express();
   app.set("env", "development");
@@ -64,7 +64,7 @@ export function startServer() {
     _req: express.Request,
     _res: express.Response
   ) => {
-    error.send(error.HTTPCodes.BadRequest, "An Error");
+    error.send(error.HTTP.codes.BadRequest, "An Error");
   });
 
   app.all("/timeout", async(
@@ -74,7 +74,7 @@ export function startServer() {
   ) => {
     setTimeout(() => {
       try {
-        error.send(error.HTTPCodes.InternalServerError);
+        error.send(error.HTTP.codes.InternalServerError);
       } catch(err) {
         next(err);
       }
@@ -99,7 +99,7 @@ export function startServer() {
   // Launch ViteExpress
   function viteExpressStarted() {
     logger.info("Server is listening on port 3000...");
-    error.installMiddleware(app);
+    error.expressMiddleware.install(app);
   }
   ViteExpress.listen(app, 3000, viteExpressStarted);
 }
