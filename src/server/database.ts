@@ -3,6 +3,7 @@ import Sqlite from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import * as error from "./error";
+import * as user from "./user";
 
 //
 // Initialize and database access
@@ -159,8 +160,7 @@ class Database {
         .get();
       if (admin == null) {
         logger.warn("[UpdateDB] No administrator found. Add default administrator: admin/admin.");
-        // TODO: password hash
-        const admin_password_hash = "admin"; // loginService.getPasswordHash("admin");
+        const admin_password_hash = user.hashPassword("admin");
         this.db.prepare("INSERT INTO users " +
           "(userName, displayName, passwordHash, firstLogin, isAdmin) " +
           "VALUES('admin', 'admin', ?, 1, 1)")
