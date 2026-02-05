@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx ./scripts/init.ts && nodemon -w src/server -x tsx src/server/main.ts",
-    "start": "tsx ./scripts/init.ts && cross-env NODE_ENV=production tsx src/server/main.ts",
+    "dev": "tsx scripts/launch.ts -e development",
+    "start": "tsx scripts/launch.ts -e production",
     "build": "vite build",
     "check": "tsc && eslint"
   },

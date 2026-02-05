@@ -13,8 +13,7 @@ export function init() {
 }
 export function get(): Database {
   if (database === undefined) {
-    error.send(error.HTTP.codes.InternalServerError,
-      "Database not yet initialized !");
+    error.die("Database is not initialized !");
   }
   return database;
 }
@@ -66,7 +65,12 @@ class Database {
     logger.info("[Open database]");
 
     try {
-      this.db = new Sqlite("database/database.db", { readonly: false, fileMustExist: false });
+      if (process.env.DATABASE_DIR === undefined ||
+        fs.lstatSync(process.env.DATABASE_DIR).isDirectory() === false) {
+        error.die(`Invalid env DATABASE_DIR (${process.env.DATABASE_DIR})`);
+      }
+      const database_file = process.env.DATABASE_DIR + "/database.db";
+      this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
     } catch(error) {
       const db_dir_stat = fs.statSync("database", { throwIfNoEntry: false });
       if (db_dir_stat == null || db_dir_stat.isDirectory() === false) {
@@ -108,14 +112,17 @@ class Database {
     const schemas = new Map<number, string>();
     let target_db_version = 0;
 
-    const schemas_path = path.join(process.cwd(), "schemas");
-    const files = fs.readdirSync(schemas_path);
+    if (process.env.DATABASE_SCHEMAS === undefined ||
+      fs.lstatSync(process.env.DATABASE_SCHEMAS).isDirectory() === false) {
+      error.die(`Invalid env DATABASE_SCHEMAS (${process.env.DATABASE_SCHEMAS})`);
+    }
+    const files = fs.readdirSync(process.env.DATABASE_SCHEMAS);
     files.forEach((file: string) => {
       const match = file.match(/^db_([0-9]+)\.sql$/);
       if (match == null) return;
       const version = parseInt(match[1]);
       if (isNaN(version)) return;
-      const schema_path = path.join(schemas_path, file);
+      const schema_path = path.join(process.env.DATABASE_SCHEMAS!, file);
       schemas.set(version, fs.readFileSync(schema_path).toString());
       if (version > target_db_version) target_db_version = version;
     });

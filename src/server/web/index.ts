@@ -96,10 +96,18 @@ export function start() {
   ViteExpress.config({ ignorePaths: /^\/.+$/ });
   app.use(ViteExpress.static());
 
+  if (!process.env.PROGRAM_PORT || /^[0-9]+$/.test(process.env.PROGRAM_PORT) === false) {
+    error.die("env var PROGRAM_PORT is not a number!");
+  }
+  const port = parseInt(process.env.PROGRAM_PORT, 10);
+  if (isNaN(port)) {
+    error.die("env var PROGRAM_PORT is not a number!");
+  }
+
   // Launch ViteExpress
   function viteExpressStarted() {
-    logger.info("Server is listening on port 3000...");
+    logger.info("Server is listening on port " + port + "...");
     error.expressMiddleware.install(app);
   }
-  ViteExpress.listen(app, 3000, viteExpressStarted);
+  ViteExpress.listen(app, port, viteExpressStarted);
 }
