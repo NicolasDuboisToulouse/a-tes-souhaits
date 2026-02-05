@@ -1,4 +1,5 @@
 /node_modules
-dist
+/dist
 /database
 /jwt_secret.txt
+/build

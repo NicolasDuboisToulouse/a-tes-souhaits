@@ -26,6 +26,7 @@ export default defineConfig(() => {
     publicDir: "static",
     build: {
       outDir: "../../dist",
+      minify: "esbuild",
     },
     resolve: {
       alias: { "/src/client": path.resolve(process.cwd(), "src/client") }

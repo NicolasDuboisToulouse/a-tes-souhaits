@@ -1,7 +1,6 @@
 import { Command, Option, InvalidArgumentError } from "commander";
 import path from "path";
 import fs from "fs";
-const argsParser = new Command();
 
 //
 // Display an error then exit
@@ -24,6 +23,9 @@ function randomString(length: number) {
   return result;
 }
 
+//
+// Parse a string to a decimal number (or throw comander error)
+//
 function parseDecNumber(value: string) {
   if (/^[0-9]+$/.test(value) === false) {
     throw new InvalidArgumentError("Not a number.");
@@ -38,6 +40,7 @@ function parseDecNumber(value: string) {
 //
 // Parse args
 //
+const argsParser = new Command();
 argsParser.description("Initialize environment and run the project.");
 
 argsParser.addOption(new Option("-e, --env <env>", "Runtime environment environment")
@@ -65,7 +68,7 @@ process.env.DATABASE_SCHEMAS = process.env.PROGRAM_ROOT + "/schemas";
 
 //
 // Get or Generate jwt secret
-// it need to be stored because it is salt to generate password hashes.
+// This is used as salf for user/password cookies
 //
 const secret_file = process.env.PROGRAM_ROOT + "/jwt_secret.txt";
 let secret: string;

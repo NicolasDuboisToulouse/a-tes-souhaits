@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx scripts/launch.ts -e development",
     "start": "tsx scripts/launch.ts -e production",
-    "build": "vite build",
+    "build": "tsx scripts/build.ts",
+    "build-start": "npm run build -- --keep-db && cd build && npm run start",
     "check": "tsc && eslint"
   },
   "dependencies": {

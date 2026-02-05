@@ -52,7 +52,12 @@ export default defineConfig([
       "@typescript-eslint/one-var": [ "off" ],
       "@typescript-eslint/no-namespace": [ "off" ],
       "prefer-arrow-callback": [ "warn" ],
-      "@typescript-eslint/no-unused-vars": [ "warn", { argsIgnorePattern: "^_" } ],
+      "@typescript-eslint/no-unused-vars": [ "warn", {
+        argsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+      } ],
 
       // See https://eslint.style/rules
       "@stylistic/array-bracket-newline": [ "warn", "consistent" ],
