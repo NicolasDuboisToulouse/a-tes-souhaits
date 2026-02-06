@@ -32,7 +32,7 @@ export function install(app: express.Express) {
     _next: express.NextFunction, // Must be define to make express call this Middleware
   ) => {
     logger.error("----");
-    let result: { status: HTTP.CodesType, msg: string } = {
+    let result: { status: HTTP.CodesType; msg: string } = {
       status: HTTP.codes.Ok,
       msg: HTTP.getMessage(HTTP.codes.Ok)
     };

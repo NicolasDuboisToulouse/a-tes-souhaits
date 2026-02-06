@@ -41,6 +41,7 @@ export default defineConfig([
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
+          project: true,
         },
       },
     },
@@ -62,7 +63,7 @@ export default defineConfig([
       // See https://eslint.style/rules
       "@stylistic/array-bracket-newline": [ "warn", "consistent" ],
       "@stylistic/array-bracket-spacing": [ "warn", "always", { arraysInArrays: false } ],
-      "@stylistic/arrow-parens": [ "warn", "as-needed" ],
+      "@stylistic/arrow-parens": [ "warn", "always" ],
       "@stylistic/arrow-spacing": "warn",
       "@stylistic/block-spacing": "warn",
       "@stylistic/brace-style": [ "warn", "1tbs", { allowSingleLine: true } ],
@@ -110,7 +111,7 @@ export default defineConfig([
       "@stylistic/lines-between-class-members": "off",
       "@stylistic/max-len": "off",
       "@stylistic/max-statements-per-line": "off",
-      "@stylistic/member-delimiter-style": "warn",
+      "@stylistic/member-delimiter-style": [ "warn", { multiline: { delimiter: "semi" } } ],
       "@stylistic/multiline-comment-style": "off",
       "@stylistic/multiline-ternary": [ "warn", "always-multiline" ],
       "@stylistic/new-parens": "warn",
@@ -158,5 +159,6 @@ export default defineConfig([
   globalIgnores([
     "**/node_modules",
     "**/dist",
+    "**/build",
   ]),
 ]);
