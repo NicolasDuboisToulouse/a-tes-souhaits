@@ -1,12 +1,12 @@
 import { defineConfig } from "eslint/config";
 import js from "@eslint/js";
 import ts from "typescript-eslint";
-import tseslint from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 import reactPlugin from "eslint-plugin-react";
 import { globalIgnores } from "@eslint/config-helpers";
 // import css from "@eslint/css";
+
 
 export default defineConfig([
   // css disabled: issue with no-irregular-whitespace
@@ -19,7 +19,7 @@ export default defineConfig([
   // },
 
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...ts.configs.recommended,
   ...ts.configs.stylistic,
   stylistic.configs.customize({}),
   {

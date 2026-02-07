@@ -1,0 +1,21 @@
+html, body {
+    background-color: var(--color-bg);
+}
+
+body {
+    min-width:  200px;
+    min-height: 150px;
+    margin:     0;
+}
+
+#header {
+    height: 140px;
+    background: url(a-tes-souhaits.svg) top left no-repeat,
+                url(presents.svg) top right no-repeat,
+                url(header_middle.png) top left repeat-x;
+}
+
+#main {
+    max-width: 90%;
+    overflow: scroll;
+}

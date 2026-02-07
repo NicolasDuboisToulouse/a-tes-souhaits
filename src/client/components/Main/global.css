@@ -1,0 +1,17 @@
+/* center a div horizontally */
+.h-center {
+    width: -moz-fit-content;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+
+/* center both vertically and horizontally the inner div */
+.absolute-center-child {
+    max-width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: fit-content;
+}
