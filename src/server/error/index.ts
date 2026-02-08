@@ -1,6 +1,5 @@
 export * as HTTP from "./httpResponseStatus";
-export { send, stash, getStashed } from "./application";
-export * as expressMiddleware from "./expressMiddleware";
+export { ApplicationError, send, stash, handleStashed } from "./application";
 
 export function die(text?: string): never {
   if (text) console.error(text);

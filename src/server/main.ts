@@ -1,6 +1,6 @@
-import * as webServer from "./web";
-import * as database from "./database";
-import * as error from "./error";
+import * as webServer from "@server/web";
+import * as database from "@server/database";
+import * as error from "@server/error";
 
 try {
   database.init();

@@ -1,4 +1,4 @@
-import { useAppStore } from "../services/store";
+import { useAppStore } from "@client/services/store";
 
 // Object that depend on the request
 type responseDataTtpe = unknown;

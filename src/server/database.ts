@@ -1,9 +1,9 @@
-import logger from "./logger";
 import Sqlite from "better-sqlite3";
 import fs from "fs";
 import path from "path";
-import * as error from "./error";
-import * as user from "./user";
+import logger from "@server/logger";
+import * as error from "@server/error";
+import * as user from "@server/user";
 
 //
 // Initialize and database access

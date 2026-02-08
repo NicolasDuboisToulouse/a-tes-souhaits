@@ -1,4 +1,5 @@
 import * as HTTP from "./httpResponseStatus";
+import express from "express";
 
 //
 // ApplicationError that handle HTTP.codes
@@ -7,7 +8,7 @@ export class ApplicationError extends Error {
   readonly code: HTTP.CodesType;
 
   constructor(code: HTTP.CodesType, extra_message?: string) {
-    let msg = code.toString() + ": " + HTTP.getMessage(code);
+    let msg = "Erreur " + code.toString() + ": " + HTTP.getMessage(code);
     if (extra_message) {
       msg += " (" + extra_message + ")";
     }
@@ -35,4 +36,23 @@ export function stash(error: stashedErrorType) {
 }
 export function getStashed(): stashedErrorType {
   return stashed;
+}
+
+//
+// Handle error that was stashed
+//
+export function handleStashed(app: express.Express) {
+  app.use((
+    _req: express.Request,
+    _res: express.Response,
+    next: express.NextFunction
+  ) => {
+    if (getStashed()) {
+      const error = getStashed();
+      stash(undefined);
+      throw error;
+    } else {
+      next();
+    }
+  });
 }

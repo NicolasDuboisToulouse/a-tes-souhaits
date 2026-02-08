@@ -1,53 +1,31 @@
 import express from "express";
-import ViteExpress from "vite-express";
 import cors from "cors";
-import * as error from "../error";
-import logger from "../logger";
+import { createServer } from "vite";
+import helmet from "helmet";
+import * as error from "@server/error";
+import logger from "@server/logger";
+import * as api from "@server/api";
 
-export function start() {
+export async function start() {
 
   const app = express();
-  app.set("env", "development");
+  app.set("env", process.env.NODE_ENV);
   app.use(cors());
   app.use(express.json());
 
-  // Handle stashed error
+  // Dispatch error that was raised before server starts
+  error.handleStashed(app);
+
+  // Display the requested URL
   app.use((
-    _req: express.Request,
+    req: express.Request,
     _res: express.Response,
-    next: express.NextFunction
+    next: express.NextFunction,
   ) => {
-    if (error.getStashed()) {
-      throw error.getStashed();
-    } else {
-      next();
-    }
+    logger.trace("Request URL: " + req.url + ", data: " + req.body);
+    next();
   });
 
-  // TODO: Force secure
-  // if (process.env.NODE_ENV === "production") {
-  //     https
-  //         .createServer(httpsOptions, app)
-  //         .listen(443, () => debug.info("Server listening on port 443"));
-
-  //     app.use((request, response, next) => {
-  //         if (!request.secure) {
-  //             return response.redirect("https://" + request.headers.host + request.url);
-  //         }
-
-  //         next();
-  //     });
-
-  // TODO: Cookies
-  // app.use(express.urlencoded({ extended: true }));
-  // app.use(
-  //     session({
-  //         secret: config.session_secret,
-  //         resave: false,
-  //         saveUninitialized: true,
-  //     })
-  // );
-  // app.use(cookieParser(config.session_secret));
 
   //
   // Some tests
@@ -56,11 +34,14 @@ export function start() {
     req: express.Request,
     res: express.Response
   ) => {
+    if (req.get("Content-Type") !== "application/json") {
+      error.send(error.HTTP.codes.Forbidden);
+    }
     logger.info("req", req.body);
     res.json({ hello: "world" });
   });
 
-  app.all("/error", (
+  app.all("/do_error", (
     _req: express.Request,
     _res: express.Response
   ) => {
@@ -81,20 +62,88 @@ export function start() {
     }, 1000);
   });
 
-  // Hanlde functional error
-  app.use((
-    err: Error,
+  //
+  // Catch invaid API call
+  //
+  app.all(api.ROOT_URL_RE, (
     _req: express.Request,
-    _res: express.Response,
-    next: express.NextFunction,
+    _res: express.Response
   ) => {
-    // just call the main error handler
-    next(err);
+    error.send(error.HTTP.codes.Forbidden, "Appel API invalide");
   });
 
-  // Only the root is serve by vite
-  ViteExpress.config({ ignorePaths: /^\/.+$/ });
-  app.use(ViteExpress.static());
+
+  //
+  // Main error handler
+  // - Trap all error that has been throw in express middleware (ApplicationError, Error, unknown)
+  // - Display information in server console
+  // - Return either an JSON content or redirect to error page
+  //
+  app.use((
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction, // Must be define to make express call this Middleware
+  ) => {
+    logger.error("----");
+    let result: { status: error.HTTP.CodesType; msg: string } = {
+      status: error.HTTP.codes.Ok,
+      msg: error.HTTP.getMessage(error.HTTP.codes.Ok)
+    };
+
+    if (err instanceof error.ApplicationError) {
+      // Hanlded application error
+      result = { status: err.code, msg: err.message };
+      logger.error("Application error: %o", result);
+    } else if (err instanceof Error) {
+      // unhanlded server error
+      result = {
+        status: error.HTTP.codes.InternalServerError,
+        msg: err.message ? err.message : "No error message"
+      };
+      logger.error("Internal error: %o", result);
+    } else {
+      // Not an error ? We shall not be here
+      result = { status: error.HTTP.codes.InternalServerError, msg: "Unexpected Error" };
+      logger.error("Not an error ??: %o", result);
+    }
+    logger.error("Error: %s", err.stack);
+
+    if (req.get("Content-Type") === "application/json") {
+      // We receive json, we return json
+      res.status(result.status);
+      res.send(result);
+    } else {
+      // We receive anything else json (like a simple GET), redirect to error
+      res.status(result.status);
+      res.redirect("/error/" + encodeURIComponent(result.msg));
+    }
+    logger.error("----");
+  });
+
+
+  //
+  // Launch the server
+  //
+  function serverStarted() {
+    logger.info("Server is listening on port " + port + "...");
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    // in development, run vite as HMR server
+    const viteDevServer = await createServer({
+      mode: "development",
+      server: {
+        // TODO: https
+        // https: ...
+        middlewareMode: true,
+      },
+    });
+    app.use(viteDevServer.middlewares);
+  } else {
+    // in production mode, just serve static files
+    app.use(helmet(), express.static("dist"));
+  }
 
   if (!process.env.PROGRAM_PORT || /^[0-9]+$/.test(process.env.PROGRAM_PORT) === false) {
     error.die("env var PROGRAM_PORT is not a number!");
@@ -104,10 +153,5 @@ export function start() {
     error.die("env var PROGRAM_PORT is not a number!");
   }
 
-  // Launch ViteExpress
-  function viteExpressStarted() {
-    logger.info("Server is listening on port " + port + "...");
-    error.expressMiddleware.install(app);
-  }
-  ViteExpress.listen(app, port, viteExpressStarted);
+  app.listen(port, serverStarted);
 }

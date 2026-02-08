@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAppStore } from "../../services/store";
+import { useAppStore } from "@client/services/store";
 import "./spinner.css";
 
 //

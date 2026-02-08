@@ -94,7 +94,7 @@ if (argsParser.opts().docker === false) {
 }
 
 if (process.env.NODE_ENV === "development") {
-  process.env.LOG_LEVEL = "debug";
+  process.env.LOG_LEVEL = "trace";
   const nodemon = await import("nodemon");
   nodemon.default({
     exec: "tsx",
