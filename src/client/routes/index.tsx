@@ -1,5 +1,9 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router";
 import Spinner from "@client/components/Spinner";
 
 // Global CSS
@@ -8,22 +12,24 @@ import "./global.css";
 import "./main.css";
 
 // Routes
-import { createBrowserRouter, RouterProvider } from "react-router";
 import RouteDebug from "./Debug";
-import RouteError from "./Error";
+import RouteServerError from "./ServerError";
+import RouteRouteError from "./RouteError";
 
 const router = createBrowserRouter([
   {
     index: true,
     path: "/",
+    ErrorBoundary: RouteRouteError,
     Component: RouteDebug,
   },
   {
     path: "/error/:message",
-    Component: RouteError,
+    Component: RouteServerError,
   },
 ]);
 
+// Main page
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <div id = "header" />

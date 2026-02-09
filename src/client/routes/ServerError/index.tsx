@@ -1,9 +1,10 @@
 import { useParams } from "react-router";
+import "../error.css";
 
-export default function Error() {
+export default function ServerError() {
   const params = useParams();
   return (
-    <div style = {{ fontSize: "2em" }}>
+    <div className = "error-main">
       { params.message ? params.message : "Unexpected Error" }
     </div>
   );
