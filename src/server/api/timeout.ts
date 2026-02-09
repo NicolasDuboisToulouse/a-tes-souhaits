@@ -1,6 +1,6 @@
 import express from "express";
-import logger from "@server/logger";
 import * as error from "@server/error";
+import * as server from "@server/server";
 
 const router = express.Router();
 
@@ -9,10 +9,9 @@ router.post("/timeout", (
   _res: express.Response,
   next: express.NextFunction,
 ) => {
-  logger.info("req", req.body);
   setTimeout(() => {
     try {
-      error.send(error.HTTP.codes.InternalServerError, "timeout");
+      error.send(server.HTTP.Status.InternalServerError, "timeout");
     } catch(err) {
       next(err);
     }

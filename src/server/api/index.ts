@@ -1,50 +1,63 @@
 import express from "express";
 import * as error from "@server/error";
-import logger from "@server/logger";
+import * as server from "@server/server";
 
-export const ROOT_URL = "/api/";
-export const ROOT_URL_RE = /^\/api\/.*/;
-
-export const router = express.Router();
+const ROOT_URL = "/api/";
+const ROOT_URL_RE = /^\/api\/.*/;
 
 //
-// Check API requests are json
+// Create the API router
+// extraRoutes can be provided to insert routes after the API
+// ones but before the 404 catch. This router will be relative
+// to "/api/".
 //
-router.use(ROOT_URL, (
-  req: express.Request,
-  _res: express.Response,
-  next: express.NextFunction,
-) => {
-  if (req.get("Content-Type") !== "application/json") {
-    error.send(error.HTTP.codes.Forbidden);
-  } else {
-    next();
+export async function createRouter(extraRoutes?: express.Router): Promise<express.Router> {
+
+  const router = express.Router();
+
+  //
+  // Check API requests are json
+  //
+  router.use(ROOT_URL, (
+    req: express.Request,
+    _res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    if (req.get("Content-Type") !== "application/json") {
+      error.send(server.HTTP.Status.Forbidden);
+    } else {
+      next();
+    }
+  });
+
+
+  //
+  // Load all API routes
+  //
+  await useRoute(router, "./hello");
+  await useRoute(router, "./do_error");
+  await useRoute(router, "./timeout");
+
+  if (extraRoutes) {
+    router.use(ROOT_URL, extraRoutes);
   }
-});
 
 
-//
-// Load all API
-//
-import hello from "./hello";
-router.use(ROOT_URL, hello);
+  //
+  // Catch invaid API call
+  //
+  router.all(ROOT_URL_RE, (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    server.replyError(res, new error.ApplicationError(server.HTTP.Status.NotFound, req.url));
+  });
 
-import do_error from "./do_error";
-router.use(ROOT_URL, do_error);
-
-import timeout from "./timeout";
-router.use(ROOT_URL, timeout);
+  return router;
+}
 
 
-//
-// Catch invaid API call
-//
-router.all(ROOT_URL_RE, (
-  req: express.Request,
-  res: express.Response
-) => {
-  const err = new error.ApplicationError(error.HTTP.codes.NotFound, req.url).protocolError();
-  logger.error(err);
-  res.status(err.status);
-  res.json(err);
-});
+async function useRoute(router: express.Router, route: string) {
+  const routeRouter = (await import(route)).default;
+  router.use(ROOT_URL, routeRouter);
+}

@@ -1,9 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 import Spinner from "@client/components/Spinner";
 
 // Global CSS
@@ -12,7 +10,7 @@ import "./global.css";
 import "./main.css";
 
 // Routes
-import RouteDebug from "./Debug";
+import RouteMain from "./Main";
 import RouteServerError from "./ServerError";
 import RouteRouteError from "./RouteError";
 
@@ -21,7 +19,7 @@ const router = createBrowserRouter([
     index: true,
     path: "/",
     ErrorBoundary: RouteRouteError,
-    Component: RouteDebug,
+    Component: RouteMain,
   },
   {
     path: "/error/:message",

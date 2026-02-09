@@ -1,33 +1,49 @@
-import { ProtocolError } from ".";
-import * as HTTP from "./httpResponseStatus";
 import express from "express";
+import * as server from "@server/server";
 
 //
-// ApplicationError that handle HTTP.codes
+// ApplicationError that handle server.HTTP.Status
 //
 export class ApplicationError extends Error {
-  readonly code: HTTP.CodesType;
+  readonly status: server.HTTP.StatusType;
 
-  constructor(code: HTTP.CodesType, extra_message?: string) {
-    let msg = "Erreur " + code.toString() + ": " + HTTP.getMessage(code);
+  constructor(status: server.HTTP.StatusType, extra_message?: string) {
+    let msg = "Erreur " + status.toString() + ": " + server.HTTP.getMessage(status);
     if (extra_message) {
       msg += " (" + extra_message + ")";
     }
     super(msg);
     this.name = "ApplicationError";
-    this.code = code;
+    this.status = status;
   }
 
-  protocolError(): ProtocolError {
-    return { status: this.code, msg: this.message };
+  static from(data: unknown): ApplicationError {
+    if (data instanceof ApplicationError) {
+      return data;
+    }
+    if (data instanceof Error) {
+      return new ApplicationError(
+        server.HTTP.Status.InternalServerError,
+        data.message,
+      );
+    }
+    let msg = "Other Error";
+    if (data && typeof data === "object") {
+      msg += ": " + JSON.stringify(data);
+    }
+    return new ApplicationError(
+      server.HTTP.Status.InternalServerError,
+      msg,
+    );
   }
+
 }
 
 //
-// Send an error that handle HTTP.codes
+// Send an error that handle server.HTTP.Status
 //
-export function send(code: HTTP.CodesType, extra_message?: string): never {
-  throw new ApplicationError(code, extra_message);
+export function send(status: server.HTTP.StatusType, extra_message?: string): never {
+  throw new ApplicationError(status, extra_message);
 }
 
 //

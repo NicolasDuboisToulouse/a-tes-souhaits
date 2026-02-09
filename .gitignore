@@ -1,5 +1,5 @@
 /node_modules
-/dist
 /database
 /jwt_secret.txt
 /build
+/tests_result

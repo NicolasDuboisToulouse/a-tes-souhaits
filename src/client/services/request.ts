@@ -1,5 +1,7 @@
 import { useAppStore } from "@client/services/store";
 
+const HTTPStatusOk = 200;
+
 // Object that depend on the request
 type responseDataTtpe = unknown;
 
@@ -28,7 +30,7 @@ export function get(
     )
     .then(
       (answer) => {
-        if (answer.status !== 200) {
+        if (answer.status !== HTTPStatusOk) {
           // TODO handle error
           console.log(answer);
         }

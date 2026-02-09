@@ -18,10 +18,15 @@
     "isolatedModules": true,
     "noEmit": true,
 
+    /* test global types */
+    "types": ["vitest/globals"],
+
     /* path alias */
     "paths": {
       "@client/*": ["./src/client/*"],
-      "@server/*": ["./src/server/*"]
+      "@server/*": ["./src/server/*"],
+      "@scripts/*": ["./scripts/*"],
+      "@tests/*": ["./tests/*"]
     },
 
     /* Linting */
@@ -37,5 +42,5 @@
 	  },
     ],
   },
-  "include": ["scripts", "src", "<root>/*.ts"]
+  "include": ["scripts", "tests", "src/server", "src/client", "<root>/*.ts"]
 }

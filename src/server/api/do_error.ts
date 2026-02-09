@@ -1,15 +1,14 @@
 import express from "express";
-import logger from "@server/logger";
 import * as error from "@server/error";
+import * as server from "@server/server";
 
 const router = express.Router();
 
 router.post("/do_error", (
-  req: express.Request,
+  _req: express.Request,
   _res: express.Response
 ) => {
-  logger.info("req", req.body);
-  error.send(error.HTTP.codes.BadRequest, "An Error");
+  error.send(server.HTTP.Status.BadRequest, "An Error");
 });
 
 export default router;

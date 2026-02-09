@@ -29,7 +29,12 @@ export default defineConfig([
     }
   },
   {
-    files: [ "**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}" ],
+    files: [
+      "./*.{js,ts,jsx,tsx}",
+      "src/+(server|client)/**/*.{js,ts,jsx,tsx}",
+      "tests/**/*.{js,ts,jsx,tsx}",
+      "scripts/**/*.{js,ts,jsx,tsx}",
+    ],
     settings: {
       react: {
         version: "detect"
@@ -139,7 +144,7 @@ export default defineConfig([
       "@stylistic/no-floating-decimal": "warn",
       "@stylistic/no-mixed-operators": "warn",
       "@stylistic/no-mixed-spaces-and-tabs": "warn",
-      "@stylistic/no-multi-spaces": "warn",
+      "@stylistic/no-multi-spaces": [ "warn", { ignoreEOLComments: true } ],
       "@stylistic/no-multiple-empty-lines": [ "warn", { max: 2, maxEOF: 0 } ],
       "@stylistic/no-tabs": "warn",
       "@stylistic/no-trailing-spaces": "warn",
@@ -177,5 +182,6 @@ export default defineConfig([
     "**/node_modules",
     "**/dist",
     "**/build",
+    "**/src/!(server|client)"
   ]),
 ]);

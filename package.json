@@ -8,7 +8,11 @@
     "start": "tsx scripts/launch.ts -e production",
     "build": "tsx scripts/build.ts",
     "build-start": "npm run build -- --keep-db && cd build && npm run start",
-    "check": "tsc && eslint"
+    "check": "tsc && eslint",
+    "tests": "npm run tests-server && npm run tests-client",
+    "tests-server": "vitest run --config tests/server/vitest.config.ts",
+    "tests-client": "vitest run --config tests/client/vitest.config.ts",
+    "vitest-preview": "vitest-preview"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -32,6 +36,9 @@
     "@eslint/css": "^0.14.1",
     "@eslint/js": "^9.39.2",
     "@stylistic/eslint-plugin": "^5.7.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
@@ -39,17 +46,24 @@
     "@types/node": "^22.15.2",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "eslint": "^9.39.2",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.1.0",
     "jiti": "^2.6.1",
+    "jsdom": "^28.0.0",
     "nodemon": "^3.1.10",
+    "supertest": "^7.2.2",
     "typescript-eslint": "^8.54.0",
     "typescript-eslint-language-service": "^5.0.5",
-    "vite": "^6.3.3"
+    "vite": "^6.3.3",
+    "vitest": "^4.0.18",
+    "vitest-preview": "^0.0.3"
   }
 }
