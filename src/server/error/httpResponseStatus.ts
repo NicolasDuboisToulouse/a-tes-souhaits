@@ -16,7 +16,7 @@ export type CodesType = typeof codes[keyof typeof codes];
 const messages: Record<CodesType, string> = {
   [codes.Ok]:                  "Ok",
   [codes.BadRequest]:          "Requête invalide",
-  [codes.Unauthorized]:        "Connection requise",
+  [codes.Unauthorized]:        "Connexion requise",
   [codes.Forbidden]:           "Accès refusé",
   [codes.NotFound]:            "Page non trouvée",
   [codes.InternalServerError]: "Erreur interne",

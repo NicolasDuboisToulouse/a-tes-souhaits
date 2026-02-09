@@ -1,4 +1,4 @@
-import * as webServer from "@server/web";
+import * as webServer from "@server/server";
 import * as database from "@server/database";
 import * as error from "@server/error";
 

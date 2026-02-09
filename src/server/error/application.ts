@@ -1,3 +1,4 @@
+import { ProtocolError } from ".";
 import * as HTTP from "./httpResponseStatus";
 import express from "express";
 
@@ -15,6 +16,10 @@ export class ApplicationError extends Error {
     super(msg);
     this.name = "ApplicationError";
     this.code = code;
+  }
+
+  protocolError(): ProtocolError {
+    return { status: this.code, msg: this.message };
   }
 }
 
@@ -47,8 +52,8 @@ export function handleStashed(app: express.Express) {
     _res: express.Response,
     next: express.NextFunction
   ) => {
-    if (getStashed()) {
-      const error = getStashed();
+    const error = getStashed();
+    if (error) {
       stash(undefined);
       throw error;
     } else {

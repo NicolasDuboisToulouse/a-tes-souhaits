@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "vite";
 import helmet from "helmet";
-import * as error from "@server/error";
 import logger from "@server/logger";
+import * as error from "@server/error";
 import * as api from "@server/api";
 
 export async function start() {
@@ -13,10 +13,16 @@ export async function start() {
   app.use(cors());
   app.use(express.json());
 
+
+  //
   // Dispatch error that was raised before server starts
+  //
   error.handleStashed(app);
 
+
+  //
   // Display the requested URL
+  //
   app.use((
     req: express.Request,
     _res: express.Response,
@@ -28,49 +34,9 @@ export async function start() {
 
 
   //
-  // Some tests
+  // Import API middleware
   //
-  app.all("/hello", (
-    req: express.Request,
-    res: express.Response
-  ) => {
-    if (req.get("Content-Type") !== "application/json") {
-      error.send(error.HTTP.codes.Forbidden);
-    }
-    logger.info("req", req.body);
-    res.json({ hello: "world" });
-  });
-
-  app.all("/do_error", (
-    _req: express.Request,
-    _res: express.Response
-  ) => {
-    error.send(error.HTTP.codes.BadRequest, "An Error");
-  });
-
-  app.all("/timeout", async(
-    _req: express.Request,
-    _res: express.Response,
-    next: express.NextFunction
-  ) => {
-    setTimeout(() => {
-      try {
-        error.send(error.HTTP.codes.InternalServerError);
-      } catch(err) {
-        next(err);
-      }
-    }, 1000);
-  });
-
-  //
-  // Catch invaid API call
-  //
-  app.all(api.ROOT_URL_RE, (
-    _req: express.Request,
-    _res: express.Response
-  ) => {
-    error.send(error.HTTP.codes.Forbidden, "Appel API invalide");
-  });
+  app.use(api.router);
 
 
   //
@@ -86,37 +52,33 @@ export async function start() {
     _next: express.NextFunction, // Must be define to make express call this Middleware
   ) => {
     logger.error("----");
-    let result: { status: error.HTTP.CodesType; msg: string } = {
-      status: error.HTTP.codes.Ok,
-      msg: error.HTTP.getMessage(error.HTTP.codes.Ok)
-    };
+    let protocolError: error.ProtocolError;
 
     if (err instanceof error.ApplicationError) {
-      // Hanlded application error
-      result = { status: err.code, msg: err.message };
-      logger.error("Application error: %o", result);
+      protocolError = err.protocolError();
+      logger.error("Application error: %o", protocolError);
     } else if (err instanceof Error) {
-      // unhanlded server error
-      result = {
+      protocolError = {
         status: error.HTTP.codes.InternalServerError,
-        msg: err.message ? err.message : "No error message"
+        msg: err.message ? err.message : "Unknown error",
       };
-      logger.error("Internal error: %o", result);
+      logger.error("Internal error: %o", protocolError);
     } else {
-      // Not an error ? We shall not be here
-      result = { status: error.HTTP.codes.InternalServerError, msg: "Unexpected Error" };
-      logger.error("Not an error ??: %o", result);
+      protocolError = {
+        status: error.HTTP.codes.InternalServerError,
+        msg: "Unexpected error"
+      };
+      logger.error("Not an error ??: %o", protocolError);
     }
     logger.error("Error: %s", err.stack);
 
+    res.status(protocolError.status);
     if (req.get("Content-Type") === "application/json") {
       // We receive json, we return json
-      res.status(result.status);
-      res.send(result);
+      res.json(protocolError);
     } else {
       // We receive anything else json (like a simple GET), redirect to error
-      res.status(result.status);
-      res.redirect("/error/" + encodeURIComponent(result.msg));
+      res.redirect("/error/" + encodeURIComponent(protocolError.msg));
     }
     logger.error("----");
   });
@@ -134,14 +96,12 @@ export async function start() {
     const viteDevServer = await createServer({
       mode: "development",
       server: {
-        // TODO: https
-        // https: ...
         middlewareMode: true,
       },
     });
     app.use(viteDevServer.middlewares);
   } else {
-    // in production mode, just serve static files
+    // in production mode, just serve static (generated) files
     app.use(helmet(), express.static("dist"));
   }
 
