@@ -25,12 +25,6 @@ export function get(
       (response) =>
         response.json()
           .then((data) => ({ status: response.status, data }))
-          .catch(
-            (jsonParseError) => {
-              // TODO: handle error
-              console.log(jsonParseError);
-              return Promise.reject();
-            })
     )
     .then(
       (answer) => {
@@ -38,13 +32,12 @@ export function get(
           // TODO handle error
           console.log(answer);
         }
-        return Promise.resolve(answer.data);
+        return answer.data;
       })
     .catch(
-      (fetchError) => {
+      (error) => {
         // TODO: handle error
-        console.log(fetchError);
-        return Promise.reject();
+        console.log(error);
       })
     .finally(appState.removeSpinner);
 }

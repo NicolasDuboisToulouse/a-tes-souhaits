@@ -4,6 +4,7 @@ import ts from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 import reactPlugin from "eslint-plugin-react";
+import pluginPromise from "eslint-plugin-promise";
 import { globalIgnores } from "@eslint/config-helpers";
 // import css from "@eslint/css";
 
@@ -45,7 +46,23 @@ export default defineConfig([
         },
       },
     },
+    ...pluginPromise.configs["flat/recommended"],
     rules: {
+      // See https://github.com/eslint-community/eslint-plugin-promise
+      "promise/always-return": "warn",
+      "promise/avoid-new": "off",
+      "promise/catch-or-return": "warn",
+      "promise/no-callback-in-promise": "warn",
+      "promise/no-return-wrap": "warn",
+      "promise/param-names": "warn",
+      "promise/no-native": "off",
+      "promise/no-nesting": "warn",
+      "promise/no-promise-in-callback": "warn",
+      "promise/no-new-statics": "warn",
+      "promise/no-return-in-finally": "warn",
+      "promise/valid-params": "warn",
+      "promise/no-multiple-resolved": "warn",
+
       // See https://eslint.org/docs/latest/rules
       "eqeqeq": [ "warn", "smart" ],
       "no-var": [ "warn" ],
