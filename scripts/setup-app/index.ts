@@ -5,28 +5,25 @@ import fs from "fs";
 //
 // App configuration
 //
-export type EnvType = "production" | "development";
+const envValues = [ "production", "development", "test" ] as const;
+export type EnvType = typeof envValues[number];
 
 export class AppConfig {
   readonly env: EnvType;
-  readonly docker: boolean;
   readonly port: number;
 
-  constructor(param: EnvType | OptionValues | { env: EnvType; docker?: boolean; port?: number }) {
+  constructor(param: EnvType | OptionValues | { env: EnvType; port?: number }) {
     if (typeof param === "string") {
       this.env = param;
-      this.docker = false;
       this.port = 3000;
     } else {
       // Note: OptionValues type drop typescript checks
-      if (!param.env && param.env !== "production" && param.env !== "development") {
-        throw new Error("env options must be production or development");
+      if (!param.env || !envValues.includes(param.env)) {
+        throw new Error("env options must be in " + JSON.stringify(envValues));
       }
-      if (param.docker && typeof param.docker !== "boolean") throw new Error("docker option must be a boolean");
       if (param.port && typeof param.port !== "number") throw new Error("port option must be a number");
 
       this.env = param.env;
-      this.docker = param.docker ? param.docker : false;
       this.port = param.port ? param.port : 3000;
     }
   }
@@ -35,14 +32,16 @@ export class AppConfig {
 //
 // Setup global env
 //
-export async function setupEnv(appConfig: AppConfig) {
+export function setupEnv(appConfig: AppConfig) {
   process.env.NODE_ENV = appConfig.env;
-  process.env.PROGRAM_ROOT = path.normalize(import.meta.dirname + "/../..");
-  const package_json = await import("file://" + process.env.PROGRAM_ROOT + "/package.json");
-  process.env.PROGRAM_VERSION = package_json.version;
+  process.env.PROGRAM_ROOT = path.resolve(import.meta.dirname, "..", "..");
   process.env.PROGRAM_PORT = appConfig.port.toString();
-  process.env.DATABASE_DIR = process.env.PROGRAM_ROOT + "/database";
-  process.env.DATABASE_SCHEMAS = process.env.PROGRAM_ROOT + "/schemas";
+  process.env.DATABASE_DIR = path.join(process.env.PROGRAM_ROOT, "database");
+  process.env.DATABASE_SCHEMAS = path.join(process.env.PROGRAM_ROOT, "schemas");
+  if (process.env.NODE_ENV === "test") {
+    process.env.TESTS_RESULT_DIR = path.join(process.env.PROGRAM_ROOT, "tests_result");
+    process.env.DATABASE_DIR = path.join(process.env.TESTS_RESULT_DIR, "database");
+  }
 }
 
 //
@@ -59,7 +58,7 @@ export async function setupServer(appConfig: AppConfig) {
   // Get or Generate jwt secret
   // This is used as salf for user/password cookies
   //
-  const secret_file = process.env.PROGRAM_ROOT + "/jwt_secret.txt";
+  const secret_file = path.join(process.env.PROGRAM_ROOT!, "jwt_secret.txt");
   let secret: string;
   if (fs.existsSync(secret_file)) {
     secret = fs.readFileSync(secret_file, { encoding: "utf8" });
@@ -68,34 +67,6 @@ export async function setupServer(appConfig: AppConfig) {
     fs.writeFileSync(secret_file, secret);
   }
   process.env.JWT_SECRET = secret;
-
-  //
-  // Initialize or check database dir
-  //
-  if (appConfig.docker === false) {
-    if (typeof process.env.DATABASE_DIR !== "string") {
-      throw new Error("DATABASE_DIR shall be a directory path.");
-    }
-
-    if (appConfig.docker === false) {
-      if (fs.existsSync(process.env.DATABASE_DIR) === false) {
-        fs.mkdirSync(process.env.DATABASE_DIR);
-      }
-    } else {
-      if (fs.existsSync(process.env.DATABASE_DIR) === false) {
-        die("In docker context, database dir shall be a volume!");
-      }
-    }
-  }
-}
-
-
-//
-// Display an error then exit
-//
-function die(text?: string): never {
-  if (text) console.error(text);
-  process.exit(1);
 }
 
 //

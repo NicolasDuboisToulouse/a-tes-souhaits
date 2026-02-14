@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 
-const program_root = path.normalize(import.meta.dirname + "/..");
+const program_root = path.resolve(import.meta.dirname, "..");
 
 //
 // Parse args
@@ -18,8 +18,8 @@ argsParser.addOption(new Option("-s --sub-string", "Run all tests which names co
 argsParser.parse();
 
 const files = Array.prototype.concat(
-  fs.globSync(path.join(program_root, "src/server", "**/*.test.ts?(x)")),
-  fs.globSync(path.join(program_root, "src/client", "**/*.test.ts?(x)"))
+  fs.globSync(path.join(program_root, "src", "server", "**/*.test.ts?(x)")),
+  fs.globSync(path.join(program_root, "src", "client", "**/*.test.ts?(x)"))
 );
 const tests: Map<string, string[]> = new Map<string, string[]>();
 for (const file of files) {
@@ -47,7 +47,8 @@ let exit_code = 0;
 
 function run_tests(kind: "client" | "server", files: string[], testName: string) {
   const testRe = argsParser.opts().subString ? testName : "^" + testName + "$";
-  const command = `vitest run --silent false --hideSkippedTests --config tests/${kind}/vitest.config.ts ` +
+  const configFile = path.join("tests", kind, "vitest.config.ts");
+  const command = `vitest run --silent false --hideSkippedTests --config ${configFile} ` +
     files.join(" ") +
     ` -t '${testRe}'`;
   console.log(command);

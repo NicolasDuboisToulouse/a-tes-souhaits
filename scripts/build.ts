@@ -18,7 +18,7 @@ function die(text?: string): never {
 function pathLookup(seachedFile: string): string | undefined {
   const sys_path = process.env.path || process.env.PATH || "";
   for (const dir of sys_path.split(path.delimiter)) {
-    const file = dir + path.sep + seachedFile;
+    const file = path.join(dir, seachedFile);
     try {
       fs.accessSync(file, fs.constants.F_OK | fs.constants.X_OK);
       return file;
@@ -63,7 +63,7 @@ function cpIfNewer(sourceFile: string, secondFile: string, basePathForLog = "") 
 }
 
 
-const program_root = path.normalize(import.meta.dirname + "/..");
+const program_root = path.resolve(import.meta.dirname, "..");
 
 //
 // Parse args
@@ -108,7 +108,7 @@ if (!vite) {
   die("vite cannot be found !");
 }
 
-const vite_target = target + "/dist";
+const vite_target = path.join(target, "dist");
 fs.rmSync(vite_target, {
   force: true,
   recursive: true,
@@ -124,12 +124,12 @@ execSync(`${vite} build --outDir ${vite_target} --emptyOutDir`, {
 // Copy needed files
 //
 console.log("Copy needed files...");
-cpIfNewer(path.join(program_root, "/LICENSE"), path.join(target, "/LICENSE"));
-cpIfNewer(path.join(program_root, "/tsconfig.json"), path.join(target, "/tsconfig.json"));
-cpIfNewer(path.join(program_root, "/vite.config.ts"), path.join(target, "/vite.config.ts"));
-cpIfNewer(path.join(program_root, "/schemas"), path.join(target, "/schemas"));
-cpIfNewer(path.join(program_root, "/scripts"), path.join(target, "/scripts"));
-cpIfNewer(path.join(program_root, "/src/server"), path.join(target, "/src/server"));
+cpIfNewer(path.join(program_root, "LICENSE"), path.join(target, "LICENSE"));
+cpIfNewer(path.join(program_root, "tsconfig.json"), path.join(target, "tsconfig.json"));
+cpIfNewer(path.join(program_root, "vite.config.ts"), path.join(target, "vite.config.ts"));
+cpIfNewer(path.join(program_root, "schemas"), path.join(target, "schemas"));
+cpIfNewer(path.join(program_root, "scripts"), path.join(target, "scripts"));
+cpIfNewer(path.join(program_root, "src", "server"), path.join(target, "src", "server"));
 
 //
 // Copy database if required
@@ -137,15 +137,15 @@ cpIfNewer(path.join(program_root, "/src/server"), path.join(target, "/src/server
 if (options.keepDb) {
   console.log("Copy database...");
   // the secret is keept to keep cookies valid
-  cpIfNewer(path.join(program_root, "/jwt_secret.txt"), path.join(target, "/jwt_secret.txt"));
-  cpIfNewer(path.join(program_root, "/database"), path.join(target, "/database"));
+  cpIfNewer(path.join(program_root, "jwt_secret.txt"), path.join(target, "jwt_secret.txt"));
+  cpIfNewer(path.join(program_root, "database"), path.join(target, "database"));
 }
 
 //
 // Install NPM packages
 //
-const sourcePackageJson = path.join(program_root, "/package.json");
-const destPackageJson = path.join(target, "/package.json");
+const sourcePackageJson = path.join(program_root, "package.json");
+const destPackageJson = path.join(target, "package.json");
 if (isFirstNewer(sourcePackageJson, destPackageJson)) {
   console.log("Install NPM packages...");
   const npm = pathLookup("npm");

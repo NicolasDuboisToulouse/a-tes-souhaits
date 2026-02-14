@@ -47,7 +47,8 @@ beforeAll(async() => {
   ) => {
     server.replyError(
       res,
-      error.ApplicationError.from(new Error("An error"))
+      error.ApplicationError.from(new Error("An error")),
+      false,
     );
   });
 

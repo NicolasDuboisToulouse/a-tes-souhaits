@@ -1,7 +1,11 @@
 import path from "path";
+import { AppConfig, setupEnv } from "./scripts/setup-app";
 
-process.env.PROGRAM_ROOT = __dirname;
-export const tests_result_dir = path.resolve(process.env.PROGRAM_ROOT, "./tests_result");
+setupEnv(new AppConfig("test"));
+if (typeof process.env.PROGRAM_ROOT !== "string") {
+  console.error("env PROGRAM_ROOT is not defined!");
+  process.exit(1);
+}
 
 export const userConfig = {
   resolve: {

@@ -65,23 +65,29 @@ class Database {
   constructor() {
     logger.info("[Open database]");
 
-    try {
-      if (process.env.DATABASE_DIR === undefined ||
-        fs.lstatSync(process.env.DATABASE_DIR).isDirectory() === false) {
-        error.die(`Invalid env DATABASE_DIR (${process.env.DATABASE_DIR})`);
-      }
-      const database_file = process.env.DATABASE_DIR + "/database.db";
-      this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
-    } catch(error) {
-      const db_dir_stat = fs.statSync("database", { throwIfNoEntry: false });
-      if (db_dir_stat == null || db_dir_stat.isDirectory() === false) {
-        logger.error("Folder 'database' does not exists !");
-        logger.error("In a docker container, 'database' shall be a volume !");
-      } else {
-        logger.error(error);
-      }
-      throw error;
+    if (typeof process.env.DATABASE_DIR !== "string") {
+      error.die("env DATABASE_DIR is not set !");
     }
+    try {
+      fs.mkdirSync(process.env.DATABASE_DIR, { recursive: true });
+    } catch(err) {
+      if (err instanceof Error) {
+        error.die(`Cannot create database dir ${process.env.DATABASE_DIR}: ${err.message}`);
+      } else {
+        error.die(`Cannot create database dir ${process.env.DATABASE_DIR}`);
+      }
+    }
+    const database_file = path.join(process.env.DATABASE_DIR, "database.db");
+    try {
+      this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
+    } catch(err) {
+      if (err instanceof Error) {
+        error.die(`Failled to create or load database ${database_file}: ${err.message}`);
+      } else {
+        error.die(`Failled to create or load database ${database_file}`);
+      }
+    }
+
     this.db.pragma("journal_mode = WAL");
     this.update();
   }
@@ -114,7 +120,7 @@ class Database {
     let target_db_version = 0;
 
     if (process.env.DATABASE_SCHEMAS === undefined ||
-      fs.lstatSync(process.env.DATABASE_SCHEMAS).isDirectory() === false) {
+      fs.statSync(process.env.DATABASE_SCHEMAS).isDirectory() === false) {
       error.die(`Invalid env DATABASE_SCHEMAS (${process.env.DATABASE_SCHEMAS})`);
     }
     const files = fs.readdirSync(process.env.DATABASE_SCHEMAS);

@@ -1,5 +1,6 @@
 #!npx tsx
 import { Command, Option, InvalidArgumentError } from "commander";
+import path from "path";
 import { AppConfig, setupServer } from "./setup-app";
 
 
@@ -27,7 +28,7 @@ argsParser.description("Initialize environment and run the project.");
 argsParser.addOption(new Option("-e, --env <env>", "Runtime environment environment")
   .choices([ "development", "production" ])
   .makeOptionMandatory());
-argsParser.addOption(new Option("-d, --docker", "Program will run in docker. './database' shall be a volume")
+argsParser.addOption(new Option("-d, --docker", "Program will run in docker. 'database' shall be a volume")
   .default(false));
 argsParser.addOption(new Option("-p --port <number>", "Server port")
   .default(3000)
@@ -46,14 +47,18 @@ await setupServer(appConfig);
 //
 // Launch
 //
+if (typeof process.env.PROGRAM_ROOT !== "string") {
+  throw new Error("env var PROGRAM_ROOT unset !");
+}
+
 if (process.env.NODE_ENV === "development") {
   process.env.LOG_LEVEL = "trace";
   const nodemon = await import("nodemon");
   nodemon.default({
     exec: "tsx",
-    script: process.env.PROGRAM_ROOT + "/src/server/main.ts",
-    watch: [ process.env.PROGRAM_ROOT + "/src/server" ],
+    script: path.join(process.env.PROGRAM_ROOT, "src", "server", "main.ts"),
+    watch: [ path.join(process.env.PROGRAM_ROOT, "src", "server") ],
   });
 } else {
-  await import("file://" + process.env.PROGRAM_ROOT + "/src/server/main.ts");
+  await import("file://" + path.join(process.env.PROGRAM_ROOT, "src", "server", "main.ts"));
 }
