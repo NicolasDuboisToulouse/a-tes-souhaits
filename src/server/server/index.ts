@@ -3,6 +3,7 @@ import { Server } from "http";
 import cors from "cors";
 import { createServer } from "vite";
 import helmet from "helmet";
+import path from "path";
 import logger from "@server/logger";
 import * as error from "@server/error";
 import * as api from "@server/api";
@@ -113,7 +114,8 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
 
     case "production":
       // in production mode, just serve static (generated) files
-      app.use(helmet(), express.static("dist"));
+      app.use(helmet(), express.static(path.resolve("dist")));
+      app.get(/.*/, (_req, res) => res.sendFile(path.resolve("dist", "index.html")));
       break;
 
     case "test":
