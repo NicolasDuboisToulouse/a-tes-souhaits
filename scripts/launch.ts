@@ -1,3 +1,4 @@
+#!npx tsx
 import { Command, Option, InvalidArgumentError } from "commander";
 import { AppConfig, setupServer } from "./setup-app";
 

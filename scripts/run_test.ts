@@ -1,3 +1,4 @@
+#!npx tsx
 import { Command, Option } from "commander";
 import fs from "fs";
 import path from "path";
