@@ -39,6 +39,7 @@ export function setupEnv(appConfig: AppConfig) {
   process.env.DATABASE_DIR = path.join(process.env.PROGRAM_ROOT, "database");
   process.env.DATABASE_SCHEMAS = path.join(process.env.PROGRAM_ROOT, "schemas");
   if (process.env.NODE_ENV === "test") {
+    process.env.LOG_LEVEL = "trace";
     process.env.TESTS_RESULT_DIR = path.join(process.env.PROGRAM_ROOT, "tests_result");
     process.env.DATABASE_DIR = path.join(process.env.TESTS_RESULT_DIR, "database");
   }

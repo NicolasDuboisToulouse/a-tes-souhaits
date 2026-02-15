@@ -12,6 +12,12 @@ let database: Database | undefined = undefined;
 export function init() {
   database = new Database();
 }
+
+export function close() {
+  if (database) {
+    database.close();
+  }
+}
 export function get(): Database {
   if (database === undefined) {
     error.die("Database is not initialized !");
@@ -20,44 +26,106 @@ export function get(): Database {
 }
 
 //
-// Shortcut for get().statement(...)
-// Return a prepared statement, store it for next usage
-// if pluck is true, return only the first result, instead of a full result object
+// Generic types
 //
-export function statement(name: string, query: string, options: { pluck: boolean } = { pluck: false }): Statement {
-  return get().statement(name, query, options);
-}
+type SqlType = number | string | null;
+type RowType = Record<string, SqlType>;
+type SelectType = RowType | SqlType;
 
 //
-// Simple Sqlite.Statement wrapper
+// Define pluck to clarify statement Cor
+// When a statement is pluck, for each result, return only the first column,
+// instead of an object of all columns
 //
-class Statement {
-  private stmt: Sqlite.Statement;
+type PluckType = boolean;
+export const pluck: PluckType = true;
 
-  constructor(stmt: Sqlite.Statement) {
-    this.stmt = stmt;
-    logger.debug("New stmt: " + stmt.source);
+//
+// A base statement that cannot return data.
+// Statements are stored to prevent a call to prepare() each time.
+//
+class StatementBase {
+  protected stmt: Sqlite.Statement;
+  private static store = new Map<string, Sqlite.Statement>();
+
+  constructor(query: string) {
+    if (StatementBase.store.has(query)) {
+      this.stmt = StatementBase.store.get(query)!;
+      logger.debug("REUSE statement: " + this.stmt.source);
+    } else {
+      this.stmt = get().prepare(query);
+      StatementBase.store.set(query, this.stmt);
+      logger.debug("New statement: " + this.stmt.source);
+    }
   }
 
-  public run(...args: unknown[]): boolean {
+  // Run the statement, return true if any row has been changed.
+  // ...args: replace '?' in statement query. Order and count must match.
+  // Throw an Error on error.
+  public run(...args: SqlType[]): boolean {
     return this.stmt.run(...args).changes !== 0;
   }
 
-  public get<T>(...args: unknown[]): T | undefined {
-    return this.stmt.get(...args) as T | undefined;
-  }
-
-  public all<T>(...args: unknown[]): T[] {
-    return this.stmt.all(...args) as T[];
+  // Clear stored statement
+  public static clearStore() {
+    StatementBase.store.clear();
   }
 }
+
+//
+// A statement that return data. See also StatementBase.
+// SelectType allows to type the return value (for typescript check & completion).
+//   if statement is not pluck, SelectType type a row. Example: { name: string, age: number }.
+//   if statement is not pluck, SelectType type the first columns. Example: string.
+//
+class StatementSelect<SelType extends SelectType> extends StatementBase {
+  constructor(query: string, pluck?: PluckType) {
+    super(query);
+    this.stmt.pluck(pluck ? true : false);
+  }
+
+  // Get a single row by running the statement. (The first row if several results).
+  // ...args: replace '?' in statement query. Order and count must match.
+  // Return SelectType on success, undefined if not found or throw an Error on error.
+  public get(...args: SqlType[]): SelType | undefined {
+    return this.stmt.get(...args) as SelType | undefined;
+  }
+
+  // Get all rows by running the statement.
+  // ...args: replace '?' in statement query. Order and count must match.
+  // Return SelectType[] on success (might be empty) or throw an Error on error.
+  public all(...args: SqlType[]): SelType[] {
+    return this.stmt.all(...args) as SelType[];
+  }
+}
+
+//
+// Create a base statement. See StatementBase.
+//
+export function statement(query: string): StatementBase {
+  return new StatementBase(query);
+}
+
+//
+// Create a statement that return value(s). See StatementSelect.
+//
+export function select<SelType extends SelectType>(query: string, pluck?: PluckType): StatementSelect<SelType> {
+  return new StatementSelect<SelType>(query, pluck);
+}
+
 
 //
 // Sqlite.Database wrapper
 //
-class Database {
+export class Database {
   private db: Sqlite.Database;
-  private stmts = new Map<string, Statement>();
+
+  //
+  // Return a prepared Sqlite.Statement
+  //
+  public prepare(query: string): Sqlite.Statement {
+    return this.db.prepare(query);
+  }
 
   //
   // Open database. Create it if needed.
@@ -79,6 +147,7 @@ class Database {
     }
     const database_file = path.join(process.env.DATABASE_DIR, "database.db");
     try {
+      if (database) database.close();
       this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
     } catch(err) {
       if (err instanceof Error) {
@@ -93,16 +162,13 @@ class Database {
   }
 
   //
-  // Return a prepared statement, store it for next usage
-  // if pluck is true, return only the first result, instead of a full result object
+  // Close the database
   //
-  public statement(name: string, query: string, options: { pluck: boolean } = { pluck: false }): Statement {
-    if (this.stmts.has(name) === false) {
-      const stmt = this.db.prepare(query);
-      if (options.pluck) stmt.pluck();
-      this.stmts.set(name, new Statement(stmt));
-    }
-    return this.stmts.get(name)!;
+  public close() {
+    logger.info("[Database] Shutdown");
+    StatementBase.clearStore();
+    this.db.close();
+    database = undefined;
   }
 
   //
@@ -120,7 +186,9 @@ class Database {
     let target_db_version = 0;
 
     if (process.env.DATABASE_SCHEMAS === undefined ||
+      fs.existsSync(process.env.DATABASE_SCHEMAS) === false ||
       fs.statSync(process.env.DATABASE_SCHEMAS).isDirectory() === false) {
+      this.close();
       error.die(`Invalid env DATABASE_SCHEMAS (${process.env.DATABASE_SCHEMAS})`);
     }
     const files = fs.readdirSync(process.env.DATABASE_SCHEMAS);
