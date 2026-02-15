@@ -48,7 +48,7 @@ export async function createRouter(extraRoutes?: express.Router): Promise<expres
   //
   router.all(ROOT_URL_RE, (
     req: express.Request,
-    res: express.Response
+    res: express.Response,
   ) => {
     server.replyError(res, new error.ApplicationError(server.HTTP.Status.NotFound, req.url));
   });

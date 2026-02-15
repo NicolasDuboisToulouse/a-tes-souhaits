@@ -25,8 +25,8 @@ export default defineConfig([
   stylistic.configs.customize({}),
   {
     linterOptions: {
-      reportUnusedDisableDirectives: "off"
-    }
+      reportUnusedDisableDirectives: "off",
+    },
   },
   {
     files: [
@@ -37,8 +37,8 @@ export default defineConfig([
     ],
     settings: {
       react: {
-        version: "detect"
-      }
+        version: "detect",
+      },
     },
     ...reactPlugin.configs.flat.recommended,
     languageOptions: {
@@ -89,7 +89,7 @@ export default defineConfig([
       "@stylistic/arrow-spacing": "warn",
       "@stylistic/block-spacing": "warn",
       "@stylistic/brace-style": [ "warn", "1tbs", { allowSingleLine: true } ],
-      "@stylistic/comma-dangle": "off",
+      "@stylistic/comma-dangle": [ "warn", "always-multiline" ],
       "@stylistic/comma-spacing": [ "warn", { before: false, after: true } ],
       "@stylistic/computed-property-spacing": "off",
       "@stylistic/curly-newline": "off",
@@ -123,7 +123,7 @@ export default defineConfig([
         condition: "parens-new-line",
         logical: "parens-new-line",
         prop: "parens-new-line",
-        propertyValue: "parens-new-line"
+        propertyValue: "parens-new-line",
       } ],
       "@stylistic/key-spacing": [ "warn", { mode: "minimum" } ],
       "@stylistic/keyword-spacing": "warn",
@@ -176,12 +176,12 @@ export default defineConfig([
       "@stylistic/wrap-iife": [ "warn", "outside" ],
       "@stylistic/wrap-regex": "off",
       "@stylistic/yield-star-spacing": "warn",
-    }
+    },
   },
   globalIgnores([
     "**/node_modules",
     "**/dist",
     "**/build",
-    "**/src/!(server|client)"
+    "**/src/!(server|client)",
   ]),
 ]);

@@ -5,7 +5,7 @@ import * as server from "@server/server";
 const router = express.Router();
 
 router.post("/timeout", (
-  req: express.Request,
+  _req: express.Request,
   _res: express.Response,
   next: express.NextFunction,
 ) => {

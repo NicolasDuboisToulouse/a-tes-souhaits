@@ -19,7 +19,7 @@ argsParser.parse();
 
 const files = Array.prototype.concat(
   fs.globSync(path.join(program_root, "src", "server", "**/*.test.ts?(x)")),
-  fs.globSync(path.join(program_root, "src", "client", "**/*.test.ts?(x)"))
+  fs.globSync(path.join(program_root, "src", "client", "**/*.test.ts?(x)")),
 );
 const tests: Map<string, string[]> = new Map<string, string[]>();
 for (const file of files) {

@@ -10,7 +10,7 @@ type responseDataTtpe = unknown;
 // promise is rejected.
 export function get(
   url: string,
-  content?: object
+  content?: object,
 ): Promise<responseDataTtpe> {
 
   const appState = useAppStore.getState();
@@ -26,7 +26,7 @@ export function get(
     .then(
       (response) =>
         response.json()
-          .then((data) => ({ status: response.status, data }))
+          .then((data) => ({ status: response.status, data })),
     )
     .then(
       (answer) => {

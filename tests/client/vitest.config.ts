@@ -16,7 +16,7 @@ export default defineConfig({
     silent: "passed-only",
     reporters: [
       "default",
-      [ "junit", { outputFile: path.resolve(process.env.TESTS_RESULT_DIR, "client.xml") } ]
+      [ "junit", { outputFile: path.resolve(process.env.TESTS_RESULT_DIR, "client.xml") } ],
     ],
     globals: true,       // test functions are included by default
     include: [

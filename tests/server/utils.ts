@@ -26,7 +26,7 @@ export function get(
         if (dump) {
           console.log("supertest:", supertestTest);
         }
-      }
+      },
     );
 }
 

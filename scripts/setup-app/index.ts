@@ -53,7 +53,7 @@ export async function setupServer(appConfig: AppConfig) {
   //
   // Global env init
   //
-  await setupEnv(appConfig);
+  setupEnv(appConfig);
 
   //
   // Get or Generate jwt secret

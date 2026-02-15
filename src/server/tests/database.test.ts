@@ -92,7 +92,7 @@ describe("Validate database module", () => {
     database.init();
 
     const insStmt = database.statement(
-      "INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES (?, ?, ?, ?, ?)"
+      "INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES (?, ?, ?, ?, ?)",
     );
     insStmt.run("user1", "user1", "hash1", 0, 1);
     insStmt.run("user2", "user2", "hash2", 1, 0);
@@ -106,7 +106,7 @@ describe("Validate database module", () => {
         { userName: "admin", displayName: "admin", firstLogin: 1, isAdmin: 1 },
         { userName: "user1", displayName: "user1", firstLogin: 0, isAdmin: 1 },
         { userName: "user2", displayName: "user2", firstLogin: 1, isAdmin: 0 },
-      ]
+      ],
     );
 
     expect(userGet.get()).toStrictEqual(

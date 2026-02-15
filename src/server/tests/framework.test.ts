@@ -35,9 +35,9 @@ beforeAll(async() => {
       error.ApplicationError.from(
         new error.ApplicationError(
           server.HTTP.Status.BadRequest,
-          "An error"
-        )
-      )
+          "An error",
+        ),
+      ),
     );
   });
 
@@ -58,7 +58,7 @@ beforeAll(async() => {
   ) => {
     server.replyError(
       res,
-      error.ApplicationError.from({ err: "An error" })
+      error.ApplicationError.from({ err: "An error" }),
     );
   });
 

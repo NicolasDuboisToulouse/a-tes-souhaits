@@ -66,7 +66,7 @@ export function handleStashed(app: express.Express) {
   app.use((
     _req: express.Request,
     _res: express.Response,
-    next: express.NextFunction
+    next: express.NextFunction,
   ) => {
     const error = getStashed();
     if (error) {
