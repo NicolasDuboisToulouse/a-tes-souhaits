@@ -9,9 +9,9 @@
     "build": "tsx scripts/build.ts",
     "build-start": "npm run build -- --keep-db && cd build && npm run start",
     "check": "tsc && eslint",
-    "tests": "npm run tests-server && npm run tests-client",
-    "tests-server": "vitest run --config tests/server/vitest.config.ts",
-    "tests-client": "vitest run --config tests/client/vitest.config.ts",
+    "tests": "tsx scripts/run_test.ts",
+    "tests-server": "tsx scripts/run_test.ts --server",
+    "tests-client": "tsx scripts/run_test.ts --client",
     "vitest-preview": "vitest-preview"
   },
   "dependencies": {
@@ -52,6 +52,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
+    "@xmldom/xmldom": "^0.8.11",
     "eslint": "^9.39.2",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "^7.37.5",
@@ -64,6 +65,7 @@
     "typescript-eslint-language-service": "^5.0.5",
     "vite": "^6.3.3",
     "vitest": "^4.0.18",
-    "vitest-preview": "^0.0.3"
+    "vitest-preview": "^0.0.3",
+    "xpath": "^0.0.34"
   }
 }

@@ -3,6 +3,7 @@ import { Command, Option } from "commander";
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
+import { AppConfig, setupEnv } from "./setup-app";
 
 //
 // Display an error then exit
@@ -98,6 +99,10 @@ if (options.clean) {
 
 fs.mkdirSync(target, { recursive: true });
 
+//
+// setup env, needed for building
+//
+setupEnv(new AppConfig("production"));
 
 //
 // Build vite (regardless clean option)
