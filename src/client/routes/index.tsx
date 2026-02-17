@@ -14,6 +14,8 @@ import RouteMain from "./Main";
 import RouteServerError from "./ServerError";
 import RouteRouteError from "./RouteError";
 
+/* v8 ignore start main cannot be tested */
+
 const router = createBrowserRouter([
   {
     index: true,
@@ -37,3 +39,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     </div>
   </StrictMode>,
 );
+
+/* v8 ignore stop */
