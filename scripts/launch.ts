@@ -52,7 +52,6 @@ if (typeof process.env.PROGRAM_ROOT !== "string") {
 }
 
 if (process.env.NODE_ENV === "development") {
-  process.env.LOG_LEVEL = "trace";
   const nodemon = await import("nodemon");
   nodemon.default({
     exec: "tsx",

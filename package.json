@@ -9,9 +9,9 @@
     "build": "tsx scripts/build.ts",
     "build-start": "npm run build -- --keep-db && cd build && npm run start",
     "check": "tsc && eslint",
-    "tests": "tsx scripts/run_test.ts",
-    "tests-server": "tsx scripts/run_test.ts --server",
-    "tests-client": "tsx scripts/run_test.ts --client",
+    "tests": "tsx scripts/run_test.ts --no-verbose",
+    "tests-server": "tsx scripts/run_test.ts --server --no-verbose",
+    "tests-client": "tsx scripts/run_test.ts --client --no-verbose",
     "vitest-preview": "vitest-preview"
   },
   "dependencies": {

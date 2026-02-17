@@ -4,14 +4,7 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 import { AppConfig, setupEnv } from "./setup-app";
-
-//
-// Display an error then exit
-//
-function die(text?: string): never {
-  if (text) console.error(text);
-  process.exit(1);
-}
+import * as logger from "@shared/logger";
 
 //
 // lookup for a program in PATH
@@ -107,10 +100,10 @@ setupEnv(new AppConfig("production"));
 //
 // Build vite (regardless clean option)
 //
-console.log("Building vite...");
+logger.info("Building vite...");
 const vite = pathLookup("vite");
 if (!vite) {
-  die("vite cannot be found !");
+  logger.die("vite cannot be found !");
 }
 
 const vite_target = path.join(target, "dist");
@@ -128,19 +121,20 @@ execSync(`${vite} build --outDir ${vite_target} --emptyOutDir`, {
 //
 // Copy needed files
 //
-console.log("Copy needed files...");
+logger.info("Copy needed files...");
 cpIfNewer(path.join(program_root, "LICENSE"), path.join(target, "LICENSE"));
 cpIfNewer(path.join(program_root, "tsconfig.json"), path.join(target, "tsconfig.json"));
 cpIfNewer(path.join(program_root, "vite.config.ts"), path.join(target, "vite.config.ts"));
 cpIfNewer(path.join(program_root, "schemas"), path.join(target, "schemas"));
 cpIfNewer(path.join(program_root, "scripts"), path.join(target, "scripts"));
 cpIfNewer(path.join(program_root, "src", "server"), path.join(target, "src", "server"));
+cpIfNewer(path.join(program_root, "src", "shared"), path.join(target, "src", "shared"));
 
 //
 // Copy database if required
 //
 if (options.keepDb) {
-  console.log("Copy database...");
+  logger.info("Copy database...");
   // the secret is keept to keep cookies valid
   cpIfNewer(path.join(program_root, "jwt_secret.txt"), path.join(target, "jwt_secret.txt"));
   cpIfNewer(path.join(program_root, "database"), path.join(target, "database"));
@@ -152,10 +146,10 @@ if (options.keepDb) {
 const sourcePackageJson = path.join(program_root, "package.json");
 const destPackageJson = path.join(target, "package.json");
 if (isFirstNewer(sourcePackageJson, destPackageJson)) {
-  console.log("Install NPM packages...");
+  logger.info("Install NPM packages...");
   const npm = pathLookup("npm");
   if (!npm) {
-    die("npm cannot be found !");
+    logger.die("npm cannot be found !");
   }
   fs.cpSync(sourcePackageJson, destPackageJson);
   execSync("npm install --omit=dev", {
@@ -164,4 +158,4 @@ if (isFirstNewer(sourcePackageJson, destPackageJson)) {
   });
 }
 
-console.log("Done.");
+logger.info("Done.");

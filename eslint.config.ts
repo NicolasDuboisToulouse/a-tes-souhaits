@@ -31,7 +31,7 @@ export default defineConfig([
   {
     files: [
       "./*.{js,ts,jsx,tsx}",
-      "src/+(server|client)/**/*.{js,ts,jsx,tsx}",
+      "src/+(server|client|shared)/**/*.{js,ts,jsx,tsx}",
       "tests/**/*.{js,ts,jsx,tsx}",
       "scripts/**/*.{js,ts,jsx,tsx}",
     ],
@@ -182,6 +182,6 @@ export default defineConfig([
     "**/node_modules",
     "**/dist",
     "**/build",
-    "**/src/!(server|client)",
+    "**/src/!(server|client|shared)",
   ]),
 ]);

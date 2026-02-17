@@ -4,7 +4,7 @@ import cors from "cors";
 import { createServer } from "vite";
 import helmet from "helmet";
 import path from "path";
-import logger from "@server/logger";
+import * as logger from "@shared/logger";
 import * as error from "@server/error";
 import * as api from "@server/api";
 import * as HTTP from "./httpStatus";
@@ -60,7 +60,7 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
     _res: express.Response,
     next: express.NextFunction,
   ) => {
-    logger.trace("Request URL: " + req.url + ", data: " + req.body);
+    logger.trace("Request URL:", req.url, "data:", req.body);
     next();
   });
 
@@ -93,7 +93,7 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
       res.status(appError.status); // That doesn't works. The status shall be set be on error route request.
       res.redirect("/error/" + encodeURIComponent(appError.message));
     }
-    logger.error("Error: %s", err.stack);
+    logger.error("Error:", err.stack);
     logger.error("----");
   });
 
@@ -123,7 +123,7 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
       break;
 
     default:
-      error.die(`Unexepected NODE_ENV: "${process.env.NODE_ENV}"`);
+      logger.die(`Unexepected NODE_ENV: "${process.env.NODE_ENV}"`);
   }
   /* v8 ignore stop */
 
@@ -139,22 +139,21 @@ export async function start(app?: express.Express): Promise<Server> {
   if (!app) app = await createExpressApp();
 
   function serverStarted() {
-    logger.info("Server is listening on port " + port + "...");
+    logger.info("Server is listening on port", port, "...");
   }
 
   if (!process.env.PROGRAM_PORT || /^[0-9]+$/.test(process.env.PROGRAM_PORT) === false) {
-    error.die("env var PROGRAM_PORT is not a number!");
+    logger.die("env var PROGRAM_PORT is not a number!");
   }
   const port = parseInt(process.env.PROGRAM_PORT, 10);
   if (isNaN(port)) {
-    error.die("env var PROGRAM_PORT is not a number!");
+    logger.die("env var PROGRAM_PORT is not a number!");
   }
 
   const server = app.listen(port, serverStarted);
 
   server.on("error", (e) => {
-    logger.error("Server failure!");
-    logger.error(e);
+    logger.error("Server failure:", e);
     process.exit(1);
   });
 

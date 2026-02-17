@@ -29,8 +29,5 @@ export default defineConfig({
       reporter: [ "html" ],
       reportsDirectory: path.resolve(process.env.TESTS_RESULT_DIR, "server_coverage"),
     },
-    globalSetup: path.resolve(__dirname, "global_setup.ts"),
-    // start server ?
-    // globalSetup:
   },
 });

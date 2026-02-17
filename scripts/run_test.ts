@@ -6,7 +6,7 @@ import { execFileSync } from "child_process";
 import xpath from "xpath";
 import { DOMParser } from "@xmldom/xmldom";
 import { AppConfig, setupEnv } from "./setup-app";
-import logger from "./logger";
+import * as logger from "@shared/logger";
 
 //
 // Init
@@ -36,6 +36,8 @@ argsParser.description("Build the delivery.");
 argsParser.argument("[testRegEx...]", "List of tests to run (separated by spaces). If no test specifiled, run all tests");
 argsParser.addOption(new Option("-e --exact", "On run tests that exatly match testRegEx (it't a substring by default)")
   .default(false));
+argsParser.addOption(new Option("--no-verbose", "Hide tests stdout/stderr.")
+  .default(true));
 argsParser.addOption(new Option("-s --server", "Only run server tests")
   .default(false)
   .conflicts("client"));
@@ -99,6 +101,15 @@ if (tests.size === 0) {
 }
 
 //
+// Define logger level
+//
+if (options.verbose) {
+  logger.setLevel("trace");
+} else {
+  logger.setLevel("silent");
+}
+
+//
 // Run all tests in testFiles filtered by testNameRe
 //
 function run_tests(kind: "client" | "server", testFiles: string[], testNameRe: string) {
@@ -109,7 +120,7 @@ function run_tests(kind: "client" | "server", testFiles: string[], testNameRe: s
   const args = [
     "vitest",
     "run",
-    "--silent", "false",
+    "--silent", (!options.verbose).toString(),
     "--hideSkippedTests",
     "--config", configFile,
     ...testFiles,
@@ -117,7 +128,7 @@ function run_tests(kind: "client" | "server", testFiles: string[], testNameRe: s
   ];
 
   try {
-    logger.info("run: npx " + args.join(" "));
+    logger.info("run: npx ", args.join(" "));
     execFileSync("npx", args, {
       cwd: process.env.PROGRAM_ROOT,
       stdio: [ 0, 1, 2 ],
@@ -140,6 +151,7 @@ tests.forEach((files, testNameRe) => {
   }
 });
 
+logger.setLevel("info");
 if (exit_code) {
   logger.error("Some tests failed:");
   const serverResult = fs.readFileSync(path.join(process.env.TESTS_RESULT_DIR!, "server.xml"), "utf8");
@@ -148,8 +160,8 @@ if (exit_code) {
   if (nodes instanceof Array) {
     for (const node of nodes) {
       if (node.nodeType === node.ELEMENT_NODE) {
-        logger.error(" - " +
-          (node as Element).getAttribute("name") +
+        logger.error(" -",
+          (node as Element).getAttribute("name"),
           "(" + (node as Element).getAttribute("classname") + ")",
         );
       }

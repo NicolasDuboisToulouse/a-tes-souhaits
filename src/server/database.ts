@@ -1,8 +1,7 @@
 import Sqlite from "better-sqlite3";
 import fs from "fs";
 import path from "path";
-import logger from "@server/logger";
-import * as error from "@server/error";
+import * as logger from "@shared/logger";
 import * as user from "@server/user";
 
 //
@@ -20,7 +19,7 @@ export function close() {
 }
 export function get(): Database {
   if (database === undefined) {
-    error.die("Database is not initialized !");
+    logger.die("Database is not initialized !");
   }
   return database;
 }
@@ -51,11 +50,11 @@ class StatementBase {
   constructor(query: string) {
     if (StatementBase.store.has(query)) {
       this.stmt = StatementBase.store.get(query)!;
-      logger.debug("REUSE statement: " + this.stmt.source);
+      logger.debug("[DB] REUSE statement: ", this.stmt.source);
     } else {
       this.stmt = get().prepare(query);
       StatementBase.store.set(query, this.stmt);
-      logger.debug("New statement: " + this.stmt.source);
+      logger.debug("[DB] New statement: ", this.stmt.source);
     }
   }
 
@@ -131,18 +130,18 @@ export class Database {
   // Open database. Create it if needed.
   //
   constructor() {
-    logger.info("[Open database]");
+    logger.info("[DB] Open database");
 
     if (typeof process.env.DATABASE_DIR !== "string") {
-      error.die("env DATABASE_DIR is not set !");
+      logger.die("env DATABASE_DIR is not set !");
     }
     try {
       fs.mkdirSync(process.env.DATABASE_DIR, { recursive: true });
     } catch(err) {
       if (err instanceof Error) {
-        error.die(`Cannot create database dir ${process.env.DATABASE_DIR}: ${err.message}`);
+        logger.die(`Cannot create database dir ${process.env.DATABASE_DIR}: ${err.message}`);
       } else {
-        error.die(`Cannot create database dir ${process.env.DATABASE_DIR}`);
+        logger.die(`Cannot create database dir ${process.env.DATABASE_DIR}`);
       }
     }
     const database_file = path.join(process.env.DATABASE_DIR, "database.db");
@@ -151,9 +150,9 @@ export class Database {
       this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
     } catch(err) {
       if (err instanceof Error) {
-        error.die(`Failled to create or load database ${database_file}: ${err.message}`);
+        logger.die(`Failled to create or load database ${database_file}: ${err.message}`);
       } else {
-        error.die(`Failled to create or load database ${database_file}`);
+        logger.die(`Failled to create or load database ${database_file}`);
       }
     }
 
@@ -165,7 +164,7 @@ export class Database {
   // Close the database
   //
   public close() {
-    logger.info("[Database] Shutdown");
+    logger.info("[DB] Database shutdown...");
     StatementBase.clearStore();
     this.db.close();
     database = undefined;
@@ -181,7 +180,7 @@ export class Database {
     // Look for schemas files schemas/db_<version>.sql
     // Store them in schemas { <version> => <sqls> }
     // Stote the greater <version> in target_db_version.
-    logger.debug("[UpdateDB] Looking for schemas...");
+    logger.debug("[DB] Looking for schemas...");
     const schemas = new Map<number, string>();
     let target_db_version = 0;
 
@@ -189,7 +188,7 @@ export class Database {
       fs.existsSync(process.env.DATABASE_SCHEMAS) === false ||
       fs.statSync(process.env.DATABASE_SCHEMAS).isDirectory() === false) {
       this.close();
-      error.die(`Invalid env DATABASE_SCHEMAS (${process.env.DATABASE_SCHEMAS})`);
+      logger.die(`Invalid env DATABASE_SCHEMAS (${process.env.DATABASE_SCHEMAS})`);
     }
     const files = fs.readdirSync(process.env.DATABASE_SCHEMAS);
     files.forEach((file: string) => {
@@ -202,11 +201,11 @@ export class Database {
       if (version > target_db_version) target_db_version = version;
     });
 
-    logger.debug("[UpdateDB] " + schemas.size + " schemas found. Target db version: " + target_db_version + ".");
+    logger.debug("[DB]", schemas.size, "schemas found. Target db version:", target_db_version + ".");
 
     // Get current db version
     const current_version = this.db.pragma("user_version", { simple: true }) as number;
-    logger.debug("[UpdateDB] Current database version: " + current_version + ".");
+    logger.debug("[DB] Current database version:", current_version + ".");
 
     // Update to latest
     if (current_version === 0) {
@@ -215,7 +214,7 @@ export class Database {
     for (let version = current_version + 1; version <= target_db_version; version++) {
       if (schemas.has(version)) {
         this.db.transaction(() => {
-          logger.info("[UpdateDB] Update database to version " + version + "...");
+          logger.info("[DB] Update database to version", version + "...");
           this.db.exec(schemas.get(version)!);
           this.db.prepare("PRAGMA user_version=" + version).run();
         }) ();
@@ -233,18 +232,18 @@ export class Database {
         .pluck()
         .get();
       if (admin == null) {
-        logger.warn("[UpdateDB] No administrator found. Add default administrator: admin/admin.");
+        logger.warn("[DB] No administrator found. Add default administrator: admin/admin.");
         const admin_password_hash = user.hashPassword("admin");
         this.db.prepare("INSERT INTO users " +
           "(userName, displayName, passwordHash, firstLogin, isAdmin) " +
           "VALUES('admin', 'admin', ?, 1, 1)")
           .run(admin_password_hash);
       } else {
-        logger.warn("[UpdateDB] No administrator found. Grant administrator rights to user admin.");
+        logger.warn("[DB] No administrator found. Grant administrator rights to user admin.");
         this.db.prepare("UPDATE users SET isAdmin=1 WHERE userName='admin'").run();
       }
     }
 
-    logger.info("[UpdateDB] Database is up to date.");
+    logger.info("[DB] Database is up to date.");
   }
 }
