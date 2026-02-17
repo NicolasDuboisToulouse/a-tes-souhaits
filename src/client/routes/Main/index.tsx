@@ -2,22 +2,22 @@ import * as request from "@client/services/request";
 
 export default function Debug() {
   async function hello() {
-    const data = await request.get("/api/hello", { username: "example" });
+    const data = await request.post("/api/hello", { username: "example" });
     console.log("resp", data);
   }
 
   async function dont_exist() {
-    const data = await request.get("/api/dont_exist", { username: "example" });
+    const data = await request.post("/api/dont_exist", { username: "example" });
     console.log("resp", data);
   }
 
   async function do_error() {
-    const data = await request.get("/api/do_error", { username: "example" });
+    const data = await request.post("/api/do_error", { username: "example" });
     console.log("resp", data);
   }
 
   async function timeout() {
-    const data = await request.get("/api/timeout");
+    const data = await request.post("/api/timeout");
     console.log("resp", data);
   }
 
