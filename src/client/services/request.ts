@@ -11,7 +11,7 @@ export class ApplicationError {
 }
 
 // Object that depend on the request
-type responseDataTtpe = unknown;
+type responseDataTtpe = object;
 
 // perform a request an return a Promise<responseDataTtpe>
 // On error, it is handled (message displayed) and the
