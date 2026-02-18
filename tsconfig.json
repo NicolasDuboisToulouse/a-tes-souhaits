@@ -36,11 +36,11 @@
     "noUnusedLocals": false, // Handled by eslint
 
     "plugins": [
-	  {
+      {
 
         "name": "typescript-eslint-language-service",
         "configFile": "./eslint.config.ts"
-	  },
+      },
     ],
   },
   "include": ["scripts", "tests", "src/server", "src/client", "src/shared", "<root>/*.ts"]

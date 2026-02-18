@@ -6,6 +6,7 @@ import globals from "globals";
 import reactPlugin from "eslint-plugin-react";
 import pluginPromise from "eslint-plugin-promise";
 import { globalIgnores } from "@eslint/config-helpers";
+import eslintPluginJsonc from "eslint-plugin-jsonc";
 // import css from "@eslint/css";
 
 
@@ -22,6 +23,7 @@ export default defineConfig([
   js.configs.recommended,
   ...ts.configs.recommended,
   ...ts.configs.stylistic,
+  ...eslintPluginJsonc.configs["flat/recommended-with-jsonc"],
   stylistic.configs.customize({}),
   {
     linterOptions: {

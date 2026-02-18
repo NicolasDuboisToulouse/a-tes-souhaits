@@ -54,6 +54,7 @@
     "@vitest/ui": "^4.0.18",
     "@xmldom/xmldom": "^0.8.11",
     "eslint": "^9.39.2",
+    "eslint-plugin-jsonc": "^2.21.1",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.1.0",
