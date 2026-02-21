@@ -1,6 +1,7 @@
 import express from "express";
-import * as error from "@server/error";
-import * as server from "@server/server";
+import { ApplicationError } from "@server/error";
+import * as HTTP from "@shared/httpStatus";
+import { router as protocolRouter } from "@server/protocol";
 
 const ROOT_URL = "/api/";
 const ROOT_URL_RE = /^\/api\/.*/;
@@ -10,6 +11,7 @@ const ROOT_URL_RE = /^\/api\/.*/;
 // extraRoutes can be provided to insert routes after the API
 // ones but before the 404 catch. This router will be relative
 // to "/api/".
+// This is used for testing purposes.
 //
 export async function createRouter(extraRoutes?: express.Router): Promise<express.Router> {
 
@@ -24,7 +26,7 @@ export async function createRouter(extraRoutes?: express.Router): Promise<expres
     next: express.NextFunction,
   ) => {
     if (req.get("Content-Type") !== "application/json") {
-      error.send(server.HTTP.Status.Forbidden);
+      throw new ApplicationError(HTTP.Status.Forbidden);
     } else {
       next();
     }
@@ -34,9 +36,11 @@ export async function createRouter(extraRoutes?: express.Router): Promise<expres
   //
   // Load all API routes
   //
-  await useRoute(router, "./hello");
-  await useRoute(router, "./do_error");
-  await useRoute(router, "./timeout");
+  await import("./hello");
+  await import("./do_error");
+  await import("./empty");
+  await import("./timeout");
+  router.use(ROOT_URL, protocolRouter);
 
   if (extraRoutes) {
     router.use(ROOT_URL, extraRoutes);
@@ -48,16 +52,10 @@ export async function createRouter(extraRoutes?: express.Router): Promise<expres
   //
   router.all(ROOT_URL_RE, (
     req: express.Request,
-    res: express.Response,
+    _res: express.Response,
   ) => {
-    server.replyError(res, new error.ApplicationError(server.HTTP.Status.NotFound, req.url));
+    throw new ApplicationError(HTTP.Status.NotFound, req.url);
   });
 
   return router;
-}
-
-
-async function useRoute(router: express.Router, route: string) {
-  const routeRouter = (await import(route)).default;
-  router.use(ROOT_URL, routeRouter);
 }

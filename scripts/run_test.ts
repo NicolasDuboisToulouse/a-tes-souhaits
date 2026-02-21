@@ -5,7 +5,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import xpath from "xpath";
 import { DOMParser } from "@xmldom/xmldom";
-import { AppConfig, setupEnv } from "./setup-app";
+import { AppConfig, setupEnv } from "./tools/setup-app";
 import * as logger from "@shared/logger";
 
 //
@@ -50,6 +50,12 @@ argsParser.addOption(new Option("-f --file <testFile> ...", "lookup only in test
 argsParser.parse();
 const testsNameReList = argsParser.args;
 const options = argsParser.opts();
+
+//
+// Update the protocol
+//
+import { updateProtocol } from "./proto-gen";
+updateProtocol();
 
 //
 // Lookup for test files

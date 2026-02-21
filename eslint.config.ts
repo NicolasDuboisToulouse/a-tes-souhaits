@@ -55,6 +55,9 @@ export default defineConfig([
     },
     ...pluginPromise.configs["flat/recommended"],
     rules: {
+      // https://typescript-eslint.io/rules
+      "@typescript-eslint/no-explicit-any": "warn",
+
       // See https://github.com/eslint-community/eslint-plugin-promise
       "promise/always-return": "warn",
       "promise/avoid-new": "off",
@@ -87,7 +90,7 @@ export default defineConfig([
       // See https://eslint.style/rules
       "@stylistic/array-bracket-newline": [ "warn", "consistent" ],
       "@stylistic/array-bracket-spacing": [ "warn", "always", { arraysInArrays: false } ],
-      "@stylistic/arrow-parens": [ "warn", "always" ],
+      "@stylistic/arrow-parens": "off",
       "@stylistic/arrow-spacing": "warn",
       "@stylistic/block-spacing": "warn",
       "@stylistic/brace-style": [ "warn", "1tbs", { allowSingleLine: true } ],
@@ -180,6 +183,16 @@ export default defineConfig([
       "@stylistic/yield-star-spacing": "warn",
     },
   },
+  {
+    files: [
+      "src/shared/protocol/generated/*.{js,ts,jsx,tsx}",
+    ],
+    rules: {
+      "@stylistic/indent": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+
   globalIgnores([
     "**/node_modules",
     "**/dist",

@@ -1,7 +1,8 @@
 import express from "express";
 import * as utils from "@tests/server/utils";
-import * as server from "@server/server";
+import * as HTTP from "@shared/httpStatus";
 import * as error from "@server/error";
+import { createExpressApp } from "@server/server";
 
 beforeAll(async() => {
   const router = express.Router();
@@ -13,14 +14,14 @@ beforeAll(async() => {
     _req: express.Request,
     res: express.Response,
   ) => {
-    server.reply(res);
+    res.status(HTTP.Status.Ok).json({});
   });
 
   router.post("/test/replyObject", (
     _req: express.Request,
     res: express.Response,
   ) => {
-    server.reply(res, { hello: "world" });
+    res.status(HTTP.Status.Ok).json({ hello: "world" });
   });
 
   //
@@ -28,38 +29,28 @@ beforeAll(async() => {
   //
   router.post("/test/applicationFromApp", (
     _req: express.Request,
-    res: express.Response,
+    _res: express.Response,
   ) => {
-    server.replyError(
-      res,
-      error.ApplicationError.from(
-        new error.ApplicationError(
-          server.HTTP.Status.BadRequest,
-          "An error",
-        ),
+    throw error.ApplicationError.from(
+      new error.ApplicationError(
+        HTTP.Status.BadRequest,
+        "An error",
       ),
     );
   });
 
   router.post("/test/applicationFromError", (
     _req: express.Request,
-    res: express.Response,
+    _res: express.Response,
   ) => {
-    server.replyError(
-      res,
-      error.ApplicationError.from(new Error("An error")),
-      false,
-    );
+    throw error.ApplicationError.from(new Error("An error"));
   });
 
   router.post("/test/applicationFromOther", (
     _req: express.Request,
-    res: express.Response,
+    _res: express.Response,
   ) => {
-    server.replyError(
-      res,
-      error.ApplicationError.from({ err: "An error" }),
-    );
+    throw error.ApplicationError.from({ err: "An error" });
   });
 
   //
@@ -70,12 +61,12 @@ beforeAll(async() => {
     _res: express.Response,
   ) => {
     throw new error.ApplicationError(
-      server.HTTP.Status.InternalServerError,
+      HTTP.Status.InternalServerError,
       "Throwed error",
     );
   });
 
-  global.testApp = await server.createExpressApp(router);
+  global.testApp = await createExpressApp(router);
 });
 
 
@@ -87,20 +78,20 @@ describe("Global framewok tests", () => {
   it("Base API error", async() => {
 
     await utils.get(global.testApp, "/api/hello", false)
-      .expect(server.HTTP.Status.Found)
+      .expect(HTTP.Status.Found)
       .expect("Content-type", /text/)
       .expect("location", /^\/error\//);
 
     await utils.get(global.testApp, "/api/do/not/exist")
-      .expect(server.HTTP.Status.NotFound)
+      .expect(HTTP.Status.NotFound)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(server.HTTP.Status.NotFound));
+      .expect(utils.isJsonError(HTTP.Status.NotFound));
 
     await utils.get(global.testApp, "/api/test/throw", true)
-      .expect(server.HTTP.Status.InternalServerError)
+      .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
       .expect(utils.isJsonError(
-        server.HTTP.Status.InternalServerError,
+        HTTP.Status.InternalServerError,
         "Throwed error",
       ));
 
@@ -109,12 +100,12 @@ describe("Global framewok tests", () => {
   it("Base valid API request", async() => {
 
     await utils.get(global.testApp as express.Express, "/api/test/replyEmpty")
-      .expect(server.HTTP.Status.Ok)
+      .expect(HTTP.Status.Ok)
       .expect("Content-type", /application\/json/)
       .expect({});
 
     await utils.get(global.testApp, "/api/test/replyObject")
-      .expect(server.HTTP.Status.Ok)
+      .expect(HTTP.Status.Ok)
       .expect("Content-type", /application\/json/)
       .expect({ hello: "world" });
   });
@@ -122,34 +113,34 @@ describe("Global framewok tests", () => {
   it("Check ApplicationError", async() => {
 
     await utils.get(global.testApp, "/api/test/applicationFromApp")
-      .expect(server.HTTP.Status.BadRequest)
+      .expect(HTTP.Status.BadRequest)
       .expect("Content-type", /application\/json/)
       .expect(utils.isJsonError(
-        server.HTTP.Status.BadRequest,
+        HTTP.Status.BadRequest,
         "An error",
       ));
 
     await utils.get(global.testApp, "/api/test/applicationFromError")
-      .expect(server.HTTP.Status.InternalServerError)
+      .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
       .expect(utils.isJsonError(
-        server.HTTP.Status.InternalServerError,
+        HTTP.Status.InternalServerError,
         "An error",
       ));
 
     await utils.get(global.testApp, "/api/test/applicationFromOther")
-      .expect(server.HTTP.Status.InternalServerError)
+      .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
       .expect(utils.isJsonError(
-        server.HTTP.Status.InternalServerError,
+        HTTP.Status.InternalServerError,
         "Other Error: {\"err\":\"An error\"}",
       ));
   });
 
   it("Stashed error test", async() => {
-    error.stash(new error.ApplicationError(server.HTTP.Status.Unauthorized, "Stashed error"));
+    error.stash(new error.ApplicationError(HTTP.Status.Unauthorized, "Stashed error"));
     await utils.get(global.testApp, "/", false)
-      .expect(server.HTTP.Status.Found)
+      .expect(HTTP.Status.Found)
       .expect("Content-type", /text/)
       .expect("location", /^\/error\//);
 

@@ -1,13 +1,6 @@
-import express from "express";
-import * as server from "@server/server";
+import { requestHello } from "@server/protocol";
 
-const router = express.Router();
-
-router.post("/hello", (
-  _req: express.Request,
-  res: express.Response,
-) => {
-  server.reply(res, { hello: "world" });
+requestHello((helloReq) => {
+  console.log(helloReq);
+  return { message: "hello!" };
 });
-
-export default router;

@@ -1,30 +1,40 @@
-import * as request from "@client/services/request";
+import * as protocol from "@client/protocol";
 
 export default function Debug() {
   async function hello() {
-    const data = await request.post("/api/hello", { username: "example" });
+    const data = await protocol.requestHello({ message: "example" });
     console.log("resp", data);
   }
 
+  async function empty() {
+    await protocol.requestEmpty();
+    console.log("request done");
+  }
+
   async function dont_exist() {
-    const data = await request.post("/api/dont_exist", { username: "example" });
+    const data = await protocol.requestDontExists();
     console.log("resp", data);
   }
 
   async function do_error() {
-    const data = await request.post("/api/do_error", { username: "example" });
-    console.log("resp", data);
+    protocol.requestDoError().catch(() => {
+      console.log("An error occurs");
+    });
+    console.log("Do error done.");
   }
 
   async function timeout() {
-    const data = await request.post("/api/timeout");
-    console.log("resp", data);
+    protocol.requestTimeout().catch(() => {
+      console.log("An error occurs");
+    });
+    console.log("Timeout done.");
   }
 
   return (
     <>
       <div>A tes souhaits !</div>
       <div><button onClick = {hello}>hello</button></div>
+      <div><button onClick = {empty}>empty</button></div>
       <div><button onClick = {do_error}>do_error</button></div>
       <div><button onClick = {dont_exist}>dont_exist</button></div>
       <div><button onClick = {timeout}>timeout</button></div>

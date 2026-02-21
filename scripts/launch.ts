@@ -1,7 +1,7 @@
 #!npx tsx
 import { Command, Option, InvalidArgumentError } from "commander";
 import path from "path";
-import { AppConfig, setupServer } from "./setup-app";
+import { AppConfig, setupServer } from "./tools/setup-app";
 
 
 //
@@ -43,7 +43,6 @@ argsParser.parse();
 const appConfig = new AppConfig(argsParser.opts());
 await setupServer(appConfig);
 
-
 //
 // Launch
 //
@@ -52,6 +51,9 @@ if (typeof process.env.PROGRAM_ROOT !== "string") {
 }
 
 if (process.env.NODE_ENV === "development") {
+  const protoGen = await import("./proto-gen");
+  protoGen.updateProtocol();
+
   const nodemon = await import("nodemon");
   nodemon.default({
     exec: "tsx",

@@ -3,3 +3,4 @@
 /jwt_secret.txt
 /build
 /tests_result
+/src/shared/protocol/generated

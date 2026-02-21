@@ -7,32 +7,6 @@ import path from "path";
 import * as logger from "@shared/logger";
 import * as error from "@server/error";
 import * as api from "@server/api";
-import * as HTTP from "./httpStatus";
-
-export * as HTTP from "./httpStatus";
-
-//
-// protocol-safe version of res.json() for a valid answer
-//
-export function reply(
-  response: express.Response,
-  content?: object) {
-  response.status(HTTP.Status.Ok).json(content ? content : {});
-}
-
-//
-// protocol-safe version of res.json() for an error
-// displayMessage: by default, display the message as a logger error
-//
-export function replyError(
-  response: express.Response,
-  appError: error.ApplicationError,
-  displayMessage = true,
-) {
-  if (displayMessage) logger.error(appError.message);
-  response.status(appError.status);
-  response.json({ status: appError.status, msg: appError.message });
-}
 
 //
 // Create express application
@@ -85,9 +59,11 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
   ) => {
     logger.error("----");
     const appError = error.ApplicationError.from(err);
+    logger.error(appError.message);
     if (req.get("Content-Type") === "application/json") {
       // We receive json, we return json
-      replyError(res, appError);
+      res.status(appError.status);
+      res.json({ status: appError.status, msg: appError.message });
     } else {
       // We receive anything else json (like a simple GET), redirect to error
       res.status(appError.status); // That doesn't works. The status shall be set be on error route request.

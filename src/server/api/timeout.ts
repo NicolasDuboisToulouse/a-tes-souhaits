@@ -1,21 +1,11 @@
-import express from "express";
-import * as error from "@server/error";
-import * as server from "@server/server";
+import { requestTimeout } from "@server/protocol";
+import { ApplicationError } from "@server/error";
+import * as HTTP from "@shared/httpStatus";
 
-const router = express.Router();
-
-router.post("/timeout", (
-  _req: express.Request,
-  _res: express.Response,
-  next: express.NextFunction,
-) => {
-  setTimeout(() => {
-    try {
-      error.send(server.HTTP.Status.InternalServerError, "timeout");
-    } catch(err) {
-      next(err);
-    }
-  }, 1000);
+requestTimeout(() => {
+  let _sum = 0;
+  for (let i = 0; i < 1000000000; i++) {
+    _sum += i;
+  }
+  throw new ApplicationError(HTTP.Status.InternalServerError, "timeout");
 });
-
-export default router;

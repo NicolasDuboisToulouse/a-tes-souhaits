@@ -1,14 +1,14 @@
 import express from "express";
-import * as server from "@server/server";
+import * as HTTP from "@shared/httpStatus";
 
 //
-// ApplicationError that handle server.HTTP.Status
+// ApplicationError that handle HTTP.Status
 //
 export class ApplicationError extends Error {
-  readonly status: server.HTTP.StatusType;
+  readonly status: HTTP.StatusType;
 
-  constructor(status: server.HTTP.StatusType, extra_message?: string) {
-    let msg = "Erreur " + status.toString() + ": " + server.HTTP.getMessage(status);
+  constructor(status: HTTP.StatusType, extra_message?: string) {
+    let msg = "Erreur " + status.toString() + ": " + HTTP.getMessage(status);
     if (extra_message) {
       msg += " (" + extra_message + ")";
     }
@@ -23,7 +23,7 @@ export class ApplicationError extends Error {
     }
     if (data instanceof Error) {
       return new ApplicationError(
-        server.HTTP.Status.InternalServerError,
+        HTTP.Status.InternalServerError,
         data.message,
       );
     }
@@ -32,18 +32,10 @@ export class ApplicationError extends Error {
       msg += ": " + JSON.stringify(data);
     }
     return new ApplicationError(
-      server.HTTP.Status.InternalServerError,
+      HTTP.Status.InternalServerError,
       msg,
     );
   }
-
-}
-
-//
-// Send an error that handle server.HTTP.Status
-//
-export function send(status: server.HTTP.StatusType, extra_message?: string): never {
-  throw new ApplicationError(status, extra_message);
 }
 
 //

@@ -34,6 +34,7 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": false, // Handled by eslint
+    "noUnusedParameters": false, // Handled by eslint
 
     "plugins": [
       {

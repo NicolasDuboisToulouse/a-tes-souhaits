@@ -1,38 +1,10 @@
 #!npx tsx
 import { Command, Option } from "commander";
-import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
-import { AppConfig, setupEnv } from "./setup-app";
+import { AppConfig, setupEnv } from "./tools/setup-app";
 import * as logger from "@shared/logger";
-
-//
-// lookup for a program in PATH
-//
-function pathLookup(seachedFile: string): string | undefined {
-  const sys_path = process.env.path || process.env.PATH || "";
-  for (const dir of sys_path.split(path.delimiter)) {
-    const file = path.join(dir, seachedFile);
-    try {
-      fs.accessSync(file, fs.constants.F_OK | fs.constants.X_OK);
-      return file;
-    } catch(_) {
-      // process next dir
-    }
-  }
-  return undefined;
-}
-
-
-//
-// Return true if frist file is newer (strictly)
-//
-function isFirstNewer(firstFile: string, secondFile: string): boolean {
-  if (!fs.existsSync(secondFile)) return true;
-  const { mtime: firstMtime } = fs.statSync(firstFile);
-  const { mtime: secondMtime } = fs.statSync(secondFile);
-  return firstMtime > secondMtime;
-}
+import * as fs from "./tools/fs";
 
 //
 // Copy sourceFile to secondFile if sourceFile is newer.
@@ -49,7 +21,7 @@ function cpIfNewer(sourceFile: string, secondFile: string, basePathForLog = "") 
       );
     });
   } else {
-    if (isFirstNewer(sourceFile, secondFile)) {
+    if (fs.isFirstNewer(sourceFile, secondFile)) {
       console.log("Install " + path.join(basePathForLog, path.basename(secondFile)) + "...");
       fs.cpSync(sourceFile, secondFile);
     }
@@ -98,10 +70,16 @@ fs.mkdirSync(target, { recursive: true });
 setupEnv(new AppConfig("production"));
 
 //
+// Update the protocol
+//
+import { updateProtocol } from "./proto-gen";
+updateProtocol();
+
+//
 // Build vite (regardless clean option)
 //
 logger.info("Building vite...");
-const vite = pathLookup("vite");
+const vite = fs.pathLookup("vite");
 if (!vite) {
   logger.die("vite cannot be found !");
 }
@@ -145,9 +123,9 @@ if (options.keepDb) {
 //
 const sourcePackageJson = path.join(program_root, "package.json");
 const destPackageJson = path.join(target, "package.json");
-if (isFirstNewer(sourcePackageJson, destPackageJson)) {
+if (fs.isFirstNewer(sourcePackageJson, destPackageJson)) {
   logger.info("Install NPM packages...");
-  const npm = pathLookup("npm");
+  const npm = fs.pathLookup("npm");
   if (!npm) {
     logger.die("npm cannot be found !");
   }

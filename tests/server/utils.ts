@@ -1,6 +1,6 @@
 import express from "express";
 import supertest from "supertest";
-import * as server from "@server/server";
+import * as HTTP from "@shared/httpStatus";
 export interface JsonResponse { httpStatus: number; json: object }
 //
 // Execute a POST request and return the result
@@ -33,7 +33,7 @@ export function get(
 //
 // Return a function that check response is a valid json error
 //
-export function isJsonError(status: server.HTTP.StatusType, msgRe?: string) {
+export function isJsonError(status: HTTP.StatusType, msgRe?: string) {
   return (response: object) => {
     if (!("body" in response)) throw new Error("Response withut body!");
 
