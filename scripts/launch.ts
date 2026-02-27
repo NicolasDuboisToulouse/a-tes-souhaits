@@ -42,14 +42,13 @@ argsParser.parse();
 //
 const appConfig = new AppConfig(argsParser.opts());
 await setupServer(appConfig);
-
-//
-// Launch
-//
 if (typeof process.env.PROGRAM_ROOT !== "string") {
   throw new Error("env var PROGRAM_ROOT unset !");
 }
 
+//
+// Launch
+//
 if (process.env.NODE_ENV === "development") {
   const protoGen = await import("./proto-gen");
   protoGen.updateProtocol();

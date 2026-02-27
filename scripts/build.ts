@@ -22,14 +22,12 @@ function cpIfNewer(sourceFile: string, secondFile: string, basePathForLog = "") 
     });
   } else {
     if (fs.isFirstNewer(sourceFile, secondFile)) {
-      console.log("Install " + path.join(basePathForLog, path.basename(secondFile)) + "...");
+      logger.info(" + Install", path.join(basePathForLog, path.basename(secondFile)) + "...");
       fs.cpSync(sourceFile, secondFile);
     }
   }
 }
 
-
-const program_root = path.resolve(import.meta.dirname, "..");
 
 //
 // Parse args
@@ -47,13 +45,23 @@ argsParser.addOption(new Option("-c --clean", "clean the delivery before build (
 argsParser.parse();
 const options = argsParser.opts();
 
+
+//
+// setup env, needed for building
+//
+setupEnv(new AppConfig("production"));
+if (typeof process.env.PROGRAM_ROOT !== "string") {
+  throw new Error("env var PROGRAM_ROOT unset !");
+}
+
+
 //
 // Create/clean output directory
 //
 const target = (path.isAbsolute(options.target))
   ? options.target
-  : path.join(program_root, options.target);
-console.log("Prepare target dir '" + target + "'.");
+  : path.join(process.env.PROGRAM_ROOT, options.target);
+logger.info("Prepare target dir '" + target + "'.");
 
 if (options.clean) {
   fs.rmSync(target, {
@@ -63,11 +71,6 @@ if (options.clean) {
 }
 
 fs.mkdirSync(target, { recursive: true });
-
-//
-// setup env, needed for building
-//
-setupEnv(new AppConfig("production"));
 
 //
 // Update the protocol
@@ -91,7 +94,7 @@ fs.rmSync(vite_target, {
 });
 
 execSync(`${vite} build --outDir ${vite_target} --emptyOutDir`, {
-  cwd: program_root,
+  cwd: process.env.PROGRAM_ROOT,
   stdio: [ 0, 1, 2 ],
 });
 
@@ -100,13 +103,14 @@ execSync(`${vite} build --outDir ${vite_target} --emptyOutDir`, {
 // Copy needed files
 //
 logger.info("Copy needed files...");
-cpIfNewer(path.join(program_root, "LICENSE"), path.join(target, "LICENSE"));
-cpIfNewer(path.join(program_root, "tsconfig.json"), path.join(target, "tsconfig.json"));
-cpIfNewer(path.join(program_root, "vite.config.ts"), path.join(target, "vite.config.ts"));
-cpIfNewer(path.join(program_root, "schemas"), path.join(target, "schemas"));
-cpIfNewer(path.join(program_root, "scripts"), path.join(target, "scripts"));
-cpIfNewer(path.join(program_root, "src", "server"), path.join(target, "src", "server"));
-cpIfNewer(path.join(program_root, "src", "shared"), path.join(target, "src", "shared"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "LICENSE"), path.join(target, "LICENSE"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "tsconfig.json"), path.join(target, "tsconfig.json"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "vite.config.ts"), path.join(target, "vite.config.ts"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "schemas"), path.join(target, "schemas"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "src", "server"), path.join(target, "src", "server"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "src", "shared"), path.join(target, "src", "shared"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "scripts", "launch.ts"), path.join(target, "scripts", "launch.ts"));
+cpIfNewer(path.join(process.env.PROGRAM_ROOT, "scripts", "tools"), path.join(target, "scripts", "tools"));
 
 //
 // Copy database if required
@@ -114,14 +118,14 @@ cpIfNewer(path.join(program_root, "src", "shared"), path.join(target, "src", "sh
 if (options.keepDb) {
   logger.info("Copy database...");
   // the secret is keept to keep cookies valid
-  cpIfNewer(path.join(program_root, "jwt_secret.txt"), path.join(target, "jwt_secret.txt"));
-  cpIfNewer(path.join(program_root, "database"), path.join(target, "database"));
+  cpIfNewer(path.join(process.env.PROGRAM_ROOT, "jwt_secret.txt"), path.join(target, "jwt_secret.txt"));
+  cpIfNewer(path.join(process.env.PROGRAM_ROOT, "database"), path.join(target, "database"));
 }
 
 //
 // Install NPM packages
 //
-const sourcePackageJson = path.join(program_root, "package.json");
+const sourcePackageJson = path.join(process.env.PROGRAM_ROOT, "package.json");
 const destPackageJson = path.join(target, "package.json");
 if (fs.isFirstNewer(sourcePackageJson, destPackageJson)) {
   logger.info("Install NPM packages...");
