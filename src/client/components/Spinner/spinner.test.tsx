@@ -10,21 +10,21 @@ describe("Validate Spinner component", () => {
     render(<Spinner />);
 
     // Be sure we are in expected state
-    expect(appState.spinnerCount).toBe(0);
+    expect(appState.spinner.count).toBe(0);
 
     // Spinner is not displayed
     const spinner = screen.queryByTestId("spinner");
     expect(spinner).toBeNull();
 
     // Display the spinner
-    act(() => { appState.addSpinner(); });
+    act(() => { appState.spinner.add(); });
     vi.waitFor(() => {
       const spinner = screen.queryByTestId("spinner");
       expect(spinner).not.toBeNull();
     });
 
     // Hide the spinner
-    act(() => { appState.removeSpinner(); });
+    act(() => { appState.spinner.remove(); });
     vi.waitFor(() => {
       const spinner = screen.queryByTestId("spinner");
       expect(spinner).toBeNull();

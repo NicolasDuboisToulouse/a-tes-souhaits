@@ -4,10 +4,10 @@ import "./spinner.css";
 
 //
 // Spinner
-// Show/hide a spinner according to AppState.spinnerCount
+// Show/hide a spinner according to AppState.spinner.count
 //
 export default function Spinner() {
-  const spinnerCount = useAppStore((state) => state.spinnerCount);
+  const spinnerCount = useAppStore((state) => state.spinner.count);
 
   const spinner = useMemo(() => {
     return (

@@ -22,7 +22,7 @@ export function post(
 ): Promise<responseDataTtpe> {
 
   const appState = useAppStore.getState();
-  appState.addSpinner();
+  appState.spinner.add();
 
   const body = (content) ? JSON.stringify(content) : "{}";
   return fetch(url, {
@@ -54,5 +54,5 @@ export function post(
         console.log(error);
         throw error;
       })
-    .finally(appState.removeSpinner);
+    .finally(appState.spinner.remove);
 }
