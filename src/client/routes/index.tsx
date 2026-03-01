@@ -6,7 +6,7 @@ import RouteMain from "./Main";
 import RouteServerError from "./ServerError";
 import RouteRouteError from "./RouteError";
 
-/* v8 ignore start main cannot be tested */
+/* v8 ignore start */
 
 const router = createBrowserRouter([
   {

@@ -9,6 +9,8 @@ import "./colors.css";
 import "./global.css";
 import "./main.css";
 
+/* v8 ignore start */
+
 function Index() {
   return (
     <>
@@ -25,3 +27,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <Index />
   </StrictMode>,
 );
+
+/* v8 ignore stop */
