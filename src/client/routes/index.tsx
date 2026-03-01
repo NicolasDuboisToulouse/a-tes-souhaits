@@ -1,14 +1,5 @@
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import Spinner from "@client/components/Spinner";
-import Alerts from "@client/components/Alerts";
-
-// Global CSS
-import "./colors.css";
-import "./global.css";
-import "./main.css";
 
 // Routes
 import RouteMain from "./Main";
@@ -30,16 +21,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Main page
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <StrictMode>
-    <div id = "header" />
-    <Spinner />
-    <Alerts />
+export default function Routes() {
+  return (
     <div id = "main" className = "h-center">
       <RouterProvider router = {router} />
     </div>
-  </StrictMode>,
-);
+  );
+}
 
 /* v8 ignore stop */
