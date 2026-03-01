@@ -1,6 +1,9 @@
 import * as protocol from "@client/protocol";
+import { useAppStore } from "@client/services/store";
 
 export default function Debug() {
+  const alertsAdd = useAppStore(state => state.alerts.add);
+
   async function hello() {
     const data = await protocol.requestHello({ message: "example" });
     console.log("resp", data);
@@ -30,9 +33,15 @@ export default function Debug() {
     console.log("Timeout done.");
   }
 
+  function addAlert() {
+    alertsAdd("An alert");
+    alertsAdd("An alert2");
+  }
+
   return (
     <>
       <div>A tes souhaits !</div>
+      <div><button onClick = {addAlert}>addAlert</button></div>
       <div><button onClick = {hello}>hello</button></div>
       <div><button onClick = {empty}>empty</button></div>
       <div><button onClick = {do_error}>do_error</button></div>

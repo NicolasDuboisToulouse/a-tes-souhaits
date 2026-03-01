@@ -4,7 +4,26 @@ import { useAppStore } from "@client/services/store";
 import Spinner from "@client/components/Spinner";
 
 describe("Validate Spinner component", () => {
-  it("spinner.tsx validation", () => {
+  it("Spinner slice validation", () => {
+    expect(useAppStore.getState().spinner.count).toBe(0);
+
+    act(() => { useAppStore.getState().spinner.add(); });
+    expect(useAppStore.getState().spinner.count).toBe(1);
+
+    act(() => { useAppStore.getState().spinner.add(); });
+    expect(useAppStore.getState().spinner.count).toBe(2);
+
+    act(() => { useAppStore.getState().spinner.remove(); });
+    expect(useAppStore.getState().spinner.count).toBe(1);
+
+    act(() => { useAppStore.getState().spinner.remove(); });
+    expect(useAppStore.getState().spinner.count).toBe(0);
+
+    act(() => { useAppStore.getState().spinner.remove(); });
+    expect(useAppStore.getState().spinner.count).toBe(0);
+  });
+
+  it("Spinner validation", () => {
 
     const appState = useAppStore.getState();
     render(<Spinner />);

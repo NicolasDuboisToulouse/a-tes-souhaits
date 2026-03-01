@@ -1,20 +1,18 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import * as spinnerSlice from "@client/components/Spinner/slice";
+import * as alertsSlice from "@client/components/Alerts/slice";
 
-interface AppState {
-  spinner: {
-    count: number;
-    add: () => void;
-    remove: () => void;
-  };
+export type Set = (cb: (state: AppState) => void) => void;
+
+export interface AppState {
+  spinner: spinnerSlice.Type;
+  alerts: alertsSlice.Type;
 }
 
 export const useAppStore = create<AppState>()(
   immer((set) => ({
-    spinner: {
-      count: 0,
-      add: () => set((state: AppState) => { ++state.spinner.count; }),
-      remove: () => set((state: AppState) => { state.spinner.count = Math.max(0, state.spinner.count - 1); }),
-    },
+    spinner: spinnerSlice.create(set),
+    alerts: alertsSlice.create(set),
   })),
 );

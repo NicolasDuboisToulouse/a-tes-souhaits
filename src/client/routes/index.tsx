@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Spinner from "@client/components/Spinner";
+import Alerts from "@client/components/Alerts";
 
 // Global CSS
 import "./colors.css";
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <div id = "header" />
     <Spinner />
+    <Alerts />
     <div id = "main" className = "h-center">
       <RouterProvider router = {router} />
     </div>

@@ -1,12 +1,17 @@
 import { useAppStore } from "@client/services/store";
+import * as HTTP from "@shared/httpStatus";
 
 // Error returned by the server
-export class ApplicationError {
-  readonly status: number;
-  readonly msg: string;
-  constructor(data: { status: number; msg: string }) {
+export class ApplicationError extends Error {
+  readonly status: HTTP.StatusType;
+
+  constructor(data: { status: HTTP.StatusType; msg: string }) {
+    const msg = (data.msg.length)
+      ? data.msg
+      : "Erreur " + data.status.toString() + ": " + HTTP.getMessage(data.status);
+    super(msg);
+    this.name = "ApplicationError";
     this.status = data.status;
-    this.msg = data.msg;
   }
 }
 
@@ -50,8 +55,10 @@ export function post(
     )
     .catch(
       (error) => {
-        // TODO: handle error
         console.log(error);
+        if (error instanceof Error) {
+          appState.alerts.add(error.message);
+        }
         throw error;
       })
     .finally(appState.spinner.remove);
