@@ -1,6 +1,6 @@
 import { useAppStore } from "@client/services/store";
 import "./alert.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Alert {
   id: number;
@@ -14,21 +14,6 @@ export default function Alerts() {
   const newMessages = useAppStore(state => state.alerts.newMessages);
   const clearMessages = useAppStore(state => state.alerts.clear);
 
-  useEffect(() => {
-    if (newMessages.length) {
-      const newAlerts = [ ...alerts ];
-      let newNextId = nextId;
-      for (const message of newMessages) {
-        const id = newNextId++;
-        newAlerts.push({ id, message, fadingOut: false });
-        setTimeout(() => { fadeoutAlert(id); }, 5000);
-      }
-      setNextId(newNextId);
-      setAlerts(newAlerts);
-      clearMessages();
-    }
-  }, [ newMessages ]);
-
   function removeAlert(id: number) {
     setAlerts(alerts => alerts.filter(a => a.id !== id));
   }
@@ -38,6 +23,19 @@ export default function Alerts() {
       setTimeout(() => { removeAlert(id); }, 300);
       return alerts.map(a => (a.id !== id) ? a : { ...a, fadingOut: true });
     });
+  }
+
+  if (newMessages.length) {
+    const newAlerts = [ ...alerts ];
+    let newNextId = nextId;
+    for (const message of newMessages) {
+      const id = newNextId++;
+      newAlerts.push({ id, message, fadingOut: false });
+      setTimeout(() => { fadeoutAlert(id); }, 5000);
+    }
+    setNextId(newNextId);
+    setAlerts(newAlerts);
+    clearMessages();
   }
 
   return (

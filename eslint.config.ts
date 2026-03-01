@@ -1,78 +1,35 @@
-import { defineConfig } from "eslint/config";
-import js from "@eslint/js";
-import ts from "typescript-eslint";
-import stylistic from "@stylistic/eslint-plugin";
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
-import reactPlugin from "eslint-plugin-react";
-import pluginPromise from "eslint-plugin-promise";
-import { globalIgnores } from "@eslint/config-helpers";
-import eslintPluginJsonc from "eslint-plugin-jsonc";
-// import css from "@eslint/css";
-
+import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import typescript from "typescript-eslint";
+import stylistic from "@stylistic/eslint-plugin";
+import promise from "eslint-plugin-promise";
 
 export default defineConfig([
-  // css disabled: issue with no-irregular-whitespace
-  // {
-  //   files: ["**/*.css"],
-  //   language: "css/css",
-  //   plugins: { css },
-  //   extends: ["css/recommended"],
-  //   rules: { 'no-irregular-whitespace': 'off' },
-  // },
-
-  js.configs.recommended,
-  ...ts.configs.recommended,
-  ...ts.configs.stylistic,
-  ...eslintPluginJsonc.configs["flat/recommended-with-jsonc"],
-  stylistic.configs.customize({}),
-  {
-    linterOptions: {
-      reportUnusedDisableDirectives: "off",
-    },
-  },
+  globalIgnores([
+    "tests_result",
+    "build",
+  ]),
   {
     files: [
-      "./*.{js,ts,jsx,tsx}",
-      "src/+(server|client|shared)/**/*.{js,ts,jsx,tsx}",
-      "tests/**/*.{js,ts,jsx,tsx}",
-      "scripts/**/*.{js,ts,jsx,tsx}",
+      "./*.{ts,tsx}",
+      "src/+(server|client|shared)/**/*.{ts,tsx}",
+      "tests/**/*.{ts,tsx}",
+      "scripts/**/*.{ts,tsx}",
     ],
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
-    ...reactPlugin.configs.flat.recommended,
+    extends: [
+      js.configs.recommended,
+      typescript.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      stylistic.configs.recommended,
+      promise.configs["flat/recommended"],
+    ],
     languageOptions: {
-      globals: globals.node,
-      parser: ts.parser,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-          project: true,
-        },
-      },
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
-    ...pluginPromise.configs["flat/recommended"],
     rules: {
-      // https://typescript-eslint.io/rules
-      "@typescript-eslint/no-explicit-any": "warn",
-
-      // See https://github.com/eslint-community/eslint-plugin-promise
-      "promise/always-return": "warn",
-      "promise/avoid-new": "off",
-      "promise/catch-or-return": "warn",
-      "promise/no-callback-in-promise": "warn",
-      "promise/no-return-wrap": "warn",
-      "promise/param-names": "warn",
-      "promise/no-native": "off",
-      "promise/no-nesting": "warn",
-      "promise/no-promise-in-callback": "warn",
-      "promise/no-new-statics": "warn",
-      "promise/no-return-in-finally": "warn",
-      "promise/valid-params": "warn",
-      "promise/no-multiple-resolved": "warn",
-
       // See https://eslint.org/docs/latest/rules
       "eqeqeq": [ "warn", "smart" ],
       "no-var": [ "warn" ],
@@ -86,6 +43,9 @@ export default defineConfig([
         destructuredArrayIgnorePattern: "^_",
         varsIgnorePattern: "^_",
       } ],
+
+      // See https://typescript-eslint.io/rules
+      "@typescript-eslint/no-explicit-any": "warn",
 
       // See https://eslint.style/rules
       "@stylistic/array-bracket-newline": [ "warn", "consistent" ],
@@ -181,6 +141,21 @@ export default defineConfig([
       "@stylistic/wrap-iife": [ "warn", "outside" ],
       "@stylistic/wrap-regex": "off",
       "@stylistic/yield-star-spacing": "warn",
+
+      // See https://github.com/eslint-community/eslint-plugin-promise
+      "promise/always-return": "warn",
+      "promise/avoid-new": "off",
+      "promise/catch-or-return": "warn",
+      "promise/no-callback-in-promise": "warn",
+      "promise/no-return-wrap": "warn",
+      "promise/param-names": "warn",
+      "promise/no-native": "off",
+      "promise/no-nesting": "warn",
+      "promise/no-promise-in-callback": "warn",
+      "promise/no-new-statics": "warn",
+      "promise/no-return-in-finally": "warn",
+      "promise/valid-params": "warn",
+      "promise/no-multiple-resolved": "warn",
     },
   },
   {
@@ -192,11 +167,4 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
-
-  globalIgnores([
-    "**/node_modules",
-    "**/dist",
-    "**/build",
-    "**/src/!(server|client|shared)",
-  ]),
 ]);
