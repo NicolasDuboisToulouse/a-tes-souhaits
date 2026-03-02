@@ -1,7 +1,7 @@
 import express from "express";
 import supertest from "supertest";
 import * as HTTP from "@shared/httpStatus";
-export interface JsonResponse { httpStatus: number; json: object }
+export type JsonResponse = { httpStatus: number; json: object };
 //
 // Execute a POST request and return the result
 // if arg is an object or unset, it will be  converted to json an a json request will be performed.

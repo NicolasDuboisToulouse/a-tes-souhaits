@@ -1,9 +1,9 @@
-export interface RpcType {
+export type RpcType = {
   url: string;            // Url relative to /api
   requestName: string;    // Name of the request function
-  request?: string;       // Name of the request interface defined in Types (if any)
-  response?: string;      // Name of the response interface defined in Types (if any)
-}
+  request?: string;       // Name of the request type defined in Types (if any)
+  response?: string;      // Name of the response type defined in Types (if any)
+};
 
 export const rpcs: RpcType[] = [
   {

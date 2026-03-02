@@ -15,7 +15,7 @@ const logger = pino(
 type ArgType = string | number | object | null | undefined;
 
 // Options that can be applied to an argument
-interface Options { quoted?: boolean; noSpace?: boolean }
+type Options = { quoted?: boolean; noSpace?: boolean };
 class OptionsArg {
   readonly arg: ArgType;
   readonly options: Options;

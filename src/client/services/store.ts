@@ -5,10 +5,10 @@ import * as alertsSlice from "@client/components/Alerts/slice";
 
 export type Set = (cb: (state: AppState) => void) => void;
 
-export interface AppState {
+export type AppState = {
   spinner: spinnerSlice.Type;
   alerts: alertsSlice.Type;
-}
+};
 
 export const useAppStore = create<AppState>()(
   immer((set) => ({

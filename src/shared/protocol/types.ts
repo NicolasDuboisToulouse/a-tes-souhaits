@@ -1,10 +1,10 @@
-export interface HelloReq {
+export type HelloReq = {
   message: string;
-}
+};
 
-export interface HelloResp {
+export type HelloResp = {
   message: string;
-}
+};
 
 export enum EnumType {
   a,
@@ -13,7 +13,7 @@ export enum EnumType {
 }
 
 
-export interface test {
+export type test = {
   aString: string;
   aNumber?: number;
   big?: bigint;
@@ -24,16 +24,16 @@ export interface test {
     subString: string;
     subObject2?: Generic;
   };
-}
+};
 
-interface Generic {
+type Generic = {
   subString2: string;
-}
+};
 
 
 export enum AnEnum { a, b }
 
-export interface Complex {
+export type Complex = {
   name: string;
   sub?: {
     a: number;
@@ -42,4 +42,4 @@ export interface Complex {
   myEnum?: AnEnum;
   anArray?: string[];
   //  invalid: Foo;
-}
+};

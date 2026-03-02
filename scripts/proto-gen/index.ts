@@ -6,7 +6,7 @@ import path from "path";
 import ts from "typescript";
 import * as fs from "@scripts/tools/fs";
 import * as logger from "@shared/logger";
-import { parseInterfaces } from "./parser-interfaces";
+import { parseTypes } from "./parser-types";
 import { generatePredicateFileNodes } from "./generator-predicates";
 import { generateClientNodes } from "./generator-client";
 import { generateServerNodes } from "./generator-server";
@@ -36,8 +36,8 @@ export function updateProtocol() {
     const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
     const sourceFile = ts.createSourceFile("t.ts", "", ts.ScriptTarget.Latest);
 
-    const interfaces = parseInterfaces(protocolTypeFile);
-    const predicateNodes = generatePredicateFileNodes(interfaces);
+    const types = parseTypes(protocolTypeFile);
+    const predicateNodes = generatePredicateFileNodes(types);
     const predicateCode = printer.printList(ts.ListFormat.MultiLine, predicateNodes, sourceFile);
     fs.writeFileSync(protocolPredicateFile, predicateCode);
 

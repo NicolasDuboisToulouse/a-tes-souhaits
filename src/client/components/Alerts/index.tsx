@@ -2,11 +2,11 @@ import { useAppStore } from "@client/services/store";
 import "./alert.css";
 import { useState } from "react";
 
-interface Alert {
+type Alert = {
   id: number;
   message: string;
   fadingOut: boolean;
-}
+};
 
 export default function Alerts() {
   const [ nextId, setNextId ] = useState<number>(0);

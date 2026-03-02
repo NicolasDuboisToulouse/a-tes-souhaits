@@ -6,29 +6,29 @@ import * as protoGen from ".";
 //
 // Parse protocol definition file and return a protocol Object list
 //
-export function parseInterfaces(protocolTypeFilePath: string): protoGen.Object[] {
+export function parseTypes(protocolTypeFilePath: string): protoGen.Object[] {
 
   const program = createProgram([ protocolTypeFilePath ]);
   const protocolDefFile = program.getSourceFile(protocolTypeFilePath);
   if (!protocolDefFile) logger.die("Cannot read", logger.quote(protocolTypeFilePath), "!");
   const typeChecker = program.getTypeChecker();
 
-  const interfaces: protoGen.Object[] = [];
+  const types: protoGen.Object[] = [];
   ts.forEachChild(protocolDefFile, (node) => {
-    if (ts.isInterfaceDeclaration(node)) {
+    if (ts.isTypeAliasDeclaration(node)) {
       if (
         node.modifiers &&
         node.modifiers.find((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
       ) {
         const nodeType = typeChecker.getTypeAtLocation(node);
-        interfaces.push({
+        types.push({
           name: node.name.text,
           content: parseObjectContent(nodeType, typeChecker, node.name.text),
         });
       }
     }
   });
-  return interfaces;
+  return types;
 }
 
 //

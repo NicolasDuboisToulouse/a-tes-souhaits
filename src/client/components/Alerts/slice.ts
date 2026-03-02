@@ -1,10 +1,10 @@
 import { Set } from "@client/services/store";
 
-export interface Type {
+export type Type = {
   newMessages: string[];
   add: (message: string) => void;
   clear: () => void;
-}
+};
 
 export function create(set: Set): Type {
   return {
