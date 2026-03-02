@@ -8,8 +8,8 @@ import * as user from "@server/user";
 // Initialize and database access
 //
 let database: Database | undefined = undefined;
-export function init() {
-  database = new Database();
+export function init(databaseDir?: string) {
+  database = new Database(databaseDir);
 }
 
 export function close() {
@@ -50,11 +50,9 @@ class StatementBase {
   constructor(query: string) {
     if (StatementBase.store.has(query)) {
       this.stmt = StatementBase.store.get(query)!;
-      logger.debug("[DB] REUSE statement: ", this.stmt.source);
     } else {
       this.stmt = get().prepare(query);
       StatementBase.store.set(query, this.stmt);
-      logger.debug("[DB] New statement: ", this.stmt.source);
     }
   }
 
@@ -129,22 +127,23 @@ export class Database {
   //
   // Open database. Create it if needed.
   //
-  constructor() {
+  constructor(databaseDir?: string) {
     logger.info("[DB] Open database");
 
-    if (typeof process.env.DATABASE_DIR !== "string") {
+    const dbDir = databaseDir ? databaseDir : process.env.DATABASE_DIR;
+    if (typeof dbDir !== "string") {
       logger.die("env DATABASE_DIR is not set !");
     }
     try {
-      fs.mkdirSync(process.env.DATABASE_DIR, { recursive: true });
+      fs.mkdirSync(dbDir, { recursive: true });
     } catch(err) {
       if (err instanceof Error) {
-        logger.die(`Cannot create database dir ${process.env.DATABASE_DIR}: ${err.message}`);
+        logger.die(`Cannot create database dir ${dbDir}: ${err.message}`);
       } else {
-        logger.die(`Cannot create database dir ${process.env.DATABASE_DIR}`);
+        logger.die(`Cannot create database dir ${dbDir}`);
       }
     }
-    const database_file = path.join(process.env.DATABASE_DIR, "database.db");
+    const database_file = path.join(dbDir, "database.db");
     try {
       if (database) database.close();
       this.db = new Sqlite(database_file, { readonly: false, fileMustExist: false });
@@ -180,7 +179,7 @@ export class Database {
     // Look for schemas files schemas/db_<version>.sql
     // Store them in schemas { <version> => <sqls> }
     // Stote the greater <version> in target_db_version.
-    logger.debug("[DB] Looking for schemas...");
+    logger.trace("[DB] Looking for schemas...");
     const schemas = new Map<number, string>();
     let target_db_version = 0;
 
@@ -201,11 +200,11 @@ export class Database {
       if (version > target_db_version) target_db_version = version;
     });
 
-    logger.debug("[DB]", schemas.size, "schemas found. Target db version:", target_db_version + ".");
+    logger.trace("[DB]", schemas.size, "schemas found. Target db version:", target_db_version + ".");
 
     // Get current db version
     const current_version = this.db.pragma("user_version", { simple: true }) as number;
-    logger.debug("[DB] Current database version:", current_version + ".");
+    logger.trace("[DB] Current database version:", current_version + ".");
 
     // Update to latest
     if (current_version === 0) {

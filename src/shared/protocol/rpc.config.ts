@@ -7,6 +7,13 @@ export type RpcType = {
 
 export const rpcs: RpcType[] = [
   {
+    url: "/user/login",
+    requestName: "requestLogin",
+    request: "LoginInfo",
+    response: "User",
+  },
+
+  {
     url: "/hello",
     requestName: "requestHello",
     request: "HelloReq",

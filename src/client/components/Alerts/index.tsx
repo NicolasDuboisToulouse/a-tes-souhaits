@@ -39,15 +39,15 @@ export default function Alerts() {
   }
 
   return (
-    <div className = "absolute-center-child" data-testid = "alerts-container">
+    <div className = "absolute-center-child" role = "alerts-container">
       { alerts.map(alert => {
         return (
           <div
             key = {alert.id}
             className = {"alert" + (alert.fadingOut ? " fadeout" : "")}
-            data-testid = {"alert-" + alert.id.toString()}
+            role = "alert"
           >
-            <button onClick = {() => { removeAlert(alert.id); }} title = "Fermer">
+            <button role = "close" onClick = {() => { removeAlert(alert.id); }} title = "Fermer">
               <span className = "icon icon-close" />
             </button>
             <span>{alert.message}</span>

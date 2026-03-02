@@ -5,6 +5,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import typescript from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
 import promise from "eslint-plugin-promise";
+import testingLibrary from "eslint-plugin-testing-library";
 
 export default defineConfig([
   globalIgnores([
@@ -24,6 +25,7 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       stylistic.configs.recommended,
       promise.configs["flat/recommended"],
+      testingLibrary.configs["flat/react"],
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -145,7 +147,7 @@ export default defineConfig([
       // See https://github.com/eslint-community/eslint-plugin-promise
       "promise/always-return": "warn",
       "promise/avoid-new": "off",
-      "promise/catch-or-return": "warn",
+      "promise/catch-or-return": "off",
       "promise/no-callback-in-promise": "warn",
       "promise/no-return-wrap": "warn",
       "promise/param-names": "warn",

@@ -1,40 +1,49 @@
-import { render } from "@testing-library/react";
-import { screen } from "@testing-library/dom";
+import { render, screen, within } from "@testing-library/react";
+import RouteError from ".";
 
-beforeAll(async() => {
-  vi.doMock("react-router", async(importOriginal) => {
-    const actual: unknown[] = await importOriginal();
-    return {
-      ...actual,
-      useRouteError() { return global.testData; },
-    };
-  });
-  global.testComponent = (await import(".")).default;
+const mockData = vi.hoisted((): { error: unknown } => {
+  return {
+    error: undefined,
+  };
 });
 
-afterAll(() => {
-  vi.doUnmock("react-router");
+vi.mock("react-router", async(importOriginal) => {
+  const actual: unknown[] = await importOriginal();
+  return {
+    ...actual,
+    useRouteError() {
+      return mockData.error;
+    },
+  };
 });
 
 describe("Validate RouteError component", () => {
   it("RouteError with ErrorResponse", async() => {
-    global.testData = { status: 23, statusText: "Error", data: "data", internal: false };
-    render(<global.testComponent />);
-    const routeErrorDom = screen.queryByTestId("routeRouteError");
+    mockData.error = { status: 23, statusText: "Error", data: "data", internal: false };
+    render(<RouteError />);
+    const routeErrorDom = screen.getByRole("RouteError");
     expect(routeErrorDom).toBeInTheDocument();
+    expect(within(routeErrorDom).getByRole("MainText")).toBeInTheDocument();
+    expect(within(routeErrorDom).getByRole("SecondaryText")).toBeInTheDocument();
+    expect(within(routeErrorDom).queryByRole("ErrorStack")).not.toBeInTheDocument();
   });
-
   it("RouteError with Error", async() => {
-    global.testData = new Error("an Error");
-    render(<global.testComponent />);
-    const routeErrorDom = screen.queryByTestId("routeErrorError");
+    mockData.error = new Error("an Error");
+    render(<RouteError />);
+    const routeErrorDom = screen.getByRole("RouteError");
     expect(routeErrorDom).toBeInTheDocument();
+    expect(within(routeErrorDom).getByRole("MainText")).toBeInTheDocument();
+    expect(within(routeErrorDom).getByRole("SecondaryText")).toBeInTheDocument();
+    expect(within(routeErrorDom).getByRole("ErrorStack")).toBeInTheDocument();
   });
 
   it("RouteError with Unknown", async() => {
-    global.testData = "an error";
-    render(<global.testComponent />);
-    const routeErrorDom = screen.queryByTestId("routeUnknownError");
+    mockData.error = "an error";
+    render(<RouteError />);
+    const routeErrorDom = screen.getByRole("RouteError");
     expect(routeErrorDom).toBeInTheDocument();
+    expect(within(routeErrorDom).queryByRole("MainText")).not.toBeInTheDocument();
+    expect(within(routeErrorDom).queryByRole("SecondaryText")).not.toBeInTheDocument();
+    expect(within(routeErrorDom).queryByRole("ErrorStack")).not.toBeInTheDocument();
   });
 });

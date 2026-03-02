@@ -2,17 +2,20 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import * as spinnerSlice from "@client/components/Spinner/slice";
 import * as alertsSlice from "@client/components/Alerts/slice";
+import * as userSlice from "@client/services/user";
 
 export type Set = (cb: (state: AppState) => void) => void;
 
 export type AppState = {
   spinner: spinnerSlice.Type;
   alerts: alertsSlice.Type;
+  user: userSlice.Type;
 };
 
 export const useAppStore = create<AppState>()(
   immer((set) => ({
     spinner: spinnerSlice.create(set),
     alerts: alertsSlice.create(set),
+    user: userSlice.create(set),
   })),
 );

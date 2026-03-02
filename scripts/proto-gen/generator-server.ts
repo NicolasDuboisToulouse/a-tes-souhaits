@@ -31,6 +31,21 @@ export function generateServerNodes() {
       ),
       ts.factory.createStringLiteral("@shared/httpStatus"),
     ),
+    ts.factory.createImportDeclaration(
+      undefined, // modifier
+      ts.factory.createImportClause(
+        undefined, // Phase modifier
+        undefined, // default name
+        ts.factory.createNamedImports([
+          ts.factory.createImportSpecifier(
+            false,
+            undefined,
+            appErrorId,
+          ),
+        ]),
+      ),
+      ts.factory.createStringLiteral("@server/error"),
+    ),
   ];
 
   const routerDeclaration =
@@ -71,21 +86,22 @@ function generateRpcReply(rpc: RpcType) {
 
   const postCbStmts: ts.Statement[] = (rpc.request)
     ? [
-      ts.factory.createIfStatement( // if (!protocol.is<Resp>(response))
-        ts.factory.createLogicalNot( // ! protocol.is<Resp>(response)
-          ts.factory.createCallExpression( // protocol.is<Resp>(response)
+      ts.factory.createIfStatement( // if (!protocol.is<Req>(request))
+        ts.factory.createLogicalNot( // ! protocol.is<Req>(request)
+          ts.factory.createCallExpression( // protocol.is<Req>(request)
             ts.factory.createPropertyAccessExpression(protocolId, "is" + rpc.request),
             undefined, // Type Arguments
             [ reqBodyId ],
           ),
         ),
         // then
-        ts.factory.createThrowStatement( // Throw new Error(msg)
+        ts.factory.createThrowStatement( // Throw new ApplicationError(badRequest, msg)
           ts.factory.createNewExpression(
-            errorId,
+            appErrorId,
             undefined,
             [
-              ts.factory.createStringLiteral("response is not an " + rpc.request + "!"),
+              httpStatusBadRequest,
+              ts.factory.createStringLiteral("request is not an " + rpc.request + "!"),
             ],
           ),
         ),
@@ -209,6 +225,7 @@ const reqId = ts.factory.createIdentifier("req");
 const resId = ts.factory.createIdentifier("res");
 const reqBodyId = ts.factory.createPropertyAccessExpression(reqId, "body");
 const cbId = ts.factory.createIdentifier("cb");
-const errorId = ts.factory.createIdentifier("Error");
+const appErrorId = ts.factory.createIdentifier("ApplicationError");
 const httpStatusOk = ts.factory.createIdentifier("HTTP.Status.Ok");
+const httpStatusBadRequest = ts.factory.createIdentifier("HTTP.Status.BadRequest");
 const contentId = ts.factory.createIdentifier("content");

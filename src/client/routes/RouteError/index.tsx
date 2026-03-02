@@ -8,22 +8,22 @@ export default function RouteError() {
   const error = useRouteError();
   if (isRouteErrorResponse(error)) {
     return (
-      <div data-testid = "routeRouteError">
-        <div className = "error-main">
+      <div role = "RouteError">
+        <div role = "MainText" className = "error-main">
           {error.status} {error.statusText}
         </div>
-        <div className = "error-seconday">{error.data}</div>
+        <div role = "SecondaryText" className = "error-seconday">{error.data}</div>
       </div>
     );
   } else if (error instanceof Error) {
     return (
-      <div data-testid = "routeErrorError">
-        <div className = "error-main">Error: {error.message}</div>
-        <div className = "error-seconday">The stack trace is:</div>
-        <div className = "error-stack">{error.stack}</div>
+      <div role = "RouteError">
+        <div role = "MainText" className = "error-main">Error: {error.message}</div>
+        <div role = "SecondaryText" className = "error-seconday">The stack trace is:</div>
+        <div role = "ErrorStack" className = "error-stack">{error.stack}</div>
       </div>
     );
   } else {
-    return <div className = "error-main" data-testid = "routeUnknownError">Unknown Error</div>;
+    return <div role = "RouteError" className = "error-main">Unknown Error</div>;
   }
 }

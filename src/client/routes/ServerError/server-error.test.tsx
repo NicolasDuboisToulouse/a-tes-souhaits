@@ -1,31 +1,30 @@
-import { render } from "@testing-library/react";
-import { screen } from "@testing-library/dom";
+import { render, screen } from "@testing-library/react";
+import ServerError from ".";
 
-beforeAll(async() => {
-  vi.doMock("react-router", () => {
-    return {
-      useParams() { return { message: global.testData }; },
-    };
-  });
-  global.testComponent = (await import(".")).default;
+const mockData = vi.hoisted((): { error: unknown } => {
+  return {
+    error: undefined,
+  };
 });
 
-afterAll(() => {
-  vi.doUnmock("react-router");
+vi.mock("react-router", () => {
+  return {
+    useParams() { return { message: mockData.error }; },
+  };
 });
 
 describe("Validate ServerError component", () => {
   it("ServerError with param", async() => {
-    global.testData = "Hello";
-    render(<global.testComponent />);
-    const serverErrorDom = screen.queryByTestId("serverError");
+    mockData.error = "Hello";
+    render(<ServerError />);
+    const serverErrorDom = screen.getByRole("ServerError");
     expect(serverErrorDom).toHaveTextContent("Hello");
   });
 
   it("ServerError without param", async() => {
-    global.testData = undefined;
-    render(<global.testComponent />);
-    const serverErrorDom = screen.queryByTestId("serverError");
+    mockData.error = undefined;
+    render(<ServerError />);
+    const serverErrorDom = screen.getByRole("ServerError");
     expect(serverErrorDom).toHaveTextContent("Unexpected Error");
   });
 

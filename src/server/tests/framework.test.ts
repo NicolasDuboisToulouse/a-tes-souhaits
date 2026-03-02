@@ -1,8 +1,10 @@
 import express from "express";
-import * as utils from "@tests/server/utils";
+import { clientRequest, isJsonError } from "@tests/server/utils";
+import { createExpressApp } from "@server/server";
 import * as HTTP from "@shared/httpStatus";
 import * as error from "@server/error";
-import { createExpressApp } from "@server/server";
+
+let expressApp: express.Express;
 
 beforeAll(async() => {
   const router = express.Router();
@@ -66,7 +68,7 @@ beforeAll(async() => {
     );
   });
 
-  global.testApp = await createExpressApp(router);
+  expressApp = await createExpressApp(router);
 });
 
 
@@ -77,20 +79,20 @@ describe("Global framewok tests", () => {
 
   it("Base API error", async() => {
 
-    await utils.get(global.testApp, "/api/hello", false)
+    await clientRequest(expressApp, "/api/hello", false)
       .expect(HTTP.Status.Found)
       .expect("Content-type", /text/)
       .expect("location", /^\/error\//);
 
-    await utils.get(global.testApp, "/api/do/not/exist")
+    await clientRequest(expressApp, "/api/do/not/exist")
       .expect(HTTP.Status.NotFound)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(HTTP.Status.NotFound));
+      .expect(isJsonError(HTTP.Status.NotFound));
 
-    await utils.get(global.testApp, "/api/test/throw", true)
+    await clientRequest(expressApp, "/api/test/throw", true)
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(
+      .expect(isJsonError(
         HTTP.Status.InternalServerError,
         "Throwed error",
       ));
@@ -99,12 +101,12 @@ describe("Global framewok tests", () => {
 
   it("Base valid API request", async() => {
 
-    await utils.get(global.testApp as express.Express, "/api/test/replyEmpty")
+    await clientRequest(expressApp as express.Express, "/api/test/replyEmpty")
       .expect(HTTP.Status.Ok)
       .expect("Content-type", /application\/json/)
       .expect({});
 
-    await utils.get(global.testApp, "/api/test/replyObject")
+    await clientRequest(expressApp, "/api/test/replyObject")
       .expect(HTTP.Status.Ok)
       .expect("Content-type", /application\/json/)
       .expect({ hello: "world" });
@@ -112,26 +114,26 @@ describe("Global framewok tests", () => {
 
   it("Check ApplicationError", async() => {
 
-    await utils.get(global.testApp, "/api/test/applicationFromApp")
+    await clientRequest(expressApp, "/api/test/applicationFromApp")
       .expect(HTTP.Status.BadRequest)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(
+      .expect(isJsonError(
         HTTP.Status.BadRequest,
         "An error",
       ));
 
-    await utils.get(global.testApp, "/api/test/applicationFromError")
+    await clientRequest(expressApp, "/api/test/applicationFromError")
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(
+      .expect(isJsonError(
         HTTP.Status.InternalServerError,
         "An error",
       ));
 
-    await utils.get(global.testApp, "/api/test/applicationFromOther")
+    await clientRequest(expressApp, "/api/test/applicationFromOther")
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(utils.isJsonError(
+      .expect(isJsonError(
         HTTP.Status.InternalServerError,
         "Other Error: {\"err\":\"An error\"}",
       ));
@@ -139,7 +141,7 @@ describe("Global framewok tests", () => {
 
   it("Stashed error test", async() => {
     error.stash(new error.ApplicationError(HTTP.Status.Unauthorized, "Stashed error"));
-    await utils.get(global.testApp, "/", false)
+    await clientRequest(expressApp, "/", false)
       .expect(HTTP.Status.Found)
       .expect("Content-type", /text/)
       .expect("location", /^\/error\//);

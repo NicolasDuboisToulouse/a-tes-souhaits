@@ -2,6 +2,10 @@ import express from "express";
 import cors from "cors";
 import { once as eventOnce } from "node:events";
 import * as request from "./request";
+import { Server } from "http";
+
+let baseURL: string;
+let server: Server;
 
 //
 // Launch test server
@@ -44,7 +48,7 @@ beforeAll(async() => {
       .send("{,,");
   });
 
-  const server = app.listen(() => {
+  server = app.listen(() => {
     app.emit("listening");
   });
   server.on("close", () => { console.log("Test Server is closed."); });
@@ -56,12 +60,11 @@ beforeAll(async() => {
     throw new Error("Unexpected server address !");
   }
 
-  global.testServer = server;
-  global.testBaseUrl = "http://127.0.0.1:" + address.port;
+  baseURL = "http://127.0.0.1:" + address.port;
 });
 
 afterAll(() => {
-  global.testServer.close();
+  server.close();
 });
 
 
@@ -71,7 +74,7 @@ afterAll(() => {
 describe("Request validation", () => {
 
   it("Request valid", async() => {
-    return request.post(global.testBaseUrl + "/test/validJson")
+    return request.post(baseURL + "/test/validJson")
       .then(
         (data) => {
           expect(data).toStrictEqual({ hello: "world" });
@@ -80,16 +83,16 @@ describe("Request validation", () => {
   });
 
   it("Request no Content-Type", async() => {
-    return expect(request.post(global.testBaseUrl + "/test/invalidContentType")).rejects.toThrow();
+    return expect(request.post(baseURL + "/test/invalidContentType")).rejects.toThrow();
   });
 
   it("Request ServerError", async() => {
-    return expect(request.post(global.testBaseUrl + "/test/serverError"))
+    return expect(request.post(baseURL + "/test/serverError"))
       .rejects.toStrictEqual(new request.ApplicationError({ status: 404, msg: "An ServerError" }));
   });
 
   it("Request invalid json", async() => {
-    return expect(request.post(global.testBaseUrl + "/test/invalidJson")).rejects.toThrow();
+    return expect(request.post(baseURL + "/test/invalidJson")).rejects.toThrow();
   });
 
 });

@@ -17,7 +17,11 @@
 }
 
 
-/* Forms */
+/* buttons, inputs, ... */
+button, input, select, textarea {
+    font-size: 100%;
+}
+
 select, button, [type='submit'], [type='button']  {
     padding:          0.3em;
     border:           1px solid var(--color-button-border);
@@ -39,6 +43,45 @@ button:hover {
 button:focus, button:active {
     outline: none;
     border: 1px solid var(--color-button-border-hover);
+}
+
+input {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    transition: outline-color 0.25s;
+    outline-color: transparent;
+}
+
+input:focus {
+    outline: 1px solid var(--color-border);
+}
+
+input.invalid {
+    background-color: var(--color-bg-focus);
+}
+
+
+/* Forms (vertical) */
+form .form-group {
+    margin-bottom: 0.8em;
+}
+
+form label {
+    display:       block;
+    margin-bottom: 0.2em;
+}
+
+form input/*, form textarea, form .preview*/  {
+    display: block;
+    width:   100%;
+    padding: 0.2em;
+}
+
+form button {
+    display: block;
+    margin-left:  auto;
+    margin-right: auto;
 }
 
 

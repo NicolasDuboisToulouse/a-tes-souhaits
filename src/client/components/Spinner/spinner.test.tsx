@@ -1,5 +1,4 @@
-import { render, act } from "@testing-library/react";
-import { screen } from "@testing-library/dom";
+import { render, act, screen } from "@testing-library/react";
 import { useAppStore } from "@client/services/store";
 import Spinner from "@client/components/Spinner";
 
@@ -23,7 +22,7 @@ describe("Validate Spinner component", () => {
     expect(useAppStore.getState().spinner.count).toBe(0);
   });
 
-  it("Spinner validation", () => {
+  it("Spinner validation", async() => {
 
     const appState = useAppStore.getState();
     render(<Spinner />);
@@ -32,20 +31,16 @@ describe("Validate Spinner component", () => {
     expect(appState.spinner.count).toBe(0);
 
     // Spinner is not displayed
-    const spinner = screen.queryByTestId("spinner");
-    expect(spinner).toBeNull();
+    expect(screen.queryByRole("spinner")).not.toBeInTheDocument();
 
     // Display the spinner
     act(() => { appState.spinner.add(); });
-    vi.waitFor(() => {
-      const spinner = screen.queryByTestId("spinner");
-      expect(spinner).not.toBeNull();
-    });
+    expect(await screen.findByRole("spinner")).toBeInTheDocument();
 
     // Hide the spinner
     act(() => { appState.spinner.remove(); });
-    vi.waitFor(() => {
-      const spinner = screen.queryByTestId("spinner");
+    await vi.waitFor(() => {
+      const spinner = screen.queryByRole("spinner");
       expect(spinner).toBeNull();
     });
 

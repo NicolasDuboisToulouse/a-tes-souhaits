@@ -1,5 +1,4 @@
-import { act, render } from "@testing-library/react";
-import { fireEvent, screen } from "@testing-library/dom";
+import { act, render, fireEvent, screen, within } from "@testing-library/react";
 import { useAppStore } from "@client/services/store";
 import Alert from ".";
 
@@ -29,33 +28,37 @@ describe("Validate Alerts", () => {
     const appState = useAppStore.getState();
     render(<Alert />);
 
-    const alerts = screen.queryByTestId("alerts-container");
-    expect(alerts).not.toBeNull();
-    expect(alerts).toBeEmptyDOMElement();
+    const alertsContainer = screen.getByRole("alerts-container");
+    expect(alertsContainer).not.toBeNull();
+    expect(alertsContainer).toBeEmptyDOMElement();
 
     act(() => { appState.alerts.add("An alert"); });
-    expect(alerts).not.toBeEmptyDOMElement();
-    let alert0 = screen.queryByTestId("alert-0");
-    expect(alert0).not.toBeNull();
-    expect(alert0).toHaveTextContent("An alert");
+    expect(alertsContainer).not.toBeEmptyDOMElement();
+    let alerts = screen.getAllByRole("alert");
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]).not.toBeNull();
+    expect(alerts[0]).toHaveTextContent("An alert");
 
     act(() => { appState.alerts.add("Another alert"); });
-    expect(alerts).not.toBeEmptyDOMElement();
-    const alert1 = screen.queryByTestId("alert-1");
-    expect(alert1).not.toBeNull();
-    expect(alert1).toHaveTextContent("Another alert");
+    expect(alertsContainer).not.toBeEmptyDOMElement();
+    alerts = screen.getAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[1]).not.toBeNull();
+    expect(alerts[1]).toHaveTextContent("Another alert");
 
-    const closeButton = alert0?.getElementsByTagName("button")[0];
-    act(() => { fireEvent.click(closeButton!); });
-    alert0 = screen.queryByTestId("alert-0");
-    expect(alert0).toBeNull();
+    const closeButton = within(alerts[0]).getByRole("close");
+    fireEvent.click(closeButton);
+    alerts = screen.getAllByRole("alert");
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]).not.toBeNull();
+    expect(alerts[0]).toHaveTextContent("Another alert");
 
-    expect(alert1?.className).not.contains("fadeout");
+    expect(alerts[0]).not.toHaveClass("fadeout");
     act(() => vi.advanceTimersToNextTimer());
-    expect(alert1?.className).contains("fadeout");
+    expect(alerts[0]).toHaveClass("fadeout");
 
     act(() => vi.advanceTimersToNextTimer());
-    expect(alerts).toBeEmptyDOMElement();
+    expect(alertsContainer).toBeEmptyDOMElement();
 
     vi.useRealTimers();
   });

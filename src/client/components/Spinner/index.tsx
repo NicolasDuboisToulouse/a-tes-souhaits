@@ -11,7 +11,7 @@ export default function Spinner() {
 
   const spinner = useMemo(() => {
     return (
-      <div className = "absolute-center-child" data-testid = "spinner">
+      <div role = "spinner" className = "absolute-center-child">
         <div className = "spinner h-center">
           {/* Many thanks to https://github.com/SamHerbert/SVG-Loaders */}
           <svg

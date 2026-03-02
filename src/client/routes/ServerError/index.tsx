@@ -4,7 +4,7 @@ import "../error.css";
 export default function ServerError() {
   const params = useParams();
   return (
-    <div className = "error-main" data-testid = "serverError">
+    <div role = "ServerError" className = "error-main">
       { params.message ? params.message : "Unexpected Error" }
     </div>
   );

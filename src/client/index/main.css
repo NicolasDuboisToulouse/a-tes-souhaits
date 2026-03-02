@@ -1,8 +1,16 @@
-html, body {
+html {
     background-color: var(--color-bg);
+    font-family: sans-serif;
+    line-height: 1.5;
+}
+
+* {
+    font-family: inherit;
+    line-height: inherit;
 }
 
 body {
+    background-color: inherit;
     min-width:  200px;
     min-height: 150px;
     margin:     0;

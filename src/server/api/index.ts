@@ -36,6 +36,7 @@ export async function createRouter(extraRoutes?: express.Router): Promise<expres
   //
   // Load all API routes
   //
+  await import("./user");
   await import("./hello");
   await import("./do_error");
   await import("./empty");

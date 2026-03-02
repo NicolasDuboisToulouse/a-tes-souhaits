@@ -77,9 +77,11 @@ export function trace(...args: ArgType[]) {
   logger.trace(stringifyArgs(...args));
 }
 
+/* eslint-disable testing-library/no-debugging-utils */
 export function debug(...args: ArgType[]) {
   logger.debug(stringifyArgs(...args));
 }
+/* eslint-enable testing-library/no-debugging-utils */
 
 export function info(...args: ArgType[]) {
   logger.info(stringifyArgs(...args));

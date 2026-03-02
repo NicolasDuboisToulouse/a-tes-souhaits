@@ -2,46 +2,49 @@ import * as database from "@server/database";
 import fs from "fs";
 import path from "path";
 
+function getDatabaseDir(): string {
+  if (typeof process.env.TESTS_TEMP_DIR !== "string") throw new Error("env DATABASE_DIR is unset!");
+  return path.join(process.env.TESTS_TEMP_DIR, "database");
+}
+
 describe("Validate database module", () => {
 
   it("check database generation errors", () => {
-    if (typeof process.env.DATABASE_DIR !== "string") throw new Error("env DATABASE_DIR is unset!");
     const mockExit = vi.spyOn(process, "exit").mockImplementation(() => { throw new Error(); });
+    const database_dir = getDatabaseDir();
 
     expect(() => database.get()).toThrow();
 
-    const database_dir = process.env.DATABASE_DIR;
     delete process.env.DATABASE_DIR;
     expect(() => database.init()).toThrow();
-    process.env.DATABASE_DIR = database_dir;
 
-    fs.rmSync(process.env.DATABASE_DIR, { force: true, recursive: true });
-    const fd = fs.openSync(process.env.DATABASE_DIR, "w");
+    fs.rmSync(database_dir, { force: true, recursive: true });
+    const fd = fs.openSync(database_dir, "w");
     fs.closeSync(fd);
-    expect(() => database.init()).toThrow();
+    expect(() => database.init(database_dir)).toThrow();
 
-    fs.rmSync(process.env.DATABASE_DIR, { force: true, recursive: true });
-    fs.mkdirSync(path.join(process.env.DATABASE_DIR, "database.db"), { recursive: true });
-    expect(() => database.init()).toThrow();
-    fs.rmSync(process.env.DATABASE_DIR, { force: true, recursive: true });
+    fs.rmSync(database_dir, { force: true, recursive: true });
+    fs.mkdirSync(path.join(database_dir, "database.db"), { recursive: true });
+    expect(() => database.init(database_dir)).toThrow();
+    fs.rmSync(database_dir, { force: true, recursive: true });
 
     const schemaDir = process.env.DATABASE_SCHEMAS;
     delete process.env.DATABASE_SCHEMAS;
-    expect(() => database.init()).toThrow();
-    process.env.DATABASE_SCHEMAS = path.join(process.env.TESTS_RESULT_DIR!, "fake_schemas");
-    expect(() => database.init()).toThrow();
+    expect(() => database.init(database_dir)).toThrow();
+    process.env.DATABASE_SCHEMAS = path.join(process.env.TESTS_TEMP_DIR!, "fake_schemas");
+    expect(() => database.init(database_dir)).toThrow();
     const fd2 = fs.openSync(process.env.DATABASE_SCHEMAS, "w");
     fs.closeSync(fd2);
-    expect(() => database.init()).toThrow();
+    expect(() => database.init(database_dir)).toThrow();
     process.env.DATABASE_SCHEMAS = schemaDir;
 
     mockExit.mockRestore();
   });
 
   it("check database generation success", () => {
-    if (typeof process.env.DATABASE_DIR !== "string") throw new Error("env DATABASE_DIR is unset!");
-    fs.rmSync(process.env.DATABASE_DIR, { force: true, recursive: true });
-    database.init();
+    const database_dir = getDatabaseDir();
+    fs.rmSync(database_dir, { force: true, recursive: true });
+    database.init(database_dir);
 
     const db = database.get();
     expect(db instanceof database.Database).toBe(true);
@@ -65,7 +68,7 @@ describe("Validate database module", () => {
     const removeAllStmt = database.statement("DELETE FROM users");
     expect(removeAllStmt.run()).toBe(true);
     expect(allUserStmt().all()).toStrictEqual([]);
-    database.init();
+    database.init(database_dir);
     expect(allUserStmt().all()).toStrictEqual([ { userName: "admin", displayName: "admin", firstLogin: 1, isAdmin: 1 } ]);
 
 
@@ -73,23 +76,22 @@ describe("Validate database module", () => {
     const removeRightsStmt = database.statement("UPDATE users SET isAdmin = 0");
     expect(removeRightsStmt.run()).toBe(true);
     expect(allUserStmt().all()).toStrictEqual([ { userName: "admin", displayName: "admin", firstLogin: 1, isAdmin: 0 } ]);
-    database.init();
+    database.init(database_dir);
     expect(allUserStmt().all()).toStrictEqual([ { userName: "admin", displayName: "admin", firstLogin: 1, isAdmin: 1 } ]);
 
     // Set admin rights to another user. init() shall not do anything
     const changeUserStmt = database.statement("UPDATE users SET userName = 'jhon'");
     expect(changeUserStmt.run()).toBe(true);
     expect(allUserStmt().all()).toStrictEqual([ { userName: "jhon", displayName: "admin", firstLogin: 1, isAdmin: 1 } ]);
-    database.init();
+    database.init(database_dir);
     expect(allUserStmt().all()).toStrictEqual([ { userName: "jhon", displayName: "admin", firstLogin: 1, isAdmin: 1 } ]);
 
     database.close();
   });
 
   it("check database statements", () => {
-    if (typeof process.env.DATABASE_DIR !== "string") throw new Error("env DATABASE_DIR is unset!");
-    fs.rmSync(process.env.DATABASE_DIR, { force: true, recursive: true });
-    database.init();
+    fs.rmSync(getDatabaseDir(), { force: true, recursive: true });
+    database.init(getDatabaseDir());
 
     const insStmt = database.statement(
       "INSERT INTO users (userName, displayName, passwordHash, firstLogin, isAdmin) VALUES (?, ?, ?, ?, ?)",

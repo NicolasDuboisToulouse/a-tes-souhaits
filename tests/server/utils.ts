@@ -8,7 +8,7 @@ export type JsonResponse = { httpStatus: number; json: object };
 // if arg is false, a non-json request will be performed.
 // if dump is true, the supertest object will be dump on console (debug)
 //
-export function get(
+export function clientRequest(
   app: express.Express,
   route: string,
   arg?: object | boolean,

@@ -48,7 +48,8 @@ export function setupEnv(appConfig: AppConfig) {
     case "test":
       process.env.LOG_LEVEL = "trace";
       process.env.TESTS_RESULT_DIR = path.join(process.env.PROGRAM_ROOT, "tests_result");
-      process.env.DATABASE_DIR = path.join(process.env.TESTS_RESULT_DIR, "database");
+      process.env.TESTS_TEMP_DIR = path.join(process.env.TESTS_RESULT_DIR, "tmp");
+      delete process.env.DATABASE_DIR;
       process.env.PROGRAM_PORT = "0";
       break;
   }
