@@ -1,6 +1,5 @@
 import express from "express";
 import supertest from "supertest";
-import * as HTTP from "@shared/httpStatus";
 export type JsonResponse = { httpStatus: number; json: object };
 //
 // Execute a POST request and return the result
@@ -31,20 +30,16 @@ export function clientRequest(
 }
 
 //
-// Return a function that check response is a valid json error
+// Return a function that check response is a protocol error
 //
-export function isJsonError(status: HTTP.StatusType, msgRe?: string) {
+export function isResponseError(errorMessageRe?: string) {
   return (response: object) => {
-    if (!("body" in response)) throw new Error("Response withut body!");
-
+    if (!("body" in response)) throw new Error("Response without body!");
     const body = response.body as object;
-    if (!("status" in body)) throw new Error("No status in error body!");
-    if (!("msg" in body)) throw new Error("No msg in error body!");
-    if ("data" in body) throw new Error("data present in error body!");
-    if (body.status !== status) throw new Error(`body.status ${body.status} != ${status}`);
-    if (typeof body.msg !== "string") throw new Error("body.msg is not a string");
-    if (msgRe && !RegExp(String.raw`${msgRe}`).test(body.msg)) {
-      throw new Error(`body.msg is '${body.msg}' wich no match RegEx '${msgRe}'`);
+    if (!("errorMessage" in body)) throw new Error("No errorMessage in error body!");
+    if (typeof body.errorMessage !== "string") throw new Error("body.errorMessage is not a string");
+    if (errorMessageRe && !RegExp(String.raw`${errorMessageRe}`).test(body.errorMessage)) {
+      throw new Error(`body.errorMessage is '${body.errorMessage}' wich no match RegEx '${errorMessageRe}'`);
     }
   };
 }

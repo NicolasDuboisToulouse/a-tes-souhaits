@@ -1,3 +1,7 @@
+export type ErrorMessage = {
+  errorMessage: string;
+};
+
 export type LoginInfo = {
   userName: string;
   password: string;

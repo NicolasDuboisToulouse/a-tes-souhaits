@@ -1,6 +1,5 @@
-import { ApplicationError } from "@server/error";
+import { UserError } from "@server/error";
 import { requestLogin } from "@server/protocol";
-import * as HTTP from "@shared/httpStatus";
 import * as database from "@server/database";
 import * as logger from "@shared/logger";
 import * as user from "@server/user";
@@ -11,9 +10,7 @@ requestLogin((loginInfo) => {
     database.pluck,
   ).get(loginInfo.userName);
   if (!passwordHash || !user.checkPassword(loginInfo.password, passwordHash)) {
-    // TODO: not an app error !
-    throw new ApplicationError(HTTP.Status.Unauthorized,
-      "Nom ou mot de passe invalide.");
+    throw new UserError("Nom ou mot de passe invalide.");
   }
 
   const loggedUser = user.get(loginInfo.userName);

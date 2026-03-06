@@ -36,7 +36,7 @@ beforeAll(async() => {
     _req: express.Request,
     res: express.Response,
   ) => {
-    res.json({ status: 404, msg: "An ServerError" });
+    res.json({ errorMessage: "An ServerError" });
   });
 
   app.post("/test/invalidJson", (
@@ -88,7 +88,7 @@ describe("Request validation", () => {
 
   it("Request ServerError", async() => {
     return expect(request.post(baseURL + "/test/serverError"))
-      .rejects.toStrictEqual(new request.ApplicationError({ status: 404, msg: "An ServerError" }));
+      .rejects.toStrictEqual(new Error("An ServerError"));
   });
 
   it("Request invalid json", async() => {

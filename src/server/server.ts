@@ -7,6 +7,7 @@ import path from "path";
 import * as logger from "@shared/logger";
 import * as error from "@server/error";
 import * as api from "@server/api";
+import * as HTTP from "@shared/httpStatus";
 
 //
 // Create express application
@@ -52,24 +53,39 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
   // - Return either an JSON content or redirect to error page
   //
   app.use((
-    err: Error,
+    err: unknown,
     req: express.Request,
     res: express.Response,
     _next: express.NextFunction, // Must be define to make express call this Middleware
   ) => {
     logger.error("----");
-    const appError = error.ApplicationError.from(err);
-    logger.error(appError.message);
+    let status: HTTP.StatusType = HTTP.Status.InternalServerError;
+    let errorMessage = "Unexpected internal error";
+
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    }
+    if (err instanceof error.ApplicationError) {
+      status = err.status;
+    }
+    if (err instanceof error.UserError) {
+      status = HTTP.Status.Ok;
+    }
+
+    logger.error("Error:", errorMessage);
+    logger.error((err instanceof Error)
+      ? err.stack
+      : JSON.stringify(err),
+    );
+
     if (req.get("Content-Type") === "application/json") {
       // We receive json, we return json
-      res.status(appError.status);
-      res.json({ status: appError.status, msg: appError.message });
+      res.status(status).json({ errorMessage });
     } else {
       // We receive anything else json (like a simple GET), redirect to error
-      res.status(appError.status); // That doesn't works. The status shall be set be on error route request.
-      res.redirect("/error/" + encodeURIComponent(appError.message));
+      // Error is displayed by the client without API call. We cannot set reply status.
+      res.redirect("/error/" + encodeURIComponent(errorMessage));
     }
-    logger.error("Error:", err.stack);
     logger.error("----");
   });
 

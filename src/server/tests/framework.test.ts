@@ -1,8 +1,8 @@
 import express from "express";
-import { clientRequest, isJsonError } from "@tests/server/utils";
+import { clientRequest, isResponseError } from "@tests/server/utils";
 import { createExpressApp } from "@server/server";
 import * as HTTP from "@shared/httpStatus";
-import * as error from "@server/error";
+import { ApplicationError, stash } from "@server/error";
 
 let expressApp: express.Express;
 
@@ -33,11 +33,9 @@ beforeAll(async() => {
     _req: express.Request,
     _res: express.Response,
   ) => {
-    throw error.ApplicationError.from(
-      new error.ApplicationError(
-        HTTP.Status.BadRequest,
-        "An error",
-      ),
+    throw new ApplicationError(
+      HTTP.Status.BadRequest,
+      "An error",
     );
   });
 
@@ -45,14 +43,14 @@ beforeAll(async() => {
     _req: express.Request,
     _res: express.Response,
   ) => {
-    throw error.ApplicationError.from(new Error("An error"));
+    throw new Error("An error");
   });
 
   router.post("/test/applicationFromOther", (
     _req: express.Request,
     _res: express.Response,
   ) => {
-    throw error.ApplicationError.from({ err: "An error" });
+    throw { err: "An error" };
   });
 
   //
@@ -62,7 +60,7 @@ beforeAll(async() => {
     _req: express.Request,
     _res: express.Response,
   ) => {
-    throw new error.ApplicationError(
+    throw new ApplicationError(
       HTTP.Status.InternalServerError,
       "Throwed error",
     );
@@ -87,15 +85,12 @@ describe("Global framewok tests", () => {
     await clientRequest(expressApp, "/api/do/not/exist")
       .expect(HTTP.Status.NotFound)
       .expect("Content-type", /application\/json/)
-      .expect(isJsonError(HTTP.Status.NotFound));
+      .expect(isResponseError());
 
     await clientRequest(expressApp, "/api/test/throw", true)
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(isJsonError(
-        HTTP.Status.InternalServerError,
-        "Throwed error",
-      ));
+      .expect(isResponseError("Throwed error"));
 
   });
 
@@ -117,30 +112,21 @@ describe("Global framewok tests", () => {
     await clientRequest(expressApp, "/api/test/applicationFromApp")
       .expect(HTTP.Status.BadRequest)
       .expect("Content-type", /application\/json/)
-      .expect(isJsonError(
-        HTTP.Status.BadRequest,
-        "An error",
-      ));
+      .expect(isResponseError("An error"));
 
     await clientRequest(expressApp, "/api/test/applicationFromError")
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(isJsonError(
-        HTTP.Status.InternalServerError,
-        "An error",
-      ));
+      .expect(isResponseError("An error"));
 
     await clientRequest(expressApp, "/api/test/applicationFromOther")
       .expect(HTTP.Status.InternalServerError)
       .expect("Content-type", /application\/json/)
-      .expect(isJsonError(
-        HTTP.Status.InternalServerError,
-        "Other Error: {\"err\":\"An error\"}",
-      ));
+      .expect(isResponseError("Unexpected internal error"));
   });
 
   it("Stashed error test", async() => {
-    error.stash(new error.ApplicationError(HTTP.Status.Unauthorized, "Stashed error"));
+    stash(new ApplicationError(HTTP.Status.Unauthorized, "Stashed error"));
     await clientRequest(expressApp, "/", false)
       .expect(HTTP.Status.Found)
       .expect("Content-type", /text/)

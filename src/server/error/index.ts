@@ -1,1 +1,3 @@
-export { ApplicationError, stash, handleStashed } from "./application";
+export { ApplicationError } from "./application";
+export { UserError } from "./user";
+export { stash, handleStashed } from "./stash";

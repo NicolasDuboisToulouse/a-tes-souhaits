@@ -1,9 +1,8 @@
 import * as user from "@server/user";
 import * as bcrypt from "bcrypt";
 import * as testDatabase from "./test-database";
-import { clientRequest, isJsonError } from "@tests/server/utils";
+import { clientRequest, isResponseError } from "@tests/server/utils";
 import { createExpressApp } from "@server/server";
-import * as HTTP from "@shared/httpStatus";
 import { LoginInfo } from "@server/protocol";
 
 
@@ -59,8 +58,7 @@ describe("Validate user rest api", () => {
     await clientRequest(app, "/api/user/login")
       .expect("Content-type", /application\/json/)
       .expect(
-        isJsonError(HTTP.Status.BadRequest,
-        ));
+        isResponseError());
 
     let loginInfo: LoginInfo = {
       userName: "no_exists",
@@ -69,8 +67,7 @@ describe("Validate user rest api", () => {
     await clientRequest(app, "/api/user/login", loginInfo)
       .expect("Content-type", /application\/json/)
       .expect(
-        isJsonError(HTTP.Status.Unauthorized,
-        ));
+        isResponseError());
 
     loginInfo = {
       userName: "user1",
@@ -79,8 +76,7 @@ describe("Validate user rest api", () => {
     await clientRequest(app, "/api/user/login", loginInfo)
       .expect("Content-type", /application\/json/)
       .expect(
-        isJsonError(HTTP.Status.Unauthorized,
-        ));
+        isResponseError());
 
     loginInfo = {
       userName: "user1",
