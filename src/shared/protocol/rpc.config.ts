@@ -1,42 +1,50 @@
 export type RpcType = {
-  url: string;            // Url relative to /api
-  requestName: string;    // Name of the request function
-  request?: string;       // Name of the request type defined in Types (if any)
-  response?: string;      // Name of the response type defined in Types (if any)
+  url: string;              // Url relative to /api
+  name: string;             // Name of the request function
+  input?: string;           // Name of the input type defined in Types (if any)
+  output?: string;          // Name of the output type defined in Types (if any)
+  AllowUndefined?: boolean; // output can be undefined
 };
 
 export const rpcs: RpcType[] = [
   {
     url: "/user/login",
-    requestName: "requestLogin",
-    request: "LoginInfo",
-    response: "User",
+    name: "requestLogin",
+    input: "LoginInfo",
+    output: "User",
+  },
+
+  {
+    url: "/user/tokenLogin",
+    name: "requestTokenLogin",
+    output: "User",
+    AllowUndefined: true,
   },
 
   {
     url: "/hello",
-    requestName: "requestHello",
-    request: "HelloReq",
-    response: "HelloResp",
+    name: "requestHello",
+    input: "HelloReq",
+    output: "HelloResp",
   },
 
   {
     url: "/empty",
-    requestName: "requestEmpty",
+    name: "requestEmpty",
   },
 
   {
     url: "/dont_exists",
-    requestName: "requestDontExists",
+    name: "requestDontExists",
   },
 
   {
     url: "/do_error",
-    requestName: "requestDoError",
+    name: "requestDoError",
   },
 
   {
     url: "/timeout",
-    requestName: "requestTimeout",
+    name: "requestTimeout",
   },
 ];

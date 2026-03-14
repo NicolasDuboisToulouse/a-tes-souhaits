@@ -1,10 +1,11 @@
-import { UserError } from "@server/error";
-import { requestLogin } from "@server/protocol";
+import { UserError, ApplicationError } from "@server/error";
+import * as HTTP from "@shared/httpStatus";
+import { requestLogin, requestTokenLogin } from "@server/protocol";
 import * as database from "@server/database";
 import * as logger from "@shared/logger";
 import * as user from "@server/user";
 
-requestLogin((loginInfo) => {
+requestLogin((loginInfo, request) => {
   const passwordHash = database.select<string>(
     "SELECT passwordHash FROM users WHERE userName=?",
     database.pluck,
@@ -16,5 +17,20 @@ requestLogin((loginInfo) => {
   const loggedUser = user.get(loginInfo.userName);
   logger.info("User logged in:", loginInfo.userName);
 
+  if (!request.session) {
+    throw new ApplicationError(HTTP.Status.InternalServerError,
+      "Server session not correctly setup.");
+  }
+  request.session.user = loggedUser.userName;
+
   return loggedUser;
+});
+
+requestTokenLogin((request) => {
+  if (request.session?.user) {
+    const loggedUser = user.get(request.session?.user);
+    logger.info("User logged in:", loggedUser.userName);
+    return loggedUser;
+  }
+  return undefined;
 });

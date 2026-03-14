@@ -8,6 +8,7 @@ import * as logger from "@shared/logger";
 import * as error from "@server/error";
 import * as api from "@server/api";
 import * as HTTP from "@shared/httpStatus";
+import cookieSession from "cookie-session";
 
 //
 // Create express application
@@ -15,11 +16,24 @@ import * as HTTP from "@shared/httpStatus";
 //
 export async function createExpressApp(extraRoutes?: express.Router): Promise<express.Express> {
 
+  if (process.env.JWT_SECRET == null) {
+    throw new error.ApplicationError(HTTP.Status.InternalServerError,
+      "Server is not correctly configured (JWT_SECRET)");
+  }
+
+  const sessionExpires = new Date();
+  sessionExpires.setDate(sessionExpires.getDate() + 30);
+
   const app = express();
   app.set("env", process.env.NODE_ENV);
   app.use(cors());
   app.use(express.json());
-
+  app.use(cookieSession({
+    name: "session",
+    secret: process.env.JWT_SECRET,
+    expires: sessionExpires,
+    sameSite: "strict",
+  }));
 
   //
   // Dispatch error that was raised before server starts

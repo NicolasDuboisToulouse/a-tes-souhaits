@@ -51,6 +51,7 @@ export function setupEnv(appConfig: AppConfig) {
       process.env.TESTS_TEMP_DIR = path.join(process.env.TESTS_RESULT_DIR, "tmp");
       delete process.env.DATABASE_DIR;
       process.env.PROGRAM_PORT = "0";
+      process.env.JWT_SECRET = "tests_secret";
       break;
   }
 }

@@ -1,19 +1,42 @@
 import { useForm } from "react-hook-form";
-import { LoginInfo, requestLogin } from "@client/protocol";
+import {
+  LoginInfo,
+  requestLogin,
+  requestTokenLogin,
+} from "@client/protocol";
 import { useAppStore } from "@client/services/store";
+import { useEffect, useState } from "react";
 
 export default function Login() {
   const userSet = useAppStore(state => state.user.set);
+  const [ waitTokenLogin, setWaitTokenLogin ] = useState(true);
   const { register, handleSubmit, formState } = useForm<LoginInfo>();
   const { errors } = formState;
+
+  useEffect(() => {
+    requestTokenLogin()
+      .then(
+        (user) => {
+          if (user) {
+            console.info("User logged in:", user.userName);
+            userSet(user);
+          }
+          return; // TODO modify eslint
+        })
+      .finally(() => setWaitTokenLogin(false));
+  }, [ userSet ]);
 
   function submit(loginInfo: LoginInfo) {
     requestLogin(loginInfo).then(user => userSet(user));
   }
 
+  // Do not render login from while performing token login.
+  // The token login request will display a sinner.
+  if (waitTokenLogin) return null;
+
   return (
     <div className = "h-center">
-      <form onSubmit = {handleSubmit(submit)} acceptCharset = "UTF-8">
+      <form name = "login" onSubmit = {handleSubmit(submit)} acceptCharset = "UTF-8">
         <div className = "form-group">
           <label>
             Nom{" "}

@@ -2,39 +2,49 @@ import ts from "typescript";
 import { RpcType, rpcs } from "@shared/protocol/rpc.config";
 import { createModuleAccessType } from "./utils";
 
-export function generateServerNodes() {
-  const moduleImports = [
+//
+// Generate all server request handlers
+//
+export function generateServerNodes(): ts.NodeArray<ts.Statement> {
+  const moduleImportStmts: ts.Statement[] = [
+    // import express from "express"
     ts.factory.createImportDeclaration(
-      undefined,   // modifier
+      undefined,   // modifiers
       ts.factory.createImportClause(
-        undefined, // Phase modifier
+        undefined, // Phase modifiers
         expressId, // default name
         undefined, // as name
       ),
       ts.factory.createStringLiteral("express"),
     ),
+
+    // import * as protocol from ".."
     ts.factory.createImportDeclaration(
-      undefined,   // modifier
+      undefined,   // modifiers
       ts.factory.createImportClause(
-        undefined, // Phase modifier
+        undefined, // Phase modifiers
         undefined, // default name
         ts.factory.createNamespaceImport(protocolId), // as name
       ),
       ts.factory.createStringLiteral(".."),
     ),
+
+    // import * as HTTP from "@shared/httpStatus"
     ts.factory.createImportDeclaration(
-      undefined,   // modifier
+      undefined,   // modifiers
       ts.factory.createImportClause(
-        undefined, // Phase modifier
+        undefined, // Phase modifiers
         undefined, // default name
         ts.factory.createNamespaceImport(httpId), // as name
       ),
       ts.factory.createStringLiteral("@shared/httpStatus"),
     ),
+
+    // import { ApplicationError } from "@server/error";
     ts.factory.createImportDeclaration(
-      undefined, // modifier
+      undefined,    // modifiers
       ts.factory.createImportClause(
-        undefined, // Phase modifier
+        undefined, // Phase modifiers
         undefined, // default name
         ts.factory.createNamedImports([
           ts.factory.createImportSpecifier(
@@ -48,15 +58,16 @@ export function generateServerNodes() {
     ),
   ];
 
-  const routerDeclaration =
+  // export const router = express.Router()
+  const routerDeclarationStmt: ts.Statement =
     ts.factory.createVariableStatement(
       ts.factory.createModifiersFromModifierFlags(ts.ModifierFlags.Export),
       ts.factory.createVariableDeclarationList(
         [
           ts.factory.createVariableDeclaration(
             routerId,
-            undefined,  // ! tocken
-            undefined,  // type
+            undefined,   // no "!" token
+            undefined,   // type
             ts.factory.createCallExpression(
               ts.factory.createPropertyAccessExpression(expressId, "Router"),
               undefined, // Type arguments
@@ -68,150 +79,212 @@ export function generateServerNodes() {
       ),
     );
 
-  return ts.factory.createNodeArray([ ...moduleImports, routerDeclaration, ...rpcs.map(generateRpcReply) ]);
+  // Generate all handler functions
+  return ts.factory.createNodeArray([
+    ...moduleImportStmts,
+    routerDeclarationStmt,
+    ...rpcs.map(generateRpcHandlerStmt),
+  ]);
 }
 
-function generateRpcReply(rpc: RpcType) {
-  const cbArgsDeclaration = (rpc.request)
-    ? [
-      ts.factory.createParameterDeclaration(
-        undefined, // modifiers
-        undefined, // dotdotdot
-        "request", // param name
-        undefined, // question tocket
-        createModuleAccessType(protocolId, rpc.request),
-      ),
-    ]
-    : [];
+//
+// Generate one server RPC handler
+//
+function generateRpcHandlerStmt(rpc: RpcType): ts.Statement {
 
-  const postCbStmts: ts.Statement[] = (rpc.request)
-    ? [
-      ts.factory.createIfStatement( // if (!protocol.is<Req>(request))
-        ts.factory.createLogicalNot( // ! protocol.is<Req>(request)
-          ts.factory.createCallExpression( // protocol.is<Req>(request)
-            ts.factory.createPropertyAccessExpression(protocolId, "is" + rpc.request),
+  //
+  // Code executed when server receive the POST request
+  //
+  const routeHandlerStmts: ts.Statement[] = [];
+
+  // Add check input type (if any)
+  // if (!protocol.is<type>(request.body)) throw new ApplicationError(...)
+  if (rpc.input) {
+    routeHandlerStmts.push(
+      ts.factory.createIfStatement(          // if (! protocol.is<Req>(input))
+        ts.factory.createLogicalNot(         //     ! protocol.is<Req>(input)
+          ts.factory.createCallExpression(   //       protocol.is<Req>(input)
+            ts.factory.createPropertyAccessExpression(protocolId, "is" + rpc.input),
             undefined, // Type Arguments
-            [ reqBodyId ],
+            [ requestBodyExp ],
           ),
         ),
-        // then
-        ts.factory.createThrowStatement( // Throw new ApplicationError(badRequest, msg)
+        // then throw new ApplicationError(...)
+        ts.factory.createThrowStatement(
           ts.factory.createNewExpression(
             appErrorId,
             undefined,
             [
               httpStatusBadRequest,
-              ts.factory.createStringLiteral("request is not an " + rpc.request + "!"),
+              ts.factory.createStringLiteral("request is not an " + rpc.input + "!"),
             ],
           ),
         ),
       ),
+    );
+  }
 
+  // Generate callback call expression
+  const cbArgs: ts.Expression[] = [ requestId, responseId ];
+  if (rpc.input) cbArgs.unshift(requestBodyExp);
+  const cbCallExpr: ts.Expression = ts.factory.createCallExpression(cbId, undefined, cbArgs);
+
+  // Add callback call and store result in contentId (if rpc.output)
+  // Add return statement
+  if (rpc.output) {
+    routeHandlerStmts.push(
       ts.factory.createVariableStatement(
         undefined, // modifiers
         ts.factory.createVariableDeclarationList(
           [
             ts.factory.createVariableDeclaration(
               contentId,
-              undefined,  // ! tocken
+              undefined,  // ! token
               undefined,  // type
-              ts.factory.createCallExpression(
-                cbId,
-                undefined, // Type arguments
-                [ reqBodyId ],
-              ),
+              cbCallExpr,
             ),
           ],
           ts.NodeFlags.Const,
         ),
       ),
-      generateReplyOk([ contentId ]),
-    ]
-    : [
-      ts.factory.createExpressionStatement(
-        ts.factory.createCallExpression(
-          cbId,
-          undefined, // Type arguments
-          [ ],
-        ),
+      generateJsonOkStmt(
+        (rpc.AllowUndefined)
+          ? ts.factory.createBinaryExpression(
+            contentId,
+            ts.factory.createToken(ts.SyntaxKind.BarBarToken),
+            ts.factory.createObjectLiteralExpression(),
+          )
+          : contentId,
       ),
-      generateReplyOk([ ts.factory.createObjectLiteralExpression() ]),
-    ];
+    );
+  } else {
+    routeHandlerStmts.push(
+      ts.factory.createExpressionStatement(cbCallExpr),
+      generateJsonOkStmt(ts.factory.createObjectLiteralExpression()),
+    );
+  }
 
+  // Create expressjs post call statement
+  // router.post(<route>, (...) => routeHandlerStmts
+  const postCallStmt: ts.Statement =
+    ts.factory.createExpressionStatement(
+      ts.factory.createCallExpression(
+        routerPostExpr,
+        undefined,     // type parameters
+        [
+          ts.factory.createStringLiteral(rpc.url),
+          ts.factory.createArrowFunction(
+            undefined, // Modifiers
+            undefined, // type parameters
+            generateEpressParameterDeclarations(),
+            undefined, // Return type
+            undefined, // =>
+            // Function body
+            ts.factory.createBlock(routeHandlerStmts, true),
+          ),
+        ],
+      ),
+    );
 
+  // Generate main handle function
+  // export function(cb(...) => Promise<Type>) { ... }
   return ts.factory.createFunctionDeclaration(
     ts.factory.createModifiersFromModifierFlags(ts.ModifierFlags.Export),
     undefined,  // asteriskToken
-    ts.factory.createIdentifier(rpc.requestName),
+    ts.factory.createIdentifier(rpc.name),
     undefined,  // generic parameters
     [
       ts.factory.createParameterDeclaration(
         undefined,        // modifiers
         undefined,        // dotdotdot
         cbId,             // param name
-        undefined,        // question tocket
-        ts.factory.createFunctionTypeNode(
-          undefined,      // type parameters
-          cbArgsDeclaration,
-          (rpc.response)  // return type
-            ? createModuleAccessType(protocolId, rpc.response)
-            : ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-        ),
+        undefined,        // question token
+        generateCbPrototypeTypeNode(rpc),
       ),
     ],
     undefined,  // return type
-    // Function body
-    ts.factory.createBlock([
-      ts.factory.createExpressionStatement(
-        ts.factory.createCallExpression(
-          routerPostId,
-          undefined,    // type paramaters
-          [
-            ts.factory.createStringLiteral(rpc.url),
-            ts.factory.createArrowFunction(
-              undefined, // Modifiers
-              undefined, // type parameters
-              [
-                ts.factory.createParameterDeclaration(
-                  undefined, // modifiers
-                  undefined, // dotdotdot
-                  (rpc.request) ? reqId : "_req",
-                  undefined, // question tocket
-                  createModuleAccessType(expressId, "Request"),
-                ),
-                ts.factory.createParameterDeclaration(
-                  undefined, // modifiers
-                  undefined, // dotdotdot
-                  resId, // param name
-                  undefined, // question tocket
-                  createModuleAccessType(expressId, "Response"),
-                ),
-              ],
-              undefined, // Return type
-              undefined, // =>
-              // Function body
-              ts.factory.createBlock(postCbStmts, true),
-            ),
-          ],
-        ),
-      ),
-    ], true),
+    ts.factory.createBlock([ postCallStmt ], true),
   );
 }
 
-function generateReplyOk(argumentsArray: ts.Expression[]): ts.Statement {
+//
+// Generate the prototype of the callback function.
+// returns: (input?, request: express.Request, response: express.Response) => <Type>
+//
+function generateCbPrototypeTypeNode(rpc: RpcType): ts.TypeNode {
+  // Parameter types of the callback
+  const parameters: ts.ParameterDeclaration[] =
+    (rpc.input)
+      ? [
+        ts.factory.createParameterDeclaration(
+          undefined, // modifiers
+          undefined, // dotdotdot
+          "input",   // param name
+          undefined, // question token
+          createModuleAccessType(protocolId, rpc.input),
+        ),
+        ...generateEpressParameterDeclarations(),
+      ]
+      : generateEpressParameterDeclarations();
+
+  // callback return type
+  let returnTypeNode: ts.TypeNode =
+    (rpc.output)
+      ? createModuleAccessType(protocolId, rpc.output)
+      : ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword);
+  if (rpc.AllowUndefined) {
+    returnTypeNode = ts.factory.createUnionTypeNode([
+      returnTypeNode,
+      ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
+    ]);
+  }
+
+  // callback signature
+  return ts.factory.createFunctionTypeNode(
+    [],              // type parameters
+    parameters,      // parameters
+    returnTypeNode,  // return type
+  );
+}
+
+//
+// Generate express function parameters
+// returns: [ request: Request, response: Response ]
+function generateEpressParameterDeclarations(): ts.ParameterDeclaration[] {
+  return [
+    ts.factory.createParameterDeclaration(
+      undefined, // modifiers
+      undefined, // dotdotdot
+      requestId, // param name
+      undefined, // question token
+      createModuleAccessType(expressId, "Request"),
+    ),
+    ts.factory.createParameterDeclaration(
+      undefined,   // modifiers
+      undefined,   // dotdotdot
+      responseId,  // param name
+      undefined,   // question token
+      createModuleAccessType(expressId, "Response"),
+    ),
+  ];
+}
+
+//
+// generate response.status(HTTP.OK).json(object)
+//
+function generateJsonOkStmt(responseObjectExpr: ts.Expression): ts.Statement {
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(
         ts.factory.createCallExpression(
-          ts.factory.createPropertyAccessExpression(resId, "status"),
-          undefined, // Type aruments
+          ts.factory.createPropertyAccessExpression(responseId, "status"),
+          undefined, // Type arguments
           [ httpStatusOk ],
         ),
         "json",
       ),
-      undefined, // Type aruments
-      argumentsArray,
+      undefined, // Type arguments
+      [ responseObjectExpr ],
     ),
   );
 }
@@ -220,10 +293,10 @@ const expressId = ts.factory.createIdentifier("express");
 const protocolId = ts.factory.createIdentifier("protocol");
 const httpId = ts.factory.createIdentifier("HTTP");
 const routerId = ts.factory.createIdentifier("router");
-const routerPostId = ts.factory.createPropertyAccessExpression(routerId, "post");
-const reqId = ts.factory.createIdentifier("req");
-const resId = ts.factory.createIdentifier("res");
-const reqBodyId = ts.factory.createPropertyAccessExpression(reqId, "body");
+const routerPostExpr = ts.factory.createPropertyAccessExpression(routerId, "post");
+const requestId = ts.factory.createIdentifier("request");
+const responseId = ts.factory.createIdentifier("response");
+const requestBodyExp = ts.factory.createPropertyAccessExpression(requestId, "body");
 const cbId = ts.factory.createIdentifier("cb");
 const appErrorId = ts.factory.createIdentifier("ApplicationError");
 const httpStatusOk = ts.factory.createIdentifier("HTTP.Status.Ok");

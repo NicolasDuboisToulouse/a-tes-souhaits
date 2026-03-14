@@ -23,7 +23,7 @@ export function clientRequest(
     .expect(
       (supertestTest) => {
         if (dump) {
-          console.log("supertest:", supertestTest);
+          console.debug("supertest:", supertestTest);
         }
       },
     );

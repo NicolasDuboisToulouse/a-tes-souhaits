@@ -19,8 +19,8 @@ export function get(userName: string): User {
   ).get(userName);
   if (!user) {
     logger.error("Try to select an user that don't exists:", userName);
-    throw new ApplicationError(HTTP.Status.InternalServerError,
-      "Unexpected database request.");
+    throw new ApplicationError(HTTP.Status.BadRequest,
+      "Unexpected database request");
   }
   return user;
 }

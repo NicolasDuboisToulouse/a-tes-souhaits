@@ -6,7 +6,7 @@ import { useAppStore } from "@client/services/store";
 export function post(
   url: string,
   content?: object,
-): Promise<unknown> {
+): Promise<object> {
 
   const appState = useAppStore.getState();
   appState.spinner.add();
@@ -15,6 +15,7 @@ export function post(
   return fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
     body })
     .then(
       (response) => {
@@ -33,7 +34,7 @@ export function post(
     )
     .catch(
       (error) => {
-        console.log(error);
+        console.error(error);
         if (error instanceof Error) {
           appState.alerts.add(error.message);
         }
