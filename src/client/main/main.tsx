@@ -13,24 +13,24 @@ import "./main.css";
 
 /* v8 ignore start */
 
-function Index() {
+function Main() {
   const userInfo = useAppStore(state => state.user.info);
 
-  const index = userInfo ? <Routes /> : <Login />;
+  const main = userInfo ? <Routes /> : <Login />;
 
   return (
     <>
       <div id = "header" />
       <Spinner />
       <Alerts />
-      {index}
+      {main}
     </>
   );
 }
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <Index />
+    <Main />
   </StrictMode>,
 );
 

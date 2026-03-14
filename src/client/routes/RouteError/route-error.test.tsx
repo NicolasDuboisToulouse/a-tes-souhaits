@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import RouteError from ".";
+import RouteError from "./route-error";
 
 const mockData = vi.hoisted((): { error: unknown } => {
   return {

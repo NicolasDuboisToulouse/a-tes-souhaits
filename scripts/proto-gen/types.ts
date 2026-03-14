@@ -18,4 +18,4 @@ export type ContentType = {
 
 export type ObjectContentMap = Map<string, ContentType>;
 
-export type Object = { name: string; content: ObjectContentMap };
+export type ProtocolObject = { name: string; content: ObjectContentMap };

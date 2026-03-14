@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import ServerError from ".";
+import ServerError from "./server-error";
 
 const mockData = vi.hoisted((): { error: unknown } => {
   return {

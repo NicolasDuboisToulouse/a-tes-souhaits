@@ -1,19 +1,20 @@
 import ts from "typescript";
 import path from "path";
 import * as logger from "@shared/logger";
-import * as protoGen from ".";
+import { ProtocolObject, ObjectContentMap, Types } from "./types";
+import { parseError } from "./error";
 
 //
 // Parse protocol definition file and return a protocol Object list
 //
-export function parseTypes(protocolTypeFilePath: string): protoGen.Object[] {
+export function parseTypes(protocolTypeFilePath: string): ProtocolObject[] {
 
   const program = createProgram([ protocolTypeFilePath ]);
   const protocolDefFile = program.getSourceFile(protocolTypeFilePath);
   if (!protocolDefFile) logger.die("Cannot read", logger.quote(protocolTypeFilePath), "!");
   const typeChecker = program.getTypeChecker();
 
-  const types: protoGen.Object[] = [];
+  const types: ProtocolObject[] = [];
   ts.forEachChild(protocolDefFile, (node) => {
     if (ts.isTypeAliasDeclaration(node)) {
       if (
@@ -59,18 +60,18 @@ function createProgram(sourceFiles: string[]): ts.Program {
 // Parse a object ts.Type and return a protocol ObjectContentMap.
 // path: path of the type for error messages
 //
-function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: string): protoGen.ObjectContentMap {
+function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: string): ObjectContentMap {
   const properties = type.getProperties();
   if (properties.length === 0) {
-    protoGen.parseError(path, "Unexepect empty Object type.");
+    parseError(path, "Unexepect empty Object type.");
   }
 
-  const objectContent: protoGen.ObjectContentMap = new Map();
+  const objectContent: ObjectContentMap = new Map();
 
   for (const property of properties) {
     const subPath = path + "." + property.name;
     if (!property.declarations || property.declarations.length === 0) {
-      protoGen.parseError(subPath, "Invalid property declaration.");
+      parseError(subPath, "Invalid property declaration.");
     }
 
     let propertyType = typeChecker.getTypeAtLocation(property.declarations[0]);
@@ -102,7 +103,7 @@ function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: st
         const arrayTsType = typeChecker.getTypeArguments(propertyType as ts.TypeReference)[0];
         const arrayProtocolType = parseSimpleType(arrayTsType.flags);
         if (arrayProtocolType === undefined) {
-          protoGen.parseError(subPath, "Complex arrays are not supported!");
+          parseError(subPath, "Complex arrays are not supported!");
         }
         objectContent.set(property.name, { type: arrayProtocolType, optional, isArray: true });
         continue;
@@ -111,7 +112,7 @@ function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: st
       objectContent.set(
         property.name,
         {
-          type: protoGen.Types.Object,
+          type: Types.Object,
           optional,
           object: parseObjectContent(propertyType, typeChecker, subPath),
         },
@@ -131,7 +132,7 @@ function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: st
       objectContent.set(
         property.name,
         {
-          type: protoGen.Types.Enum,
+          type: Types.Enum,
           optional,
           enumName: propertyType.aliasSymbol?.getName(),
           enumSymbols,
@@ -143,7 +144,7 @@ function parseObjectContent(type: ts.Type, typeChecker: ts.TypeChecker, path: st
     // Handle simple types
     const simpleType = parseSimpleType(propertyFlags);
     if (simpleType === undefined) {
-      protoGen.parseError(subPath, "Unsuported type!");
+      parseError(subPath, "Unsuported type!");
     }
     objectContent.set(
       property.name,
@@ -173,23 +174,23 @@ function unionTypeGetOriginalUnion(type: ts.Type): ts.Type {
 //
 // parse Flags for simple types. return protocol.Types or undefined
 //
-function parseSimpleType(flags: ts.TypeFlags): protoGen.Types | undefined {
+function parseSimpleType(flags: ts.TypeFlags): Types | undefined {
   if (
     ((flags & ts.TypeFlags.NumberLike) !== 0) &&
     ((flags & ~ts.TypeFlags.Number) === 0)
-  ) return protoGen.Types.Number;
+  ) return Types.Number;
   if (
     ((flags & ts.TypeFlags.BigIntLike) !== 0) &&
     ((flags & ~ts.TypeFlags.BigInt) === 0)
-  ) return protoGen.Types.BigInt;
+  ) return Types.BigInt;
   if (
     ((flags & ts.TypeFlags.StringLike) !== 0) &&
     ((flags & ~ts.TypeFlags.String) === 0)
-  ) return protoGen.Types.String;
+  ) return Types.String;
   if (
     ((flags & ts.TypeFlags.BooleanLike) !== 0) &&
     ((flags & ~ts.TypeFlags.Boolean) === ts.TypeFlags.Union) // boolean is an union true | false
-  ) return protoGen.Types.Boolean;
+  ) return Types.Boolean;
 
   return undefined;
 }

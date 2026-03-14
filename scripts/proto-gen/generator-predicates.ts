@@ -1,9 +1,10 @@
 import ts from "typescript";
-import * as protoGen from ".";
+import { ProtocolObject, ObjectContentMap, Types } from "./types";
 import { createModuleAccessType } from "./utils";
+import { parseError } from "./error";
 
 export function generatePredicateFileNodes(
-  objectList: protoGen.Object[],
+  objectList: ProtocolObject[],
 ) {
   const moduleImport = ts.factory.createImportDeclaration(
     undefined, // modifier
@@ -19,7 +20,7 @@ export function generatePredicateFileNodes(
 
 // Generate predicate function for each object in objectList
 function generatePredicatesStmts(
-  objectList: protoGen.Object[],
+  objectList: ProtocolObject[],
 ): ts.Statement[] {
   const statements: ts.Statement[] = [];
   objectList.forEach((object) => {
@@ -33,7 +34,7 @@ function generatePredicatesStmts(
 //
 function generatePredicateStmt(
   objectName: string,
-  objectContent: protoGen.ObjectContentMap,
+  objectContent: ObjectContentMap,
 ): ts.Statement {
   const objectTypeNode = createModuleAccessType(protocolId, objectName);
 
@@ -75,7 +76,7 @@ function generatePredicateStmt(
 //
 function generateCheckObjectStmts(
   objectExpression: ts.Expression,           // Object to check
-  objectContent: protoGen.ObjectContentMap,  // Object content
+  objectContent: ObjectContentMap,  // Object content
 ): ts.Statement[] {
   const stmtResults: ts.Statement[] = [];
 
@@ -86,10 +87,10 @@ function generateCheckObjectStmts(
 
     // Simple type cases
     if ([
-      protoGen.Types.Number,
-      protoGen.Types.BigInt,
-      protoGen.Types.String,
-      protoGen.Types.Boolean,
+      Types.Number,
+      Types.BigInt,
+      Types.String,
+      Types.Boolean,
     ]
       .includes(value.type)) {
 
@@ -131,7 +132,7 @@ function generateCheckObjectStmts(
                   ts.factory.createBinaryExpression(
                     ts.factory.createTypeOfExpression(elementId),
                     ts.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                    ts.factory.createStringLiteral(protoGen.Types[value.type].toLowerCase()),
+                    ts.factory.createStringLiteral(Types[value.type].toLowerCase()),
                   ),
                 ),
               ],
@@ -143,10 +144,10 @@ function generateCheckObjectStmts(
       } else {  // non-array case, check type is the expected one
         checkTypeStmts.push(genrareExpectJSTypeStmt(
           subobjectExpression,
-          protoGen.Types[value.type].toLowerCase(),
+          Types[value.type].toLowerCase(),
         ));
       }
-    } else if (value.type === protoGen.Types.Enum) {
+    } else if (value.type === Types.Enum) {
       // Enum case
       // Check type
       checkTypeStmts.push(genrareExpectJSTypeStmt(
@@ -173,7 +174,7 @@ function generateCheckObjectStmts(
         ),
         returnFalseStmt,
       ));
-    } else if (value.type === protoGen.Types.Object) {
+    } else if (value.type === Types.Object) {
       // object type.
       const objectStmts: ts.Statement[] = [
         genrareExpectJSTypeStmt(
@@ -189,7 +190,7 @@ function generateCheckObjectStmts(
         checkTypeStmts.push(...objectStmts);
       }
     } else {
-      protoGen.parseError(key, "Type not yet implemented: " + value.type);
+      parseError(key, "Type not yet implemented: " + value.type);
     }
 
     if (value.optional) {
