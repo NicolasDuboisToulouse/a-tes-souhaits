@@ -32,13 +32,17 @@ export function post(
         return result;
       },
     )
-    .catch(
-      (error) => {
-        console.error(error);
-        if (error instanceof Error) {
-          appState.alerts.add(error.message);
-        }
-        throw error;
-      })
     .finally(appState.spinner.remove);
 }
+
+//
+// Display an alert on Error
+//
+/* v8 ignore start this function is always mocked*/
+export function handleRequestError(error: unknown) {
+  console.error(error);
+  if (error instanceof Error) {
+    useAppStore.getState().alerts.add(error.message);
+  }
+}
+/* v8 ignore stop */

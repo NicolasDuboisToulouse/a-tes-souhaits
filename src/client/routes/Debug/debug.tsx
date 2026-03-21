@@ -5,32 +5,33 @@ export default function Debug() {
   const alertsAdd = useAppStore(state => state.alerts.add);
 
   async function hello() {
-    const data = await protocol.requestHello({ message: "example" });
-    console.log("resp", data);
+    protocol.requestHello({ message: "example" })
+      .then(data => { console.log("resp", data); return data; })
+      .catch(protocol.handleRequestError);
   }
 
   async function empty() {
-    await protocol.requestEmpty();
-    console.log("request done");
+    protocol.requestEmpty()
+      .then(data => { console.log("resp", data); return data; })
+      .catch(protocol.handleRequestError);
   }
 
   async function dont_exist() {
-    const data = await protocol.requestDontExists();
-    console.log("resp", data);
+    protocol.requestDontExists()
+      .then(data => { console.log("resp", data); return data; })
+      .catch(protocol.handleRequestError);
   }
 
   async function do_error() {
-    protocol.requestDoError().catch(() => {
-      console.log("An error occurs");
-    });
-    console.log("Do error done.");
+    protocol.requestDoError()
+      .then(data => { console.log("resp", data); return data; })
+      .catch(protocol.handleRequestError);
   }
 
   async function timeout() {
-    protocol.requestTimeout().catch(() => {
-      console.log("An error occurs");
-    });
-    console.log("Timeout done.");
+    protocol.requestTimeout()
+      .then(data => { console.log("resp", data); return data; })
+      .catch(protocol.handleRequestError);
   }
 
   function addAlert() {

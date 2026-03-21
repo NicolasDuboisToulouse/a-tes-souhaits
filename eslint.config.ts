@@ -147,7 +147,7 @@ export default defineConfig([
       // See https://github.com/eslint-community/eslint-plugin-promise
       "promise/always-return": "warn",
       "promise/avoid-new": "off",
-      "promise/catch-or-return": "off",
+      "promise/catch-or-return": "warn",
       "promise/no-callback-in-promise": "warn",
       "promise/no-return-wrap": "warn",
       "promise/param-names": "warn",

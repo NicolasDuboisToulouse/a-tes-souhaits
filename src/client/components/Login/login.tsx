@@ -3,6 +3,7 @@ import {
   LoginInfo,
   requestLogin,
   requestTokenLogin,
+  handleRequestError,
 } from "@client/protocol";
 import { useAppStore } from "@client/services/store";
 import { useEffect, useState } from "react";
@@ -15,19 +16,15 @@ export default function Login() {
 
   useEffect(() => {
     requestTokenLogin()
-      .then(
-        (user) => {
-          if (user) {
-            console.info("User logged in:", user.userName);
-            userSet(user);
-          }
-          return; // TODO modify eslint
-        })
-      .finally(() => setWaitTokenLogin(false));
+      .then(userSet)
+      .finally(() => setWaitTokenLogin(false))
+      .catch(handleRequestError);
   }, [ userSet ]);
 
   function submit(loginInfo: LoginInfo) {
-    requestLogin(loginInfo).then(user => userSet(user));
+    requestLogin(loginInfo)
+      .then(userSet)
+      .catch(handleRequestError);
   }
 
   // Do not render login from while performing token login.
