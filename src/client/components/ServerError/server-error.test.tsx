@@ -17,14 +17,14 @@ describe("Validate ServerError component", () => {
   it("ServerError with param", async() => {
     mockData.error = "Hello";
     render(<ServerError />);
-    const serverErrorDom = screen.getByRole("ServerError");
+    const serverErrorDom = screen.getByRole("error");
     expect(serverErrorDom).toHaveTextContent("Hello");
   });
 
   it("ServerError without param", async() => {
     mockData.error = undefined;
     render(<ServerError />);
-    const serverErrorDom = screen.getByRole("ServerError");
+    const serverErrorDom = screen.getByRole("error");
     expect(serverErrorDom).toHaveTextContent("Unexpected Error");
   });
 

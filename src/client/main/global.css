@@ -1,10 +1,8 @@
-/* center a div horizontally */
-.h-center {
-    width: -moz-fit-content;
-    width: fit-content;
-    margin: 0 auto;
+/* Main error */
+[role=error] {
+    font-size: 2em;
+    margin-bottom: 0.5em;
 }
-
 
 /* center both vertically and horizontally the inner div */
 .absolute-center-child {
@@ -76,7 +74,6 @@ form label {
 
 form input/*, form textarea, form .preview*/  {
     display: block;
-    width:   100%;
     padding: 0.2em;
 }
 

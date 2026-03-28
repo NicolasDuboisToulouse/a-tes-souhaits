@@ -2,6 +2,7 @@ import * as protocol from "@client/protocol";
 import { useAppStore } from "@client/services/store";
 
 export default function Debug() {
+  const userInfo = useAppStore(state => state.user.info);
   const alertsAdd = useAppStore(state => state.alerts.add);
 
   async function hello() {
@@ -38,6 +39,8 @@ export default function Debug() {
     alertsAdd("An alert");
     alertsAdd("An alert2");
   }
+
+  if (userInfo === undefined) return null;
 
   return (
     <>
