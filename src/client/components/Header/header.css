@@ -1,0 +1,62 @@
+[role=header] {
+    height: 140px;
+    background: url(/a-tes-souhaits.svg) top left no-repeat,
+                url(/presents.svg) top right no-repeat,
+                url(/header_middle.png) top left repeat-x;
+    text-align: end;
+}
+
+/* Menu */
+[role=header] button {
+    background-color: transparent;
+    border-radius: calc(infinity * 1px);
+    border-width: 0px;
+}
+
+[role=header] button svg {
+    width: 1.5rem;
+    fill: var(--color-border-focus);
+}
+
+[role=header] button:hover, [role=header] button:focus, [role=header] button:active {
+    background-color: var(--color-button-translucent);
+}
+
+[role=header] ul {
+    background-color: var(--color-bg-focus);
+    border: solid 1px var(--color-border);
+    display: inline-block;
+    border-radius: 0.25rem;
+    margin: 0 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+
+/*    position: absolute;*/
+
+
+    /*
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+   */
+}
+
+[role=header] ul.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[role=header] ul.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+[role=header] ul li {
+    padding: 0 0.25rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+[role=header] ul li:hover {
+    background-color: var(--color-menu-hover);
+}

@@ -10,7 +10,7 @@
     --color-link:                   #1d4ed8;
 
     --color-button:                 var(--color-border);
-    --color-button-transparent:     #F26D2140;
+    --color-button-translucent:     #F26D2140;
     --color-button-text:            var(--color-bg);
     --color-button-border:          var(--color-bg);
     --color-button-border-hover:    var(--color-border-focus);

@@ -21,9 +21,6 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
       "Server is not correctly configured (JWT_SECRET)");
   }
 
-  const sessionExpires = new Date();
-  sessionExpires.setDate(sessionExpires.getDate() + 30);
-
   const app = express();
   app.set("env", process.env.NODE_ENV);
   app.use(cors());
@@ -31,8 +28,9 @@ export async function createExpressApp(extraRoutes?: express.Router): Promise<ex
   app.use(cookieSession({
     name: "session",
     secret: process.env.JWT_SECRET,
-    expires: sessionExpires,
+    maxAge: 1000 * 3600 * 24 * 30,  // One month
     sameSite: "strict",
+    httpOnly: false,                // Allows client to modify the cookies
   }));
 
   //

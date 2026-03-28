@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { useAppStore } from "@client/services/store";
+import Header from "@client/components/Header";
 import Spinner from "@client/components/Spinner";
 import Alerts from "@client/components/Alerts";
 import Login from "@client/components/Login";
@@ -20,7 +21,7 @@ function Main() {
 
   return (
     <>
-      <div id = "header" />
+      <Header />
       <Spinner />
       <Alerts />
       {main}
