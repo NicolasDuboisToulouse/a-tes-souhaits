@@ -1,11 +1,7 @@
-import { StrictMode, useEffect, useState } from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { useEffect, useState } from "react";
+import { Route, Routes } from "react-router";
 import { handleRequestError, requestTokenLogin } from "@client/protocol";
 import { useAppStore } from "@client/services/store";
-import Header from "@client/components/Header";
-import Spinner from "@client/components/Spinner";
-import Alerts from "@client/components/Alerts";
 import Login from "@client/components/Login";
 import Debug from "@client/components/Debug/debug";
 import ServerError from "@client/components/ServerError";
@@ -16,9 +12,7 @@ import "./colors.css";
 import "./global.css";
 import "./main.css";
 
-/* v8 ignore start */
-
-function Main() {
+export default function Main() {
   const [ doTokenLogin, setDoTokenLogin ] = useState(true);
   const userState = useAppStore(state => state.user);
 
@@ -48,18 +42,3 @@ function Main() {
     </Routes>
   );
 }
-
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <StrictMode>
-    <BrowserRouter>
-      <Header />
-      <Spinner />
-      <Alerts />
-      <div id = "main">
-        <Main />
-      </div>
-    </BrowserRouter>
-  </StrictMode>,
-);
-
-/* v8 ignore stop */
