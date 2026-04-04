@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import "./header.css";
+import { useNavigate } from "react-router";
 import { useAppStore } from "@client/services/store";
+import "./header.css";
 
 
 type MenuAction = () => void;
@@ -15,6 +16,7 @@ export default function Header() {
   const [ menuVisible, setMenuVisible ] = useState<boolean>(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
+  const navigate = useNavigate();
 
   const userState = useAppStore(state => state.user);
 
@@ -55,18 +57,14 @@ export default function Header() {
 
   // Menu content
   const items: MenuItem[] = [
+    { text: "Acceuil", action() { navigate("/"); }, role: "gotoHome" },
     { text: "Déconnexion", action: logout, role: "logout" },
-    /*    { text: "Changer de mot de passe", action() { console.log("Pass"); } }, */
+    { text: "Changer de mot de passe", action() { navigate("/changePassword"); }, role: "changePassword" },
+    { text: "À propos", action() { navigate("/about"); }, role: "gotoAbout" },
   ];
   /*
   if (user.isAdmin && pathname != '/users/admin') {
       items.push({ text: "Administration", target: '/users/admin' });
-  }
-  if (pathname != '/') {
-      items.push({ text: "Acceuil", target: '/' });
-  }
-  if (pathname != '/about') {
-    items.push({ text: "À propos", target: '/about' });
   }
    */
 
@@ -83,17 +81,12 @@ export default function Header() {
         </svg>
       </button>
       <div>
-        <ul ref = {menuRef} className = { menuVisible ? "visible" : "hidden" }>
+        <ul role = "menuHeader" ref = {menuRef} className = { menuVisible ? "visible" : "hidden" }>
           {
             items.map(item => {
               return (
-                <li key = {item.role}>
-                  <a
-                    role = {item.role}
-                    onClick = {() => handleMenuAction(item.action)}
-                  >
-                    {item.text}
-                  </a>
+                <li key = {item.role} role = {item.role} onClick = {() => handleMenuAction(item.action)}>
+                  <span>{item.text}</span>
                 </li>
               );
             })

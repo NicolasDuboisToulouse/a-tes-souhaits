@@ -14,6 +14,7 @@ export default defineConfig({
     root: path.resolve(process.env.PROGRAM_ROOT!, "src", "client"),
     cache: false,
     silent: "passed-only",
+    css: true,
     reporters: [
       "default",
       [ "junit", { outputFile: path.resolve(process.env.TESTS_RESULT_DIR, "client.xml") } ],
