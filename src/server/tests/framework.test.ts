@@ -1,6 +1,6 @@
 import express from "express";
 import { clientRequest, isResponseError } from "@tests/server/utils";
-import { createExpressApp } from "@server/server";
+import { createExpressApp } from "@server/core/server";
 import * as HTTP from "@shared/httpStatus";
 import { ApplicationError, stash } from "@server/error";
 

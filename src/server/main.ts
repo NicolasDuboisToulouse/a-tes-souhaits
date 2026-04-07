@@ -1,5 +1,5 @@
-import * as webServer from "@server/server";
-import * as database from "@server/database";
+import * as webServer from "@server/core/server";
+import * as database from "@server/core/database";
 import * as error from "@server/error";
 
 /* v8 ignore start main cannot be tested */

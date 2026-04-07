@@ -1,4 +1,4 @@
-import * as database from "@server/database";
+import * as database from "@server/core/database";
 import fs from "fs";
 import path from "path";
 

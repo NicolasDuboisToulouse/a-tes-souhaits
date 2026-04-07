@@ -1,4 +1,4 @@
-import { requestTimeout } from "@server/protocol";
+import { requestTimeout } from "@server/core/protocol";
 import { ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
 

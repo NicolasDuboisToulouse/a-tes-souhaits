@@ -1,6 +1,6 @@
 import * as bcrypt from "bcrypt";
-import * as database from "@server/database";
-import { User } from "@server/protocol";
+import * as database from "@server/core/database";
+import { User } from "@server/core/protocol";
 import { ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
 import * as logger from "@shared/logger";

@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import * as database from "@server/database";
-import * as user from "@server/user";
+import * as database from "@server/core/database";
+import * as user from "@server/core/user";
 
-export * from "@server/database";
+export * from "@server/core/database";
 
 function getDatabaseDir(testId: string): string {
   if (typeof process.env.TESTS_TEMP_DIR !== "string") throw new Error("env TESTS_TEMP_DIR is unset!");

@@ -1,4 +1,4 @@
-import { requestDoError } from "@server/protocol";
+import { requestDoError } from "@server/core/protocol";
 import { ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
 

@@ -1,9 +1,9 @@
 import { UserError, ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
-import { requestLogin, requestTokenLogin } from "@server/protocol";
-import * as database from "@server/database";
+import { requestLogin, requestTokenLogin } from "@server/core/protocol";
+import * as database from "@server/core/database";
 import * as logger from "@shared/logger";
-import * as user from "@server/user";
+import * as user from "@server/core/user";
 
 requestLogin((loginInfo, request) => {
   const passwordHash = database.select<string>(

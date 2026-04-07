@@ -1,7 +1,7 @@
 import express from "express";
 import { ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
-import { router as protocolRouter } from "@server/protocol";
+import { router as protocolRouter } from "@server/core/protocol";
 
 const ROOT_URL = "/api/";
 const ROOT_URL_RE = /^\/api\/.*/;

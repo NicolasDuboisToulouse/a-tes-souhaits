@@ -1,4 +1,4 @@
-import { requestHello } from "@server/protocol";
+import { requestHello } from "@server/core/protocol";
 
 requestHello((helloReq) => {
   console.log(helloReq);

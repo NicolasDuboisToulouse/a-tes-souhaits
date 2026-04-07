@@ -1,9 +1,9 @@
-import * as user from "@server/user";
+import * as user from "@server/core/user";
 import * as bcrypt from "bcrypt";
 import * as testDatabase from "./test-database";
 import { clientRequest, isResponseError } from "@tests/server/utils";
-import { createExpressApp } from "@server/server";
-import { LoginInfo } from "@server/protocol";
+import { createExpressApp } from "@server/core/server";
+import { LoginInfo } from "@server/core/protocol";
 
 
 describe("Validate user helper", () => {

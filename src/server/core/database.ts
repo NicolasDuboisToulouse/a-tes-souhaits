@@ -2,7 +2,7 @@ import Sqlite from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import * as logger from "@shared/logger";
-import * as user from "@server/user";
+import * as user from "@server/core/user";
 
 //
 // Initialize and database access
