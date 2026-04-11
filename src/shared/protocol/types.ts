@@ -4,6 +4,7 @@ export type ErrorMessage = {
 
 export type User = {
   userName: string;
+  isAdmin: boolean;
 };
 
 export type LoginInfo = {

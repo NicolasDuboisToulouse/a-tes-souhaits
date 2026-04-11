@@ -74,14 +74,20 @@ describe("Main component", () => {
   });
 
   it("auto-login success", async() => {
-    mockData.tockenLoginResult = { userName: "User" };
+    mockData.tockenLoginResult = {
+      userName: "User",
+      isAdmin: false,
+    };
     render(<Main />);
     expect(requestTokenLogin).toHaveBeenCalled();
     expect(Login).not.toHaveBeenCalled();
     await waitFor(() => {
       expect(Routes).toHaveBeenCalled();
     });
-    expect(useAppStore.getState().user.info).toStrictEqual({ userName: "User" });
+    expect(useAppStore.getState().user.info).toStrictEqual({
+      userName: "User",
+      isAdmin: false,
+    });
   });
 
 });

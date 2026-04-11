@@ -29,14 +29,14 @@ describe("Validate user helper", () => {
       userName: "user1",
       displayName: "user1",
       firstLogin: 0,
-      isAdmin: 1,
+      isAdmin: true,
     });
 
     expect(user.get("user2")).toStrictEqual({
       userName: "user2",
       displayName: "user2",
       firstLogin: 1,
-      isAdmin: 0,
+      isAdmin: false,
     });
 
     expect(() => user.get("not_exists")).toThrow();
@@ -87,7 +87,7 @@ describe("Validate user rest api", () => {
       .expect({
         displayName: "user1",
         firstLogin: 0,
-        isAdmin: 1,
+        isAdmin: true,
         userName: "user1",
       });
   });

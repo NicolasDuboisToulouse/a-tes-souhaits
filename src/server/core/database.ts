@@ -29,7 +29,7 @@ export function get(): Database {
 //
 type SqlType = number | string | null;
 type RowType = Record<string, SqlType>;
-type SelectType = RowType | SqlType;
+type ReturnType = RowType | SqlType;
 
 //
 // Define pluck to clarify statement Cor
@@ -71,11 +71,11 @@ class StatementBase {
 
 //
 // A statement that return data. See also StatementBase.
-// SelectType allows to type the return value (for typescript check & completion).
-//   if statement is not pluck, SelectType type a row. Example: { name: string, age: number }.
-//   if statement is not pluck, SelectType type the first columns. Example: string.
+// ReturnType allows to type the return value (for typescript check & completion).
+//   if statement is not pluck, ReturnType type a row. Example: { name: string, age: number }.
+//   if statement is not pluck, ReturnType type the first columns. Example: string.
 //
-class StatementSelect<SelType extends SelectType> extends StatementBase {
+class StatementSelect<RetType extends ReturnType> extends StatementBase {
   constructor(query: string, pluck?: PluckType) {
     super(query);
     this.stmt.pluck(pluck ? true : false);
@@ -83,16 +83,16 @@ class StatementSelect<SelType extends SelectType> extends StatementBase {
 
   // Get a single row by running the statement. (The first row if several results).
   // ...args: replace '?' in statement query. Order and count must match.
-  // Return SelectType on success, undefined if not found or throw an Error on error.
-  public get(...args: SqlType[]): SelType | undefined {
-    return this.stmt.get(...args) as SelType | undefined;
+  // Return ReturnType on success, undefined if not found or throw an Error on error.
+  public get(...args: SqlType[]): RetType | undefined {
+    return this.stmt.get(...args) as RetType | undefined;
   }
 
   // Get all rows by running the statement.
   // ...args: replace '?' in statement query. Order and count must match.
-  // Return SelectType[] on success (might be empty) or throw an Error on error.
-  public all(...args: SqlType[]): SelType[] {
-    return this.stmt.all(...args) as SelType[];
+  // Return ReturnType[] on success (might be empty) or throw an Error on error.
+  public all(...args: SqlType[]): RetType[] {
+    return this.stmt.all(...args) as RetType[];
   }
 }
 
@@ -106,8 +106,8 @@ export function statement(query: string): StatementBase {
 //
 // Create a statement that return value(s). See StatementSelect.
 //
-export function select<SelType extends SelectType>(query: string, pluck?: PluckType): StatementSelect<SelType> {
-  return new StatementSelect<SelType>(query, pluck);
+export function select<RetType extends ReturnType>(query: string, pluck?: PluckType): StatementSelect<RetType> {
+  return new StatementSelect<RetType>(query, pluck);
 }
 
 

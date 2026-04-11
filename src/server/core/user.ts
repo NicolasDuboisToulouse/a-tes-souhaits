@@ -5,6 +5,11 @@ import { ApplicationError } from "@server/error";
 import * as HTTP from "@shared/httpStatus";
 import * as logger from "@shared/logger";
 
+type SqlUser = {
+  userName: string;
+  isAdmin: number;
+};
+
 export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
 }
@@ -14,7 +19,7 @@ export function checkPassword(password: string, hash: string): boolean {
 }
 
 export function get(userName: string): User {
-  const user = database.select<User>(
+  const user = database.select<SqlUser>(
     "SELECT userName, displayName, firstLogin, isAdmin FROM users WHERE userName=?",
   ).get(userName);
   if (!user) {
@@ -22,5 +27,8 @@ export function get(userName: string): User {
     throw new ApplicationError(HTTP.Status.BadRequest,
       "Unexpected database request");
   }
-  return user;
+  return {
+    ...user,
+    isAdmin: user.isAdmin !== 0,
+  };
 }

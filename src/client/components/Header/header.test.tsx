@@ -24,8 +24,13 @@ describe("Header Component validation", () => {
   });
 
   // Return HeaderDom + MenuDom
-  async function openMenu(): Promise<[HTMLElement, HTMLElement]> {
-    act(() => { useAppStore.getState().user.set({ userName: "AnUser" }); });
+  async function openMenu(isAdmin: boolean = false): Promise<[HTMLElement, HTMLElement]> {
+    act(() => {
+      useAppStore.getState().user.set({
+        userName: "AnUser",
+        isAdmin,
+      });
+    });
     render(
       <BrowserRouter>
         <Header />
@@ -34,6 +39,7 @@ describe("Header Component validation", () => {
 
     expect(useAppStore.getState().user.info).toStrictEqual({
       userName: "AnUser",
+      isAdmin,
     });
     const headerDom = screen.getByRole("header");
     expect(headerDom).toBeInTheDocument();
@@ -105,6 +111,22 @@ describe("Header Component validation", () => {
     expect(gotoAboutDom).toBeInTheDocument();
     await testUser.click(gotoAboutDom);
     expect(mockNavigate).toHaveBeenCalledWith("/about");
+  });
+
+  it("Header gotoAdmin behavior", async() => {
+    const [ _, visibleMenuDom ] = await openMenu(true);
+
+    const gotoAdminDom = within(visibleMenuDom).getByRole("gotoAdmin");
+    expect(gotoAdminDom).toBeInTheDocument();
+    await testUser.click(gotoAdminDom);
+    expect(mockNavigate).toHaveBeenCalledWith("/admin");
+  });
+
+  it("Header gotoAdmin behavior", async() => {
+    const [ _, visibleMenuDom ] = await openMenu(false);
+
+    const gotoAdminDom = within(visibleMenuDom).queryByRole("gotoAdmin");
+    expect(gotoAdminDom).not.toBeInTheDocument();
   });
 
 });

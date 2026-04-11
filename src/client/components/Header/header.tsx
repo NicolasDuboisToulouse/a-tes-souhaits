@@ -62,11 +62,9 @@ export default function Header() {
     { text: "Changer de mot de passe", action() { navigate("/changePassword"); }, role: "changePassword" },
     { text: "À propos", action() { navigate("/about"); }, role: "gotoAbout" },
   ];
-  /*
-  if (user.isAdmin && pathname != '/users/admin') {
-      items.push({ text: "Administration", target: '/users/admin' });
+  if (userState.info.isAdmin) {
+    items.push({ text: "Administration", action() { navigate("/admin"); }, role: "gotoAdmin" });
   }
-   */
 
   return (
     <div role = "header">
