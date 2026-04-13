@@ -4,7 +4,9 @@ export type ErrorMessage = {
 
 export type User = {
   userName: string;
+  displayName: string;
   isAdmin: boolean;
+  firstLogin: boolean;
 };
 
 export type LoginInfo = {

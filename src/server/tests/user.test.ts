@@ -28,14 +28,14 @@ describe("Validate user helper", () => {
     expect(user.get("user1")).toStrictEqual({
       userName: "user1",
       displayName: "user1",
-      firstLogin: 0,
+      firstLogin: false,
       isAdmin: true,
     });
 
     expect(user.get("user2")).toStrictEqual({
       userName: "user2",
       displayName: "user2",
-      firstLogin: 1,
+      firstLogin: true,
       isAdmin: false,
     });
 
@@ -85,10 +85,10 @@ describe("Validate user rest api", () => {
     await clientRequest(app, "/api/user/login", loginInfo)
       .expect("Content-type", /application\/json/)
       .expect({
-        displayName: "user1",
-        firstLogin: 0,
-        isAdmin: true,
         userName: "user1",
+        displayName: "user1",
+        firstLogin: false,
+        isAdmin: true,
       });
   });
 });

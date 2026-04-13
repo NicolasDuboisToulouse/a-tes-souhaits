@@ -7,7 +7,9 @@ import * as logger from "@shared/logger";
 
 type SqlUser = {
   userName: string;
+  displayName: string;
   isAdmin: number;
+  firstLogin: number;
 };
 
 export function hashPassword(password: string): string {
@@ -30,5 +32,6 @@ export function get(userName: string): User {
   return {
     ...user,
     isAdmin: user.isAdmin !== 0,
+    firstLogin: user.firstLogin !== 0,
   };
 }

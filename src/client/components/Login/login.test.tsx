@@ -29,7 +29,9 @@ vi.mock("@client/protocol", async(importOriginal) => {
       if (mockData.loginSucess) return Promise.reject();
       return Promise.resolve<User>({
         userName: request.userName,
+        displayName: "AnUserDisplayName",
         isAdmin: false,
+        firstLogin: false,
       });
     }),
   };
@@ -78,7 +80,9 @@ describe("Login component", () => {
 
     expect(useAppStore.getState().user.info).toStrictEqual({
       userName: "userName",
+      displayName: "AnUserDisplayName",
       isAdmin: false,
+      firstLogin: false,
     });
   });
 });

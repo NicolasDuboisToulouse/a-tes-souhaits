@@ -76,7 +76,9 @@ describe("Main component", () => {
   it("auto-login success", async() => {
     mockData.tockenLoginResult = {
       userName: "User",
+      displayName: "AnUserDisplayName",
       isAdmin: false,
+      firstLogin: false,
     };
     render(<Main />);
     expect(requestTokenLogin).toHaveBeenCalled();
@@ -86,7 +88,9 @@ describe("Main component", () => {
     });
     expect(useAppStore.getState().user.info).toStrictEqual({
       userName: "User",
+      displayName: "AnUserDisplayName",
       isAdmin: false,
+      firstLogin: false,
     });
   });
 

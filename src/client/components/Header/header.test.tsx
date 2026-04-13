@@ -28,7 +28,9 @@ describe("Header Component validation", () => {
     act(() => {
       useAppStore.getState().user.set({
         userName: "AnUser",
+        displayName: "AnUserDisplayName",
         isAdmin,
+        firstLogin: false,
       });
     });
     render(
@@ -39,7 +41,9 @@ describe("Header Component validation", () => {
 
     expect(useAppStore.getState().user.info).toStrictEqual({
       userName: "AnUser",
+      displayName: "AnUserDisplayName",
       isAdmin,
+      firstLogin: false,
     });
     const headerDom = screen.getByRole("header");
     expect(headerDom).toBeInTheDocument();
