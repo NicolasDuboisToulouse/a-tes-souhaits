@@ -6,6 +6,7 @@ import Login from "@client/components/Login";
 import Debug from "@client/components/Debug/debug";
 import ServerError from "@client/components/ServerError";
 import Page404 from "@client/components/Page404";
+import Password from "@client/components/Password";
 
 // Global CSS
 import "./colors.css";
@@ -37,6 +38,7 @@ export default function Main() {
     <Routes>
       <Route path = "" element = {<Debug />} />
       <Route path = "/debug" element = {<Debug />} />
+      <Route path = "/changePassword" element = {<Password />} />
       <Route path = "/error/:message" element = {<ServerError />} />
       <Route path = "*" element = {<Page404 />} />
     </Routes>

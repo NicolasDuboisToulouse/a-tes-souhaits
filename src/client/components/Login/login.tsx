@@ -41,7 +41,9 @@ export default function Login() {
           />
         </label>
       </div>
-      <button type = "submit">Connexion</button>
+      <div className = "button-group">
+        <button type = "submit">Connexion</button>
+      </div>
     </form>
   );
 }

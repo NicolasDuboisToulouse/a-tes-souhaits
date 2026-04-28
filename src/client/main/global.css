@@ -62,9 +62,19 @@ input.invalid {
 }
 
 
-/* Forms (vertical) */
+/* Forms */
 form .form-group {
     margin-bottom: 0.8em;
+}
+
+form .button-group {
+    width: fit-content;
+    margin-left:  auto;
+    margin-right: auto;
+}
+
+form .button-group button {
+    margin-right: 0.2em;
 }
 
 form label {
@@ -72,15 +82,10 @@ form label {
     margin-bottom: 0.2em;
 }
 
-form input/*, form textarea, form .preview*/  {
+form input /*, form textarea, form .preview*/  {
     display: block;
     padding: 0.2em;
-}
-
-form button {
-    display: block;
-    margin-left:  auto;
-    margin-right: auto;
+    width: 100%;
 }
 
 
